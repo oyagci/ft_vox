@@ -1,5 +1,6 @@
 #include <iostream>
 #include "lazy.hpp"
+#include "Cube.hpp"
 
 using namespace lazy;
 using namespace graphics;
@@ -11,23 +12,11 @@ int main()
 	display.enableCap(GL_DEPTH_TEST);
 	display.enableCap(GL_CULL_FACE);
 
-	Mesh mesh;
-	mesh.addPosition(glm::vec3(0, 0, 0))
-			.addPosition(glm::vec3(1, 0, 0))
-			.addPosition(glm::vec3(0, 1, 0))
-			.addTriangle(glm::u32vec3(0, 1, 2));
-	mesh.build();
-
-	Shader shader;
-	shader.addVertexShader("./shaders/basic.vs.glsl")
-			.addFragmentShader("shaders/basic.fs.glsl");
-	shader.link();
-
 	Camera camera(display, (maths::transform){glm::vec3(0, 0, 5), glm::quat(), glm::vec3(1), nullptr});
 	camera.setProjection(70.0f, 0.1f, 1000.0f);
 
-	float angle = 0;
-	int frames = 0;
+	Cube cube(&camera, 0, 0, 0);
+
 	double startTime = glfwGetTime();
 	while (!display.isClosed())
 	{
@@ -47,7 +36,7 @@ int main()
 				std::cout << "E UP" << std::endl;
 
 //			std::cout << input::getMouse().getPosition().x << " " << input::getMouse().getPosition().y << std::endl;
-			std::cout << input::getMouse().getVelocity().x << " " << input::getMouse().getVelocity().y << std::endl;
+//			std::cout << input::getMouse().getVelocity().x << " " << input::getMouse().getVelocity().y << std::endl;
 
 			if (input::getMouse().getButtonDown(0))
 				std::cout << "LOL DOWN" << std::endl;
@@ -61,14 +50,7 @@ int main()
 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		shader.bind();
-		shader.setUniform4x4f("projectionMatrix", camera.getProjectionMatrix());
-		shader.setUniform4x4f("viewMatrix", camera.getViewMatrix());
-		shader.setUniform4x4f("viewProjectionMatrix", camera.getViewProjectionMatrix());
-
-		angle += 0.0001f;
-		shader.setUniform4x4f("modelMatrix", glm::rotate(angle, glm::vec3(1, 1, 0)));
-		mesh.draw();
+		cube.onDraw();
 	}
 
 	return 0;
