@@ -10,18 +10,22 @@ using namespace lazy::graphics;
 class Chunk
 {
 public:
+	typedef unsigned char Block;
+	typedef std::array<std::array<std::array<Block, 16>, 16>, 256> Blocks; // [Height][X][Y]
+
+public:
 	Chunk(Shader *shader);
 
-	void onRender();
 	void onUpdate();
 
-private:
-	void initMesh();
+	// Getters
+	const Blocks &getBlocks() const { return _blocks; };
+	const Block getBlockAt(std::size_t x, std::size_t y, std::size_t z) const
+	{ 
+		return _blocks[x][y][z];
+	}
 
 private:
-	char _blocks[256][16][16];
-	Shader *_shader;
+	Blocks _blocks;
 	glm::vec3 _pos;
-	glm::mat4 _model;
-	InstancedMesh _mesh;
 };

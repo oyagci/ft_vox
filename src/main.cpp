@@ -3,6 +3,7 @@
 #include "Cube.hpp"
 #include "Chunk.hpp"
 #include "Time.hpp"
+#include "ChunkRenderer.hpp"
 
 using namespace lazy;
 using namespace graphics;
@@ -15,36 +16,39 @@ int main()
 	display.enableCap(GL_DEPTH_TEST);
 	display.enableCap(GL_CULL_FACE);
 
-	Camera camera(display, (maths::transform){glm::vec3(0, 0, 5), glm::quat(), glm::vec3(1), nullptr});
-	camera.setProjection(70.0f, 0.1f, 1000.0f);
-
-	Cube cube(&camera, 0, 0, 0);
+	Mesh mesh;
+	mesh.addPosition(glm::vec3(0, 0, 0))
+		.addPosition(glm::vec3(1, 0, 0))
+		.addPosition(glm::vec3(0, 1, 0))
+		.addTriangle(glm::u32vec3(0, 1, 2));
+	mesh.build();
 
 	Shader shader;
-
 	shader.addVertexShader("shaders/basic.vs.glsl")
-		.addFragmentShader("shaders/basic.fs.glsl");
+			.addFragmentShader("shaders/basic.fs.glsl");
 	shader.link();
-	shader.bind();
-	shader.setUniform4x4f("projectionMatrix", camera.getProjectionMatrix());
-	shader.setUniform4x4f("viewMatrix", camera.getViewMatrix());
-	shader.setUniform4x4f("viewProjectionMatrix", camera.getViewProjectionMatrix());
-	shader.unbind();
+
+	glm::vec3 camPos(0, 20, 50);
+
+	Camera camera(display, (maths::transform){camPos, glm::quat(), glm::vec3(1), nullptr});
+	camera.setProjection(70.0f, 0.1f, 1000.0f);
 
 	Chunk chunk(&shader);
 
-	glm::vec3 camPos(0, 0, 5);
+	ChunkRenderer renderer;
 
+	renderer.setChunk(std::move(chunk));
+	renderer.onTessellate();
+
+	float ms = 10.0f;
 	while (!display.isClosed())
 	{
 		Time::instance().update();
 		display.update();
-		camera.update();
 		display.updateInputs();
+		camera.update();
 
 		float deltaTime = Time::getDeltaTime();
-
-		float ms = 10.0f;
 		if (input::getKeyboard().getKey(GLFW_KEY_W)) {
 			camPos += deltaTime * vec3(0, 0, 1) * -ms;
 			camera.setPosition(std::move(camPos));
@@ -76,13 +80,14 @@ int main()
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		shader.bind();
-			shader.setUniform4x4f("projectionMatrix", camera.getProjectionMatrix());
-			shader.setUniform4x4f("viewMatrix", camera.getViewMatrix());
-			shader.setUniform4x4f("viewProjectionMatrix", camera.getViewProjectionMatrix());
-		shader.unbind();
+		shader.setUniform4x4f("projectionMatrix", camera.getProjectionMatrix());
+		shader.setUniform4x4f("viewMatrix", camera.getViewMatrix());
+		shader.setUniform4x4f("viewProjectionMatrix", camera.getViewProjectionMatrix());
 
-		chunk.onRender();
+		shader.setUniform4x4f("modelMatrix", glm::mat4(1.0f));
+		mesh.draw();
+		renderer.onRender();
 	}
 
-	return 0;
+	return EXIT_SUCCESS;
 }
