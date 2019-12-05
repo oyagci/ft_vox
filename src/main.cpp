@@ -69,6 +69,9 @@ int main()
 			camPos += deltaTime * vec3(0, 1, 0) * -ms;
 			camera.setPosition(std::move(camPos));
 		}
+		if (input::getKeyboard().getKey(GLFW_KEY_ESCAPE)) {
+			glfwSetWindowShouldClose(display.getWindow(), GLFW_TRUE);
+		}
 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
