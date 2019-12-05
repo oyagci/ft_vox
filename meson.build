@@ -7,6 +7,8 @@ srcs = [
 	'src/SimplexNoise.cpp',
 	'src/noiseTest.cpp',
 	'src/Cube.cpp',
+	'src/Chunk.cpp',
+	'src/InstancedMesh.cpp',
 ]
 
 cmake = import('cmake')

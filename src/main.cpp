@@ -1,10 +1,13 @@
 #include <iostream>
 #include "lazy.hpp"
 #include "Cube.hpp"
+#include "Chunk.hpp"
+#include "Time.hpp"
 
 using namespace lazy;
 using namespace graphics;
 using namespace inputs;
+using namespace utils;
 
 int main()
 {
@@ -17,40 +20,65 @@ int main()
 
 	Cube cube(&camera, 0, 0, 0);
 
-	double startTime = glfwGetTime();
+	Shader shader;
+
+	shader.addVertexShader("shaders/basic.vs.glsl")
+		.addFragmentShader("shaders/basic.fs.glsl");
+	shader.link();
+	shader.bind();
+	shader.setUniform4x4f("projectionMatrix", camera.getProjectionMatrix());
+	shader.setUniform4x4f("viewMatrix", camera.getViewMatrix());
+	shader.setUniform4x4f("viewProjectionMatrix", camera.getViewProjectionMatrix());
+	shader.unbind();
+
+	Chunk chunk(&shader);
+
+	glm::vec3 camPos(0, 0, 5);
+
 	while (!display.isClosed())
 	{
+		Time::instance().update();
 		display.update();
 		camera.update();
+		display.updateInputs();
 
-		double currentTime = glfwGetTime();
-		if (currentTime - startTime >= 1.0 / 60.0)
-		{
-			display.updateInputs();
+		float deltaTime = Time::getDeltaTime();
 
-			if (input::getKeyboard().getKeyDown(GLFW_KEY_E))
-				std::cout << "E DOWN" << std::endl;
-			if (input::getKeyboard().getKey(GLFW_KEY_E))
-				std::cout << "E" << std::endl;
-			if (input::getKeyboard().getKeyUp(GLFW_KEY_E))
-				std::cout << "E UP" << std::endl;
-
-//			std::cout << input::getMouse().getPosition().x << " " << input::getMouse().getPosition().y << std::endl;
-//			std::cout << input::getMouse().getVelocity().x << " " << input::getMouse().getVelocity().y << std::endl;
-
-			if (input::getMouse().getButtonDown(0))
-				std::cout << "LOL DOWN" << std::endl;
-			if (input::getMouse().getButton(0))
-				std::cout << "LOL" << std::endl;
-			if (input::getMouse().getButtonUp(0))
-				std::cout << "LOL UP" << std::endl;
-
-			startTime = currentTime;
+		float ms = 10.0f;
+		if (input::getKeyboard().getKey(GLFW_KEY_W)) {
+			camPos += deltaTime * vec3(0, 0, 1) * -ms;
+			camera.setPosition(std::move(camPos));
+		}
+		if (input::getKeyboard().getKey(GLFW_KEY_S)) {
+			camPos += deltaTime * vec3(0, 0, 1) * ms;
+			camera.setPosition(std::move(camPos));
+		}
+		if (input::getKeyboard().getKey(GLFW_KEY_D)) {
+			camPos += deltaTime * vec3(1, 0, 0) * ms;
+			camera.setPosition(std::move(camPos));
+		}
+		if (input::getKeyboard().getKey(GLFW_KEY_A)) {
+			camPos += deltaTime * vec3(1, 0, 0) * -ms;
+			camera.setPosition(std::move(camPos));
+		}
+		if (input::getKeyboard().getKey(GLFW_KEY_SPACE)) {
+			camPos += deltaTime * vec3(0, 1, 0) * ms;
+			camera.setPosition(std::move(camPos));
+		}
+		if (input::getKeyboard().getKey(GLFW_KEY_LEFT_CONTROL)) {
+			camPos += deltaTime * vec3(0, 1, 0) * -ms;
+			camera.setPosition(std::move(camPos));
 		}
 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		cube.onDraw();
+		shader.bind();
+			shader.setUniform4x4f("projectionMatrix", camera.getProjectionMatrix());
+			shader.setUniform4x4f("viewMatrix", camera.getViewMatrix());
+			shader.setUniform4x4f("viewProjectionMatrix", camera.getViewProjectionMatrix());
+		shader.unbind();
+
+		chunk.onRender();
 	}
 
 	return 0;

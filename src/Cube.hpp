@@ -6,7 +6,7 @@
 using namespace lazy::graphics;
 using namespace glm;
 
-class Cube
+class Cube : public Mesh
 {
 public:
 	Cube(Camera *c, glm::vec3 pos);

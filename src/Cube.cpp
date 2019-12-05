@@ -4,7 +4,7 @@ using namespace lazy::graphics;
 using namespace glm;
 
 Cube::Cube(Camera *c, float x, float y, float z)
-	: Cube(c, glm::vec3(x, y, z))
+	: Cube(c, std::move(glm::vec3(x, y, z)))
 {
 }
 
@@ -39,12 +39,6 @@ Cube::Cube(Camera *c, glm::vec3 pos)
 		   .addFragmentShader("shaders/basic.fs.glsl");
 	_shader.link();
 
-}
-
-void Cube::onDraw()
-{
-	glm::mat4 model(1.0f);
-
 	_shader.bind();
 	_shader.setUniform4x4f("projectionMatrix",
 		_camera->getProjectionMatrix());
@@ -52,6 +46,18 @@ void Cube::onDraw()
 		_camera->getViewMatrix());
 	_shader.setUniform4x4f("viewProjectionMatrix",
 		_camera->getViewProjectionMatrix());
+	_shader.unbind();
+
+}
+
+void Cube::onDraw()
+{
+	glm::mat4 model(1.0f);
+
+	model = glm::translate(model, _position);
+
+	_shader.bind();
 	_shader.setUniform4x4f("modelMatrix", model);
 	_mesh.draw();
+	_shader.unbind();
 }
