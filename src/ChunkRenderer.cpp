@@ -6,7 +6,7 @@ std::ostream& operator<<(std::ostream& os, const glm::vec3& v) {
 	return os;
 }
 
-ChunkRenderer::ChunkRenderer() : _chunk(nullptr)
+ChunkRenderer::ChunkRenderer()
 {
 	glm::vec3 vertices[] = {
 		glm::vec3(0, 0,  0), glm::vec3(1, 0,  0), glm::vec3(1, 1,  0), glm::vec3(0, 1,  0),
@@ -30,9 +30,9 @@ ChunkRenderer::ChunkRenderer() : _chunk(nullptr)
 	_mesh.build();
 }
 
-void ChunkRenderer::setChunk(Chunk chunk)
+void ChunkRenderer::addChunk(Chunk chunk)
 {
-	_chunk = std::move(chunk);
+	_chunks.push_back(std::move(chunk));
 }
 
 void ChunkRenderer::setShader(Shader *shader)
@@ -45,16 +45,16 @@ void ChunkRenderer::onRender()
 	_mesh.draw();
 }
 
-int ChunkRenderer::getVisibleFaces(int x, int y, int z)
+int ChunkRenderer::getVisibleFaces(Chunk &chunk, int x, int y, int z)
 {
 	int result = 0;
 
-	bool top    = (_chunk.getBlock(x, y + 1, z) == 0);
-	bool bottom = (_chunk.getBlock(x, y - 1, z) == 0);
-	bool left   = (_chunk.getBlock(x - 1, y, z) == 0);
-	bool right  = (_chunk.getBlock(x + 1, y, z) == 0);
-	bool front  = (_chunk.getBlock(x, y, z + 1) == 0);
-	bool back   = (_chunk.getBlock(x, y, z - 1) == 0);
+	bool top    = (chunk.getBlock(x, y + 1, z) == 0);
+	bool bottom = (chunk.getBlock(x, y - 1, z) == 0);
+	bool left   = (chunk.getBlock(x - 1, y, z) == 0);
+	bool right  = (chunk.getBlock(x + 1, y, z) == 0);
+	bool front  = (chunk.getBlock(x, y, z + 1) == 0);
+	bool back   = (chunk.getBlock(x, y, z - 1) == 0);
 
 	result |= top    ? 0 : 1 << 0;
 	result |= bottom ? 0 : 1 << 1;
@@ -66,17 +66,17 @@ int ChunkRenderer::getVisibleFaces(int x, int y, int z)
 	return result;
 }
 
-void ChunkRenderer::update()
+void ChunkRenderer::updateChunk(Chunk &chunk)
 {
 	for (std::size_t x = 0; x < Chunk::CHUNK_SIZE; x++) {
 		for (std::size_t y = 0; y < Chunk::CHUNK_SIZE; y++) {
 			for (std::size_t z = 0; z < Chunk::CHUNK_SIZE; z++) {
 
-				Chunk::Block b = _chunk.getBlock(x, y, z);
+				Chunk::Block b = chunk.getBlock(x, y, z);
 
 				if (b != 0) { continue; }
 
-				int faces = getVisibleFaces(x, y, z);
+				int faces = getVisibleFaces(chunk, x, y, z);
 
 				if (faces & (1 << 0)) { // Top
 					addBlockToRender(std::move(glm::u32vec3(x, y + 1, z)));
@@ -99,12 +99,19 @@ void ChunkRenderer::update()
 			}
 		}
 	}
-	buildChunkMesh();
+	buildChunkMesh(chunk);
 }
 
-void ChunkRenderer::buildChunkMesh()
+void ChunkRenderer::update()
 {
-	Mesh chunk;
+	for (auto &c : _chunks) {
+		updateChunk(c);
+	}
+}
+
+void ChunkRenderer::buildChunkMesh(Chunk &chunk)
+{
+	Mesh mesh;
 
 	std::vector<glm::vec3> chunkVerts;
 	std::vector<glm::vec3> chunkTris;
@@ -139,14 +146,14 @@ void ChunkRenderer::buildChunkMesh()
 
 	// Add every vertices and triangles of the chunk to its mesh
 	for (auto &v : chunkVerts) {
-		chunk.addPosition(v);
+		mesh.addPosition(v);
 	}
 	for (auto &t : chunkTris) {
-		chunk.addTriangle(t);
+		mesh.addTriangle(t);
 	}
-	chunk.build();
+	mesh.build();
 
-	_mesh = std::move(chunk);
+	_mesh = std::move(mesh);
 }
 
 void ChunkRenderer::addBlockToRender(glm::vec3 pos)

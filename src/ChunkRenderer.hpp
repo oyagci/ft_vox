@@ -11,18 +11,20 @@ public:
 
 	void onRender();
 	void update();
+	void updateChunk(Chunk &chunk);
 
-	int getVisibleFaces(int x, int y, int z);
+	int getVisibleFaces(Chunk &chunk, int x, int y, int z);
 
 	void addBlockToRender(glm::vec3 pos);
-	void buildChunkMesh();
+	void buildChunkMesh(Chunk &chunk);
+
+	void addChunk(Chunk chunk);
 
 	// Setters
-	void setChunk(Chunk chunk);
 	void setShader(Shader *shader);
 
 private:
-	Chunk _chunk;
+	std::vector<Chunk> _chunks;
 	std::vector<glm::vec3> _blocks;
 	Shader *_shader;
 	Mesh _mesh;

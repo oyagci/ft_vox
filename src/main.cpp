@@ -37,7 +37,7 @@ int main()
 	Chunk chunk(&shader);
 	ChunkRenderer chunkRenderer;
 
-	chunkRenderer.setChunk(std::move(chunk));
+	chunkRenderer.addChunk(std::move(chunk));
 	chunkRenderer.setShader(&shader);
 	chunkRenderer.update();
 
