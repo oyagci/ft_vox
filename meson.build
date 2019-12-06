@@ -11,6 +11,7 @@ srcs = [
 	'src/InstancedMesh.cpp',
 	'src/ChunkRenderer.cpp',
 	'src/ChunkFactory.cpp',
+	'src/TextRenderer.cpp',
 ]
 
 cmake = import('cmake')
@@ -27,8 +28,9 @@ xi = dependency('xi', required : true)
 xrandr = dependency('xrandr', required : true)
 dl = meson.get_compiler('cpp').find_library('dl')
 m = meson.get_compiler('cpp').find_library('m')
+ft = meson.get_compiler('cpp').find_library('freetype')
 
 executable('ft_vox',
 	srcs,
-	include_directories : include_directories('src/'),
-	dependencies: [ dep_lazyGL, pthread, glew, glfw, x11, xi, xrandr, dl, m ])
+	include_directories : include_directories(['src/', '/usr/include/freetype2/']),
+	dependencies: [ dep_lazyGL, pthread, glew, glfw, x11, xi, xrandr, dl, m, ft ])

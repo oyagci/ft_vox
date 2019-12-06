@@ -6,6 +6,7 @@
 #include "Chunk.hpp"
 #include "ChunkRenderer.hpp"
 #include "ChunkFactory.hpp"
+#include "TextRenderer.hpp"
 
 using namespace lazy;
 using namespace graphics;
@@ -17,6 +18,8 @@ int main()
 	Display display("LazyGL", 1280, 720);
 	display.enableCap(GL_DEPTH_TEST);
 	display.enableCap(GL_CULL_FACE);
+	display.enableCap(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	Mesh mesh;
 	mesh.addPosition(glm::vec3(0, 0, 0))
@@ -24,6 +27,8 @@ int main()
 		.addPosition(glm::vec3(0, 1, 0))
 		.addTriangle(glm::u32vec3(0, 1, 2));
 	mesh.build();
+
+	TextRenderer tr;
 
 	Shader shader;
 	shader.addVertexShader("shaders/basic.vs.glsl")
@@ -98,6 +103,8 @@ int main()
 		shader.setUniform4x4f("modelMatrix", glm::mat4(1.0f));
 		mesh.draw();
 		chunkRenderer.onRender();
+
+		tr.drawText("ft_vox", glm::vec2(10, 10), .3f, glm::vec3(1.0f));
 	}
 
 	return EXIT_SUCCESS;
