@@ -7,25 +7,27 @@ Chunk::Chunk(Shader *shader)
 {
 	SimplexNoise sn;
 
+	SimplexNoise s = SimplexNoise(0.01f, 1.0f, 2.0f, 0.25f);
 
 	__builtin_memset(_blocks, 0, sizeof(_blocks));
 
-	for (int x = 0; x < 16; x++) {
-		for (int y = 0; y < 16; y++) {
-			for (int z = 0; z < 16; z++) {
-				getBlock(x, z, y) = 3 * sn.noise(x, z, y) > 1.1;
+	for (std::size_t x = 0; x < CHUNK_SIZE; x++) {
+		for (std::size_t y = 0; y < CHUNK_SIZE; y++) {
+			for (std::size_t z = 0; z < CHUNK_SIZE; z++) {
+				float result = s.fractal(2, x, y, z);
+				getBlock(x, y, z) = (result > 0.2f ? 1 : 0);
 			}
 		}
 	}
 }
 
-Chunk::Block &Chunk::getBlock(int x, int y, int z)
+Chunk::Block &Chunk::getBlock(std::size_t x, std::size_t y, std::size_t z)
 {
-	if (x < 0 || y < 0 || z < 0 || x >= 16 || y >= 16 || z >= 16) {
+	if (x < 0 || y < 0 || z < 0 || x >= CHUNK_SIZE || y >= CHUNK_SIZE || z >= CHUNK_SIZE) {
 		return (_void);
 	}
 
-	return _blocks[x * 16 * 16 + y * 16 + z];
+	return _blocks[x * CHUNK_SIZE * CHUNK_SIZE + y * CHUNK_SIZE + z];
 }
 
 //void Chunk::initMesh()

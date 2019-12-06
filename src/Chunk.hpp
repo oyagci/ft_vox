@@ -12,12 +12,14 @@ class Chunk
 public:
 	typedef char Block;
 
+	static constexpr std::size_t CHUNK_SIZE = 128;
+
 public:
 	Chunk(Shader *shader);
 
-	Block &getBlock(int x, int y, int z);
+	Block &getBlock(std::size_t x, std::size_t y, std::size_t z);
 
 private:
-	Block _blocks[16 * 16 * 16];
+	Block _blocks[CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE];
 	Block _void = 0;
 };

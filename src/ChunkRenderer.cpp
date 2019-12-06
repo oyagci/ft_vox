@@ -76,10 +76,9 @@ int ChunkRenderer::getVisibleFaces(int x, int y, int z)
 
 void ChunkRenderer::update()
 {
-	std::size_t nbBlocks = 0;
-	for (int x = 0; x < 16; x++) {
-		for (int y = 0; y < 16; y++) {
-			for (int z = 0; z < 16; z++) {
+	for (std::size_t x = 0; x < Chunk::CHUNK_SIZE; x++) {
+		for (std::size_t y = 0; y < Chunk::CHUNK_SIZE; y++) {
+			for (std::size_t z = 0; z < Chunk::CHUNK_SIZE; z++) {
 
 				Chunk::Block b = _chunk.getBlock(x, y, z);
 
@@ -108,6 +107,11 @@ void ChunkRenderer::update()
 			}
 		}
 	}
+	buildChunkMesh();
+}
+
+void ChunkRenderer::buildChunkMesh()
+{
 }
 
 void ChunkRenderer::addBlockToRender(glm::vec3 pos)

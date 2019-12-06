@@ -15,6 +15,7 @@ public:
 	int getVisibleFaces(int x, int y, int z);
 
 	void addBlockToRender(glm::vec3 pos);
+	void buildChunkMesh();
 
 	// Setters
 	void setChunk(Chunk chunk);
