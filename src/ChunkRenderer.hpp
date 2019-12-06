@@ -27,5 +27,5 @@ private:
 	std::vector<Chunk> _chunks;
 	std::vector<glm::vec3> _blocks;
 	Shader *_shader;
-	Mesh _mesh;
+	std::vector<Mesh> _meshes;
 };

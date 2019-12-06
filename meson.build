@@ -9,7 +9,8 @@ srcs = [
 	'src/Cube.cpp',
 	'src/Chunk.cpp',
 	'src/InstancedMesh.cpp',
-	'src/ChunkRenderer.cpp'
+	'src/ChunkRenderer.cpp',
+	'src/ChunkFactory.cpp',
 ]
 
 cmake = import('cmake')

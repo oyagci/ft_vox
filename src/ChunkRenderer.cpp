@@ -8,26 +8,6 @@ std::ostream& operator<<(std::ostream& os, const glm::vec3& v) {
 
 ChunkRenderer::ChunkRenderer()
 {
-	glm::vec3 vertices[] = {
-		glm::vec3(0, 0,  0), glm::vec3(1, 0,  0), glm::vec3(1, 1,  0), glm::vec3(0, 1,  0),
-		glm::vec3(0, 0, -1), glm::vec3(1, 0, -1), glm::vec3(1, 1, -1), glm::vec3(0, 1, -1),
-	};
-	glm::vec3 triangles[] = {
-		glm::vec3(0, 1, 2), glm::vec3(0, 2, 3), // Front
-		glm::vec3(6, 5, 4), glm::vec3(7, 6, 4), // Back
-		glm::vec3(0, 3, 7), glm::vec3(0, 7, 4), // Left
-		glm::vec3(1, 5, 6), glm::vec3(1, 6, 2), // Right
-		glm::vec3(3, 2, 6), glm::vec3(3, 6, 7), // Top
-		glm::vec3(0, 5, 1), glm::vec3(0, 4, 5), // Bottom
-	};
-
-	for (auto &v : vertices) {
-		_mesh.addPosition(std::move(v));
-	}
-	for (auto &t : triangles) {
-		_mesh.addTriangle(std::move(t));
-	}
-	_mesh.build();
 }
 
 void ChunkRenderer::addChunk(Chunk chunk)
@@ -42,7 +22,9 @@ void ChunkRenderer::setShader(Shader *shader)
 
 void ChunkRenderer::onRender()
 {
-	_mesh.draw();
+	for (auto &m : _meshes) {
+		m.draw();
+	}
 }
 
 int ChunkRenderer::getVisibleFaces(Chunk &chunk, int x, int y, int z)
@@ -104,6 +86,8 @@ void ChunkRenderer::updateChunk(Chunk &chunk)
 
 void ChunkRenderer::update()
 {
+	_meshes.clear();
+
 	for (auto &c : _chunks) {
 		updateChunk(c);
 	}
@@ -145,15 +129,18 @@ void ChunkRenderer::buildChunkMesh(Chunk &chunk)
 	}
 
 	// Add every vertices and triangles of the chunk to its mesh
+	glm::vec3 worldPos = glm::vec3(chunk.getPos().x, 0.0f, chunk.getPos().y);
+	std::cout << worldPos << std::endl;
 	for (auto &v : chunkVerts) {
-		mesh.addPosition(v);
+		glm::vec3 finalPos = v + worldPos;
+		mesh.addPosition(std::move(finalPos));
 	}
 	for (auto &t : chunkTris) {
 		mesh.addTriangle(t);
 	}
 	mesh.build();
 
-	_mesh = std::move(mesh);
+	_meshes.push_back(std::move(mesh));
 }
 
 void ChunkRenderer::addBlockToRender(glm::vec3 pos)

@@ -5,6 +5,7 @@
 #include "Time.hpp"
 #include "Chunk.hpp"
 #include "ChunkRenderer.hpp"
+#include "ChunkFactory.hpp"
 
 using namespace lazy;
 using namespace graphics;
@@ -34,14 +35,19 @@ int main()
 	Camera camera(display, (maths::transform){camPos, glm::quat(), glm::vec3(1), nullptr});
 	camera.setProjection(70.0f, 0.1f, 1000.0f);
 
-	Chunk chunk(std::move(glm::vec2(0.0f, 0.0f)));
+	ChunkFactory cf;
+
+	std::unique_ptr<Chunk> c1 = cf.getChunk();
+	std::unique_ptr<Chunk> c2 = cf.getChunk();
+
 	ChunkRenderer chunkRenderer;
 
-	chunkRenderer.addChunk(std::move(chunk));
+	chunkRenderer.addChunk(std::move(*c1));
+	chunkRenderer.addChunk(std::move(*c2));
 	chunkRenderer.setShader(&shader);
 	chunkRenderer.update();
 
-	float ms = 10.0f;
+	float ms = 30.0f;
 	while (!display.isClosed())
 	{
 		Time::instance().update();
