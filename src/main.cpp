@@ -7,6 +7,7 @@
 #include "ChunkRenderer.hpp"
 #include "ChunkFactory.hpp"
 #include "TextRenderer.hpp"
+#include "FPSCounter.hpp"
 
 using namespace lazy;
 using namespace graphics;
@@ -56,6 +57,8 @@ int main()
 	chunkRenderer.setShader(&shader);
 	chunkRenderer.update();
 
+	FPSCounter fpsCounter;
+
 	float ms = 30.0f;
 	while (!display.isClosed())
 	{
@@ -65,6 +68,9 @@ int main()
 		camera.update();
 
 		float deltaTime = Time::getDeltaTime();
+
+		fpsCounter.update(deltaTime);
+
 		if (input::getKeyboard().getKey(GLFW_KEY_W)) {
 			camPos += deltaTime * vec3(0, 0, 1) * -ms;
 			camera.setPosition(std::move(camPos));
@@ -104,7 +110,7 @@ int main()
 		mesh.draw();
 		chunkRenderer.onRender();
 
-		tr.drawText("ft_vox", glm::vec2(10, 10), .3f, glm::vec3(1.0f));
+		tr.drawText(std::to_string(fpsCounter.getFPS()) + " FPS", glm::vec2(10, 10), .3f, glm::vec3(1.0f));
 	}
 
 	return EXIT_SUCCESS;
