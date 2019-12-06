@@ -42,15 +42,7 @@ void ChunkRenderer::setShader(Shader *shader)
 
 void ChunkRenderer::onRender()
 {
-	// Draw each visible block
-	for (auto &b : _blocks) {
-
-		glm::mat4 model(1.0f);
-
-		model = glm::translate(model, b);
-		_shader->setUniform4x4f("modelMatrix", std::move(model));
-		_mesh.draw();
-	}
+	_mesh.draw();
 }
 
 int ChunkRenderer::getVisibleFaces(int x, int y, int z)
@@ -112,6 +104,49 @@ void ChunkRenderer::update()
 
 void ChunkRenderer::buildChunkMesh()
 {
+	Mesh chunk;
+
+	std::vector<glm::vec3> chunkVerts;
+	std::vector<glm::vec3> chunkTris;
+	std::size_t nTris = 0;
+
+	// Base cube vertices and triangles used to build the chunk's mesh
+	std::array<glm::vec3, 8> vertices = {
+		glm::vec3(0, 0,  0), glm::vec3(1, 0,  0), glm::vec3(1, 1,  0), glm::vec3(0, 1,  0),
+		glm::vec3(0, 0, -1), glm::vec3(1, 0, -1), glm::vec3(1, 1, -1), glm::vec3(0, 1, -1),
+	};
+	std::array<glm::u32vec3, 12> triangles = {
+		glm::u32vec3(0, 1, 2), glm::u32vec3(0, 2, 3), // Front
+		glm::u32vec3(6, 5, 4), glm::u32vec3(7, 6, 4), // Back
+		glm::u32vec3(0, 3, 7), glm::u32vec3(0, 7, 4), // Left
+		glm::u32vec3(1, 5, 6), glm::u32vec3(1, 6, 2), // Right
+		glm::u32vec3(3, 2, 6), glm::u32vec3(3, 6, 7), // Top
+		glm::u32vec3(0, 5, 1), glm::u32vec3(0, 4, 5), // Bottom
+	};
+
+	// Gather all vertices and triangles into two vectors
+	for (auto &b : _blocks) {
+		for (auto &v : vertices) {
+			glm::vec3 verts = v + b;
+			chunkVerts.push_back(std::move(verts));
+		}
+		for (auto &t : triangles) {
+			glm::u32vec3 inds(t.x + nTris, t.y + nTris, t.z + nTris);
+			chunkTris.push_back(std::move(inds));
+		}
+		nTris += vertices.size();
+	}
+
+	// Add every vertices and triangles of the chunk to its mesh
+	for (auto &v : chunkVerts) {
+		chunk.addPosition(v);
+	}
+	for (auto &t : chunkTris) {
+		chunk.addTriangle(t);
+	}
+	chunk.build();
+
+	_mesh = std::move(chunk);
 }
 
 void ChunkRenderer::addBlockToRender(glm::vec3 pos)
