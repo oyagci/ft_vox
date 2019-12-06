@@ -37,13 +37,17 @@ int main()
 
 	ChunkFactory cf;
 
-	std::unique_ptr<Chunk> c1 = cf.getChunk();
-	std::unique_ptr<Chunk> c2 = cf.getChunk();
+	std::vector<std::unique_ptr<Chunk>> chunks;
+	for (std::size_t i = 0; i < 64; i++) {
+		std::unique_ptr<Chunk> c = cf.getChunk();
+		chunks.push_back(std::move(c));
+	}
 
 	ChunkRenderer chunkRenderer;
 
-	chunkRenderer.addChunk(std::move(*c1));
-	chunkRenderer.addChunk(std::move(*c2));
+	for (auto &c : chunks) {
+		chunkRenderer.addChunk(std::move(*c));
+	}
 	chunkRenderer.setShader(&shader);
 	chunkRenderer.update();
 

@@ -9,7 +9,13 @@ std::unique_ptr<Chunk> ChunkFactory::getChunk()
 {
 	std::unique_ptr<Chunk> chunk = std::make_unique<Chunk>(_nextChunkPos);
 
-	_nextChunkPos += glm::vec2(_nextChunkPos.x + 64.0f, _nextChunkPos.y + 64.0f);
+	if (_nextChunkPos.x > 512) {
+		_nextChunkPos += glm::vec2(0.0f, 64.0f);
+		_nextChunkPos.x = 0.0f;
+	}
+	else {
+		_nextChunkPos += glm::vec2(64.0f, 0.0f);
+	}
 
 	return chunk;
 }

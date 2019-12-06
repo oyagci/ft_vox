@@ -13,9 +13,7 @@ Chunk::Chunk(glm::vec2 pos)
 	for (std::size_t x = 0; x < CHUNK_SIZE; x++) {
 		for (std::size_t y = 0; y < CHUNK_SIZE; y++) {
 			for (std::size_t z = 0; z < CHUNK_SIZE; z++) {
-				float result = s.fractal(2,
-					_worldPos.x + x, _worldPos.y + y,
-					z);
+				float result = s.fractal(2, _worldPos.x + x, y, _worldPos.y + z);
 				getBlock(x, y, z) = (result > 0.2f ? 1 : 0);
 			}
 		}
