@@ -22,13 +22,6 @@ int main()
 	display.enableCap(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-	Mesh mesh;
-	mesh.addPosition(glm::vec3(0, 0, 0))
-		.addPosition(glm::vec3(1, 0, 0))
-		.addPosition(glm::vec3(0, 1, 0))
-		.addTriangle(glm::u32vec3(0, 1, 2));
-	mesh.build();
-
 	TextRenderer tr;
 
 	Shader shader;
@@ -36,7 +29,7 @@ int main()
 			.addFragmentShader("shaders/basic.fs.glsl");
 	shader.link();
 
-	glm::vec3 camPos(0, 20, 50);
+	glm::vec3 camPos(0, 64, 300);
 
 	Camera camera(display, (maths::transform){camPos, glm::quat(), glm::vec3(1), nullptr});
 	camera.setProjection(70.0f, 0.1f, 1000.0f);
@@ -107,7 +100,6 @@ int main()
 		shader.setUniform4x4f("viewProjectionMatrix", camera.getViewProjectionMatrix());
 
 		shader.setUniform4x4f("modelMatrix", glm::mat4(1.0f));
-		mesh.draw();
 		chunkRenderer.onRender();
 
 		tr.drawText(std::to_string(fpsCounter.getFPS()) + " FPS", glm::vec2(10, 10), .3f, glm::vec3(1.0f));
