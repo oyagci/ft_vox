@@ -1,23 +1,31 @@
 #include "Chunk.hpp"
 #include <cstdint>
 #include "Cube.hpp"
+#include "SimplexNoise.hpp"
 
 Chunk::Chunk(Shader *shader)
-	: _pos(glm::vec3(0.0f))
 {
-	_blocks = Blocks{
-		std::array<std::array<Block, 16>, 16>{
-			std::array<Block, 16>{ 0 }
-		}
-   	};
+	SimplexNoise sn;
 
-	for (std::size_t i = 0; i < 16; i++) {
-		_blocks[0][i].fill(1);
+
+	__builtin_memset(_blocks, 0, sizeof(_blocks));
+
+	for (int x = 0; x < 16; x++) {
+		for (int y = 0; y < 16; y++) {
+			for (int z = 0; z < 16; z++) {
+				getBlock(x, z, y) = 3 * sn.noise(x, z, y) > 1.1;
+			}
+		}
 	}
 }
 
-void Chunk::onUpdate()
+Chunk::Block &Chunk::getBlock(int x, int y, int z)
 {
+	if (x < 0 || y < 0 || z < 0 || x >= 16 || y >= 16 || z >= 16) {
+		return (_void);
+	}
+
+	return _blocks[x * 16 * 16 + y * 16 + z];
 }
 
 //void Chunk::initMesh()

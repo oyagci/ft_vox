@@ -3,6 +3,7 @@
 #include "Cube.hpp"
 #include "Chunk.hpp"
 #include "Time.hpp"
+#include "Chunk.hpp"
 #include "ChunkRenderer.hpp"
 
 using namespace lazy;
@@ -34,11 +35,11 @@ int main()
 	camera.setProjection(70.0f, 0.1f, 1000.0f);
 
 	Chunk chunk(&shader);
+	ChunkRenderer chunkRenderer;
 
-	ChunkRenderer renderer;
-
-	renderer.setChunk(std::move(chunk));
-	renderer.onTessellate();
+	chunkRenderer.setChunk(std::move(chunk));
+	chunkRenderer.setShader(&shader);
+	chunkRenderer.update();
 
 	float ms = 10.0f;
 	while (!display.isClosed())
@@ -86,7 +87,7 @@ int main()
 
 		shader.setUniform4x4f("modelMatrix", glm::mat4(1.0f));
 		mesh.draw();
-		renderer.onRender();
+		chunkRenderer.onRender();
 	}
 
 	return EXIT_SUCCESS;

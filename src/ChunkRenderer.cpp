@@ -1,10 +1,33 @@
 #include "ChunkRenderer.hpp"
 #include <glm/vec3.hpp>
 
+std::ostream& operator<<(std::ostream& os, const glm::vec3& v) {
+	os << "{ " << v.x << ", " << v.y << ", " << v.z << " }";
+	return os;
+}
+
 ChunkRenderer::ChunkRenderer() : _chunk(nullptr)
 {
-	glGenVertexArrays(1, &_vao);
-	glGenBuffers(1, &_vbo);
+	glm::vec3 vertices[] = {
+		glm::vec3(0, 0,  0), glm::vec3(1, 0,  0), glm::vec3(1, 1,  0), glm::vec3(0, 1,  0),
+		glm::vec3(0, 0, -1), glm::vec3(1, 0, -1), glm::vec3(1, 1, -1), glm::vec3(0, 1, -1),
+	};
+	glm::vec3 triangles[] = {
+		glm::vec3(0, 1, 2), glm::vec3(0, 2, 3), // Front
+		glm::vec3(6, 5, 4), glm::vec3(7, 6, 4), // Back
+		glm::vec3(0, 3, 7), glm::vec3(0, 7, 4), // Left
+		glm::vec3(1, 5, 6), glm::vec3(1, 6, 2), // Right
+		glm::vec3(3, 2, 6), glm::vec3(3, 6, 7), // Top
+		glm::vec3(0, 5, 1), glm::vec3(0, 4, 5), // Bottom
+	};
+
+	for (auto &v : vertices) {
+		_mesh.addPosition(std::move(v));
+	}
+	for (auto &t : triangles) {
+		_mesh.addTriangle(std::move(t));
+	}
+	_mesh.build();
 }
 
 void ChunkRenderer::setChunk(Chunk chunk)
@@ -12,228 +35,82 @@ void ChunkRenderer::setChunk(Chunk chunk)
 	_chunk = std::move(chunk);
 }
 
+void ChunkRenderer::setShader(Shader *shader)
+{
+	_shader = shader;
+}
+
 void ChunkRenderer::onRender()
 {
-	_mesh.draw();
-}
+	// Draw each visible block
+	for (auto &b : _blocks) {
 
+		glm::mat4 model(1.0f);
 
-std::ostream& operator<<(std::ostream& os, const glm::vec3& v) {
-	os << "{ " << v.x << ", " << v.y << ", " << v.z << " }";
-	return os;
-}
-
-void ChunkRenderer::onUpdateMesh()
-{
-	_mesh = Mesh();
-	std::size_t	nind = 0;
-
-	for (auto &quad : _quads) {
-		for (auto &pos : std::get<0>(quad)) {
-			_mesh.addPosition(pos);
-		}
-
-		quadInds inds = std::get<1>(quad);
-		_mesh.addTriangle(glm::u32vec3(nind + inds[0], nind + inds[1], nind + inds[2]))
-			 .addTriangle(glm::u32vec3(nind + inds[3], nind + inds[4], nind + inds[5]));
-
-		nind += 3;
+		model = glm::translate(model, b);
+		_shader->setUniform4x4f("modelMatrix", std::move(model));
+		_mesh.draw();
 	}
-
-	_mesh.build();
 }
 
-void ChunkRenderer::onTessellate()
+int ChunkRenderer::getVisibleFaces(int x, int y, int z)
 {
-	std::vector<quad> quads;
+	int result = 0;
 
-	for (std::size_t h = 0; h < 2; h++) {
+	bool top    = (_chunk.getBlock(x, y + 1, z) == 0);
+	bool bottom = (_chunk.getBlock(x, y - 1, z) == 0);
+	bool left   = (_chunk.getBlock(x - 1, y, z) == 0);
+	bool right  = (_chunk.getBlock(x + 1, y, z) == 0);
+	bool front  = (_chunk.getBlock(x, y, z + 1) == 0);
+	bool back   = (_chunk.getBlock(x, y, z - 1) == 0);
 
-		for (std::size_t x = 0; x < 16; x++) {
+	result |= top    ? 0 : 1 << 0;
+	result |= bottom ? 0 : 1 << 1;
+	result |= left   ? 0 : 1 << 2;
+	result |= right  ? 0 : 1 << 3;
+	result |= front  ? 0 : 1 << 4;
+	result |= back   ? 0 : 1 << 5;
 
-			for (std::size_t y = 0; y < 1; y++) {
+	return result;
+}
 
-				Chunk::Block b = _chunk.getBlockAt(h, x, y);
+void ChunkRenderer::update()
+{
+	std::size_t nbBlocks = 0;
+	for (int x = 0; x < 16; x++) {
+		for (int y = 0; y < 16; y++) {
+			for (int z = 0; z < 16; z++) {
+
+				Chunk::Block b = _chunk.getBlock(x, y, z);
 
 				if (b != 0) { continue; }
 
-				glm::vec3 pos = glm::vec3(x, h, y);
+				int faces = getVisibleFaces(x, y, z);
 
-				glm::vec3 leftPos  = glm::vec3(pos.x - 0.5f, pos.y, pos.z);
-				glm::vec3 rightPos = glm::vec3(pos.x + 0.5f, pos.y, pos.z);
-				glm::vec3 frontPos = glm::vec3(pos.x, pos.y, pos.z + 0.5f);
-				glm::vec3 backPos  = glm::vec3(pos.x, pos.y, pos.z - 0.5f);
-				glm::vec3 botPos   = glm::vec3(pos.x, pos.y - 0.5f, pos.z);
-  				glm::vec3 topPos   = glm::vec3(pos.x, pos.y + 0.5f, pos.z);
-
-				quad q = genTopQuad(topPos);
-				quads.push_back(std::move(q));
-
-				q = genBotQuad(botPos);
-				quads.push_back(std::move(q));
-//
-//				q = genFrontQuad(frontPos);
-//				quads.push_back(std::move(q));
-//
-//				q = genBackQuad(backPos);
-//				quads.push_back(std::move(q));
-//
-//				q = genLeftQuad(leftPos);
-//				quads.push_back(std::move(q));
-//
-//				q = genRightQuad(rightPos);
-//				quads.push_back(std::move(q));
-
+				if (faces & (1 << 0)) { // Top
+					addBlockToRender(std::move(glm::u32vec3(x, y + 1, z)));
+				}
+				if (faces & (1 << 1)) { // Bottom
+					addBlockToRender(std::move(glm::u32vec3(x, y - 1, z)));
+				}
+				if (faces & (1 << 2)) { // Left
+					addBlockToRender(std::move(glm::u32vec3(x - 1, y, z)));
+				}
+				if (faces & (1 << 3)) { // Right
+					addBlockToRender(std::move(glm::u32vec3(x + 1, y, z)));
+				}
+				if (faces & (1 << 4)) { // Front
+					addBlockToRender(std::move(glm::u32vec3(x, y, z + 1)));
+				}
+				if (faces & (1 << 5)) { // Back
+					addBlockToRender(std::move(glm::u32vec3(x, y, z - 1)));
+				}
 			}
 		}
 	}
-
-	for (std::size_t h = 0; h < 2; h++) {
-
-		for (std::size_t x = 0; x < 16; x++) {
-
-			for (std::size_t y = 0; y < 1; y++) {
-
-				Chunk::Block b = _chunk.getBlockAt(h, x, y);
-
-				if (b != 0) { continue; }
-
-				glm::vec3 pos = glm::vec3(x, h, y);
-				glm::vec3 botPos = glm::vec3(pos.x, pos.y - 0.5f, pos.z);
-
-				quad q = genBotQuad(botPos);
-				quads.push_back(std::move(q));
-			}
-		}
-	}
-
-	_quads = std::move(quads);
-
-	onUpdateMesh();
 }
 
-ChunkRenderer::quad ChunkRenderer::genTopQuad(glm::vec3 pos)
+void ChunkRenderer::addBlockToRender(glm::vec3 pos)
 {
-	quadVerts verts = {
-		glm::vec3(-0.5f, 0.0f,  0.5f),
-		glm::vec3( 0.5f, 0.0f,  0.5f),
-		glm::vec3( 0.5f, 0.0f, -0.5f),
-		glm::vec3(-0.5f, 0.0f, -0.5f),
-	};
-	quadInds inds = {
-		0, 1, 2,
-		0, 2, 3,
-	};
-
-	verts[0] += pos;
-	verts[1] += pos;
-	verts[2] += pos;
-	verts[3] += pos;
-
-	return std::make_tuple<quadVerts, quadInds>(std::move(verts), std::move(inds));
-}
-
-ChunkRenderer::quad ChunkRenderer::genBotQuad(glm::vec3 pos)
-{
-	quadVerts verts = {
-		glm::vec3(-0.5f, 0.0f,  0.5f),
-		glm::vec3( 0.5f, 0.0f,  0.5f),
-		glm::vec3( 0.5f, 0.0f, -0.5f),
-		glm::vec3(-0.5f, 0.0f, -0.5f),
-	};
-	quadInds inds = {
-		0, 2, 1,
-		0, 3, 2,
-	};
-
-	verts[0] += pos;
-	verts[1] += pos;
-	verts[2] += pos;
-	verts[3] += pos;
-
-	return std::make_tuple<quadVerts, quadInds>(std::move(verts), std::move(inds));
-}
-
-ChunkRenderer::quad ChunkRenderer::genFrontQuad(glm::vec3 pos)
-{
-	quadVerts verts = {
-		glm::vec3(-0.5f, -0.5f, 0.0f),
-		glm::vec3( 0.5f, -0.5f, 0.0f),
-		glm::vec3( 0.5f,  0.5f, 0.0f),
-		glm::vec3(-0.5f,  0.5f, 0.0f),
-	};
-	quadInds inds = {
-		0, 1, 2,
-		0, 2, 3,
-	};
-
-	verts[0] += pos;
-	verts[1] += pos;
-	verts[2] += pos;
-	verts[3] += pos;
-
-	return std::make_tuple<quadVerts, quadInds>(std::move(verts), std::move(inds));
-}
-
-ChunkRenderer::quad ChunkRenderer::genBackQuad(glm::vec3 pos)
-{
-	quadVerts verts = {
-		glm::vec3(-0.5f, -0.5f, 0.0f),
-		glm::vec3( 0.5f, -0.5f, 0.0f),
-		glm::vec3( 0.5f,  0.5f, 0.0f),
-		glm::vec3(-0.5f,  0.5f, 0.0f),
-	};
-	quadInds inds = {
-		0, 2, 1,
-		0, 3, 2,
-	};
-
-	verts[0] += pos;
-	verts[1] += pos;
-	verts[2] += pos;
-	verts[3] += pos;
-
-	return std::make_tuple<quadVerts, quadInds>(std::move(verts), std::move(inds));
-}
-
-ChunkRenderer::quad ChunkRenderer::genLeftQuad(glm::vec3 pos)
-{
-	quadVerts verts = {
-		glm::vec3(-0.5f, -0.5f,  0.0f),
-		glm::vec3( 0.5f, -0.5f,  0.0f),
-		glm::vec3(-0.5f,  0.5f, -0.5f),
-		glm::vec3(-0.5f, -0.5f, -0.5f),
-	};
-	quadInds inds = {
-		0, 1, 2,
-		0, 2, 3,
-	};
-
-	verts[0] += pos;
-	verts[1] += pos;
-	verts[2] += pos;
-	verts[3] += pos;
-
-	return std::make_tuple<quadVerts, quadInds>(std::move(verts), std::move(inds));
-}
-
-ChunkRenderer::quad ChunkRenderer::genRightQuad(glm::vec3 pos)
-{
-	quadVerts verts = {
-		glm::vec3(-0.5f, -0.5f,  0.0f),
-		glm::vec3( 0.5f, -0.5f,  0.0f),
-		glm::vec3(-0.5f,  0.5f, -0.5f),
-		glm::vec3(-0.5f, -0.5f, -0.5f),
-	};
-	quadInds inds = {
-		0, 2, 1,
-		0, 2, 3,
-	};
-
-	verts[0] += pos;
-	verts[1] += pos;
-	verts[2] += pos;
-	verts[3] += pos;
-
-	return std::make_tuple<quadVerts, quadInds>(std::move(verts), std::move(inds));
+	_blocks.push_back(std::move(pos));
 }
