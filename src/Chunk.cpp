@@ -3,7 +3,7 @@
 #include "Cube.hpp"
 #include "SimplexNoise.hpp"
 
-Chunk::Chunk(Shader *shader)
+Chunk::Chunk(glm::vec2 pos) : _worldPos(pos)
 {
 	SimplexNoise s = SimplexNoise(0.01f, 1.0f, 2.0f, 0.25f);
 
@@ -25,4 +25,9 @@ Chunk::Block &Chunk::getBlock(std::size_t x, std::size_t y, std::size_t z)
 	}
 
 	return (*_blocks)[x * CHUNK_SIZE * CHUNK_SIZE + y * CHUNK_SIZE + z];
+}
+
+const glm::vec2 &Chunk::getPos() const
+{
+	return _worldPos;
 }

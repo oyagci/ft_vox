@@ -34,7 +34,7 @@ int main()
 	Camera camera(display, (maths::transform){camPos, glm::quat(), glm::vec3(1), nullptr});
 	camera.setProjection(70.0f, 0.1f, 1000.0f);
 
-	Chunk chunk(&shader);
+	Chunk chunk(std::move(glm::vec2(0.0f, 0.0f)));
 	ChunkRenderer chunkRenderer;
 
 	chunkRenderer.addChunk(std::move(chunk));
