@@ -16,7 +16,7 @@ public:
 	static constexpr std::size_t CHUNK_SIZE = 64;
 
 public:
-	Chunk(glm::u32vec2 pos);
+	Chunk(glm::i32vec2 pos);
 
 	Block &getBlock(std::size_t x, std::size_t y, std::size_t z);
 	const glm::vec2 &getPos() const;
