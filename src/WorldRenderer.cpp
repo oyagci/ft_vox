@@ -27,11 +27,26 @@ void WorldRenderer::renderChunks()
 
 void WorldRenderer::generateChunks()
 {
-	std::unique_ptr<Chunk> c = _factory->getChunk(_camPos);
-	std::shared_ptr<Chunk> chunk(std::move(c));
+	const int RENDER_DISTANCE = 3;
+	glm::i32vec3 gridPos(_camPos / 64);
 
-	_chunks.push_back(chunk);
-	_renderer->registerChunk(chunk);
+	for (int j = -RENDER_DISTANCE; j < RENDER_DISTANCE; j++) {
+		for (int i = -RENDER_DISTANCE; i < RENDER_DISTANCE; i++) {
+			std::unique_ptr<Chunk> c = _factory->getChunk(
+				std::move(
+					glm::vec3(
+						(gridPos.x + j) * 64,
+						gridPos.y * 64,
+						(gridPos.z + i) * 64
+					)
+				)
+			);
+			std::shared_ptr<Chunk> chunk(std::move(c));
+			_chunks.push_back(chunk);
+			_renderer->registerChunk(chunk);
+		}
+	}
+
 	_renderer->update();
 }
 
