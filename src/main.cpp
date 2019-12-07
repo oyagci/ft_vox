@@ -22,7 +22,6 @@ int main()
 	while (!display.isClosed())
 	{
 		display.update();
-
 		double currentTime = glfwGetTime();
 		if (currentTime - startTime >= 1.0 / 60.0)
 		{
@@ -31,9 +30,8 @@ int main()
 			scene.update();
 			startTime = currentTime;
 		}
-	
-		renderingEngine.render(scene);
+		renderingEngine.renderScene(scene);
+		renderingEngine.render();
 	}
-
 	return 0;
 }

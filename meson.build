@@ -5,7 +5,10 @@ project('ft_vox', 'cpp',
 srcs = [
 	'src/main.cpp',
 	'src/core/rendering/RenderingEngine.cpp',
+	'src/core/rendering/pipeline/RenderingPipeline.cpp',
+	'src/core/rendering/textures/Framebuffer.cpp',
 	'src/core/rendering/primitives/CubePrimitive.cpp',
+	'src/core/rendering/primitives/QuadPrimitive.cpp',
 	'src/Scene.cpp'
 ]
 

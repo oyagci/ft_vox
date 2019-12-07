@@ -1,4 +1,4 @@
-#include "./CubePrimitive.hpp";
+#include "./CubePrimitive.hpp"
 
 CubePrimitive::CubePrimitive()
 {
