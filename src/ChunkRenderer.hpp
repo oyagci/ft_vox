@@ -6,6 +6,20 @@
 
 class ChunkRenderer
 {
+private:
+	enum FaceDirection {
+		FD_TOP,
+		FD_BOT,
+		FD_LEFT,
+		FD_RIGHT,
+		FD_FRONT,
+		FD_BACK,
+	};
+	struct Face {
+		glm::vec3 pos;
+		FaceDirection dir;
+	};
+
 public:
 	ChunkRenderer();
 
@@ -15,8 +29,16 @@ public:
 
 	int getVisibleFaces(Chunk &chunk, int x, int y, int z);
 
+	void addFaceToRender(glm::vec3 pos, FaceDirection f);
 	void addBlockToRender(glm::vec3 pos);
 	void buildChunkMesh(Chunk &chunk);
+
+	void buildTopFace(Mesh &mesh, glm::vec3 pos, std::size_t indOffset);
+	void buildFrontFace(Mesh &mesh, glm::vec3 pos, std::size_t indOffset);
+	void buildBotFace(Mesh &mesh, glm::vec3 pos, std::size_t indOffset);
+	void buildBackFace(Mesh &mesh, glm::vec3 pos, std::size_t indOffset);
+	void buildRightFace(Mesh &mesh, glm::vec3 pos, std::size_t indOffset);
+	void buildLeftFace(Mesh &mesh, glm::vec3 pos, std::size_t indOffset);
 
 	void addChunk(Chunk chunk);
 
@@ -25,7 +47,7 @@ public:
 
 private:
 	std::vector<Chunk> _chunks;
-	std::vector<glm::vec3> _blocks;
 	Shader *_shader;
 	std::vector<Mesh> _meshes;
+	std::vector<Face> _faces;
 };

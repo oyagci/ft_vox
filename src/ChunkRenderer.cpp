@@ -51,7 +51,6 @@ int ChunkRenderer::getVisibleFaces(Chunk &chunk, int x, int y, int z)
 void ChunkRenderer::update()
 {
 	_meshes.clear();
-
 	for (auto &c : _chunks) {
 		updateChunk(c);
 		buildChunkMesh(c);
@@ -60,7 +59,7 @@ void ChunkRenderer::update()
 
 void ChunkRenderer::updateChunk(Chunk &chunk)
 {
-	_blocks.clear();
+	_faces.clear();
 	for (std::size_t x = 0; x < Chunk::CHUNK_SIZE; x++) {
 		for (std::size_t y = 0; y < Chunk::CHUNK_SIZE; y++) {
 			for (std::size_t z = 0; z < Chunk::CHUNK_SIZE; z++) {
@@ -72,78 +71,206 @@ void ChunkRenderer::updateChunk(Chunk &chunk)
 				int faces = getVisibleFaces(chunk, x, y, z);
 
 				if (faces & (1 << 0)) { // Top
-					addBlockToRender(std::move(glm::u32vec3(x, y + 1, z)));
+					addFaceToRender(std::move(glm::u32vec3(x, y + 1, z)), FD_BOT);
 				}
 				if (faces & (1 << 1)) { // Bottom
-					addBlockToRender(std::move(glm::u32vec3(x, y - 1, z)));
+					addFaceToRender(std::move(glm::u32vec3(x, y - 1, z)), FD_TOP);
 				}
 				if (faces & (1 << 2)) { // Left
-					addBlockToRender(std::move(glm::u32vec3(x - 1, y, z)));
+					addFaceToRender(std::move(glm::u32vec3(x - 1, y, z)), FD_RIGHT);
 				}
 				if (faces & (1 << 3)) { // Right
-					addBlockToRender(std::move(glm::u32vec3(x + 1, y, z)));
+					addFaceToRender(std::move(glm::u32vec3(x + 1, y, z)), FD_LEFT);
 				}
 				if (faces & (1 << 4)) { // Front
-					addBlockToRender(std::move(glm::u32vec3(x, y, z + 1)));
+					addFaceToRender(std::move(glm::u32vec3(x, y, z + 1)), FD_BACK);
 				}
 				if (faces & (1 << 5)) { // Back
-					addBlockToRender(std::move(glm::u32vec3(x, y, z - 1)));
+					addFaceToRender(std::move(glm::u32vec3(x, y, z - 1)), FD_FRONT);
 				}
 			}
 		}
 	}
 }
 
-void ChunkRenderer::addBlockToRender(glm::vec3 pos)
+void ChunkRenderer::addFaceToRender(glm::vec3 pos, FaceDirection f)
 {
-	_blocks.push_back(std::move(pos));
+	Face face = {
+		pos,
+		f
+	};
+
+	_faces.push_back(std::move(face));
+}
+
+void ChunkRenderer::buildTopFace(Mesh &mesh, glm::vec3 pos, std::size_t indOffset)
+{
+	// Offset of the face inside the cube
+	pos.y += 0.5;
+
+	std::array<glm::vec3, 4> vertices = {
+		glm::vec3(1, 1, 0) + pos, glm::vec3(0, 1, 0) + pos,
+		glm::vec3(1, 1, -1) + pos, glm::vec3(0, 1, -1) + pos
+	};
+	std::array<glm::u32vec3, 2> triangles = {
+		glm::u32vec3(1 + indOffset, 0 + indOffset, 2 + indOffset),
+		glm::u32vec3(1 + indOffset, 2 + indOffset, 3 + indOffset)
+	};
+
+	for (auto &v : vertices) {
+		mesh.addPosition(v);
+	}
+	for (auto &t : triangles) {
+		mesh.addTriangle(t);
+	}
+}
+
+void ChunkRenderer::buildBotFace(Mesh &mesh, glm::vec3 pos, std::size_t indOffset)
+{
+	// Offset of the face inside the cube
+	pos.y += 0.5;
+
+	std::array<glm::vec3, 4> vertices = {
+		glm::vec3(1, 0, 0) + pos, glm::vec3(0, 0, 0) + pos,
+		glm::vec3(1, 0, -1) + pos, glm::vec3(0, 0, -1) + pos
+	};
+	std::array<glm::u32vec3, 2> triangles = {
+		glm::u32vec3(1 + indOffset, 2 + indOffset, 0 + indOffset),
+		glm::u32vec3(1 + indOffset, 3 + indOffset, 2 + indOffset)
+	};
+
+	for (auto &v : vertices) {
+		mesh.addPosition(v);
+	}
+	for (auto &t : triangles) {
+		mesh.addTriangle(t);
+	}
+}
+
+void ChunkRenderer::buildFrontFace(Mesh &mesh, glm::vec3 pos, std::size_t indOffset)
+{
+	// Offset of the face inside the cube
+	pos.y += 0.5;
+
+	std::array<glm::vec3, 4> vertices = {
+		glm::vec3(0, 0, 0) + pos, glm::vec3(1, 0, 0) + pos,
+		glm::vec3(1, 1, 0) + pos, glm::vec3(0, 1, 0) + pos
+	};
+	std::array<glm::u32vec3, 2> triangles = {
+		glm::u32vec3(0 + indOffset, 1 + indOffset, 2 + indOffset),
+		glm::u32vec3(0 + indOffset, 2 + indOffset, 3 + indOffset)
+	};
+
+	for (auto &v : vertices) {
+		mesh.addPosition(v);
+	}
+	for (auto &t : triangles) {
+		mesh.addTriangle(t);
+	}
+}
+
+void ChunkRenderer::buildBackFace(Mesh &mesh, glm::vec3 pos, std::size_t indOffset)
+{
+	// Offset of the face inside the cube
+	pos.y += 0.5;
+
+	std::array<glm::vec3, 4> vertices = {
+		glm::vec3(0, 0, -1) + pos, glm::vec3(1, 0, -1) + pos,
+		glm::vec3(1, 1, -1) + pos, glm::vec3(0, 1, -1) + pos
+	};
+	std::array<glm::u32vec3, 2> triangles = {
+		glm::u32vec3(0 + indOffset, 2 + indOffset, 1 + indOffset),
+		glm::u32vec3(0 + indOffset, 3 + indOffset, 2 + indOffset)
+	};
+
+	for (auto &v : vertices) {
+		mesh.addPosition(v);
+	}
+	for (auto &t : triangles) {
+		mesh.addTriangle(t);
+	}
+}
+
+void ChunkRenderer::buildRightFace(Mesh &mesh, glm::vec3 pos, std::size_t indOffset)
+{
+	// Offset of the face inside the cube
+	pos.y += 0.5;
+
+	std::array<glm::vec3, 4> vertices = {
+		glm::vec3(1, 0, 0) + pos, glm::vec3(1, 0, -1) + pos,
+		glm::vec3(1, 1, -1) + pos, glm::vec3(1, 1, 0) + pos
+	};
+	std::array<glm::u32vec3, 2> triangles = {
+		glm::u32vec3(0 + indOffset, 1 + indOffset, 2 + indOffset),
+		glm::u32vec3(0 + indOffset, 2 + indOffset, 3 + indOffset)
+	};
+
+	for (auto &v : vertices) {
+		mesh.addPosition(v);
+	}
+	for (auto &t : triangles) {
+		mesh.addTriangle(t);
+	}
+}
+
+void ChunkRenderer::buildLeftFace(Mesh &mesh, glm::vec3 pos, std::size_t indOffset)
+{
+	// Offset of the face inside the cube
+	pos.y += 0.5;
+
+	std::array<glm::vec3, 4> vertices = {
+		glm::vec3(0, 0, 0) + pos, glm::vec3(0, 0, -1) + pos,
+		glm::vec3(0, 1, -1) + pos, glm::vec3(0, 1, 0) + pos
+	};
+	std::array<glm::u32vec3, 2> triangles = {
+		glm::u32vec3(0 + indOffset, 2 + indOffset, 1 + indOffset),
+		glm::u32vec3(0 + indOffset, 3 + indOffset, 2 + indOffset)
+	};
+
+	for (auto &v : vertices) {
+		mesh.addPosition(v);
+	}
+	for (auto &t : triangles) {
+		mesh.addTriangle(t);
+	}
 }
 
 void ChunkRenderer::buildChunkMesh(Chunk &chunk)
 {
 	Mesh mesh;
-
-	std::vector<glm::vec3> chunkVerts;
-	std::vector<glm::vec3> chunkTris;
 	std::size_t nTris = 0;
-
-	// Base cube vertices and triangles used to build the chunk's mesh
-	std::array<glm::vec3, 8> vertices = {
-		glm::vec3(0, 0,  0), glm::vec3(1, 0,  0), glm::vec3(1, 1,  0), glm::vec3(0, 1,  0),
-		glm::vec3(0, 0, -1), glm::vec3(1, 0, -1), glm::vec3(1, 1, -1), glm::vec3(0, 1, -1),
-	};
-	std::array<glm::u32vec3, 12> triangles = {
-		glm::u32vec3(0, 1, 2), glm::u32vec3(0, 2, 3), // Front
-		glm::u32vec3(6, 5, 4), glm::u32vec3(7, 6, 4), // Back
-		glm::u32vec3(0, 3, 7), glm::u32vec3(0, 7, 4), // Left
-		glm::u32vec3(1, 5, 6), glm::u32vec3(1, 6, 2), // Right
-		glm::u32vec3(3, 2, 6), glm::u32vec3(3, 6, 7), // Top
-		glm::u32vec3(0, 5, 1), glm::u32vec3(0, 4, 5), // Bottom
-	};
-
-	// Gather all vertices and triangles into two vectors
-	for (auto &b : _blocks) {
-		for (auto &v : vertices) {
-			glm::vec3 verts = v + b;
-			chunkVerts.push_back(std::move(verts));
-		}
-		for (auto &t : triangles) {
-			glm::u32vec3 inds(t.x + nTris, t.y + nTris, t.z + nTris);
-			chunkTris.push_back(std::move(inds));
-		}
-		nTris += vertices.size();
-	}
-
-	// Add every vertices and triangles of the chunk to its mesh
 	glm::vec3 worldPos = glm::vec3(chunk.getPos().x, 0, chunk.getPos().y);
-	for (auto &v : chunkVerts) {
-		glm::vec3 finalPos = v + worldPos;
-		mesh.addPosition(std::move(finalPos));
-	}
-	for (auto &t : chunkTris) {
-		mesh.addTriangle(t);
-	}
-	mesh.build();
 
+	for (auto &f : _faces) {
+		switch (f.dir) {
+		case FD_TOP:
+			buildTopFace(mesh, f.pos + worldPos, nTris);
+			nTris += 4;
+			break ;
+		case FD_BOT:
+			buildBotFace(mesh, f.pos + worldPos, nTris);
+			nTris += 4;
+			break ;
+		case FD_FRONT:
+			buildFrontFace(mesh, f.pos + worldPos, nTris);
+			nTris += 4;
+			break ;
+		case FD_BACK:
+			buildBackFace(mesh, f.pos + worldPos, nTris);
+			nTris += 4;
+			break ;
+		case FD_RIGHT:
+			buildRightFace(mesh, f.pos + worldPos, nTris);
+			nTris += 4;
+			break ;
+		case FD_LEFT:
+			buildLeftFace(mesh, f.pos + worldPos, nTris);
+			nTris += 4;
+		default:
+			break;
+		}
+	}
+
+	mesh.build();
 	_meshes.push_back(std::move(mesh));
 }

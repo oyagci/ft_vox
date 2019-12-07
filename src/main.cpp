@@ -37,7 +37,7 @@ int main()
 	ChunkFactory cf;
 
 	std::vector<std::unique_ptr<Chunk>> chunks;
-	for (std::size_t i = 0; i < 64; i++) {
+	for (std::size_t i = 0; i < 2; i++) {
 		std::unique_ptr<Chunk> c = cf.getChunk();
 		chunks.push_back(std::move(c));
 	}
