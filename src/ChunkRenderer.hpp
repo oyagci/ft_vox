@@ -40,16 +40,12 @@ public:
 	void buildRightFace(Mesh &mesh, glm::vec3 pos, std::size_t indOffset);
 	void buildLeftFace(Mesh &mesh, glm::vec3 pos, std::size_t indOffset);
 
-	void addChunk(Chunk chunk);
-
-	// Setters
-	void setShader(Shader *shader);
+	void registerChunk(std::shared_ptr<Chunk> chunk);
 
 	Chunk *getChunk(glm::u32vec2 pos);
 
 private:
-	std::vector<Chunk> _chunks;
-	Shader *_shader;
+	std::vector<std::shared_ptr<Chunk>> _chunks;
 	std::vector<Mesh> _meshes;
 	std::vector<Face> _faces;
 };

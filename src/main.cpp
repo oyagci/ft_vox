@@ -8,6 +8,7 @@
 #include "ChunkFactory.hpp"
 #include "TextRenderer.hpp"
 #include "FPSCounter.hpp"
+#include "WorldRenderer.hpp"
 
 using namespace lazy;
 using namespace graphics;
@@ -34,21 +35,9 @@ int main()
 	Camera camera(display, (maths::transform){camPos, glm::quat(), glm::vec3(1), nullptr});
 	camera.setProjection(70.0f, 0.1f, 1000.0f);
 
-	ChunkFactory cf;
+	WorldRenderer wr(camera, camPos);
 
-	std::vector<std::unique_ptr<Chunk>> chunks;
-//	for (std::size_t i = 0; i < 1; i++) {
-		std::unique_ptr<Chunk> c = cf.getChunk(camPos);
-		chunks.push_back(std::move(c));
-//	}
-
-	ChunkRenderer chunkRenderer;
-
-	for (auto &c : chunks) {
-		chunkRenderer.addChunk(std::move(*c));
-	}
-	chunkRenderer.setShader(&shader);
-	chunkRenderer.update();
+	wr.generateChunks();
 
 	FPSCounter fpsCounter;
 
@@ -94,13 +83,7 @@ int main()
 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		shader.bind();
-		shader.setUniform4x4f("projectionMatrix", camera.getProjectionMatrix());
-		shader.setUniform4x4f("viewMatrix", camera.getViewMatrix());
-		shader.setUniform4x4f("viewProjectionMatrix", camera.getViewProjectionMatrix());
-
-		shader.setUniform4x4f("modelMatrix", glm::mat4(1.0f));
-		chunkRenderer.onRender();
+		wr.renderChunks();
 
 		tr.drawText(std::to_string(fpsCounter.getFPS()) + " FPS", glm::vec2(10, 10), .3f, glm::vec3(1.0f));
 	}

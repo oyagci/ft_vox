@@ -10,14 +10,9 @@ ChunkRenderer::ChunkRenderer()
 {
 }
 
-void ChunkRenderer::addChunk(Chunk chunk)
+void ChunkRenderer::registerChunk(std::shared_ptr<Chunk> chunk)
 {
 	_chunks.push_back(std::move(chunk));
-}
-
-void ChunkRenderer::setShader(Shader *shader)
-{
-	_shader = shader;
 }
 
 void ChunkRenderer::onRender()
@@ -52,8 +47,8 @@ void ChunkRenderer::update()
 {
 	_meshes.clear();
 	for (auto &c : _chunks) {
-		updateChunk(c);
-		buildChunkMesh(c);
+		updateChunk(*c);
+		buildChunkMesh(*c);
 	}
 }
 
@@ -278,9 +273,9 @@ void ChunkRenderer::buildChunkMesh(Chunk &chunk)
 Chunk *ChunkRenderer::getChunk(glm::u32vec2 pos)
 {
 	for (auto &c : _chunks) {
-		if (static_cast<int>(c.getPos().x) == pos.x
-			&& static_cast<int>(c.getPos().y) == pos.y) {
-			return &c;
+		if (static_cast<unsigned int>(c->getPos().x) == pos.x
+			&& static_cast<unsigned int>(c->getPos().y) == pos.y) {
+			return c.get();
 		}
 	}
 	return nullptr;

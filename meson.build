@@ -13,6 +13,7 @@ srcs = [
 	'src/ChunkFactory.cpp',
 	'src/TextRenderer.cpp',
 	'src/FPSCounter.cpp',
+	'src/WorldRenderer.cpp'
 ]
 
 cmake = import('cmake')
