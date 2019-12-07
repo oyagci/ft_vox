@@ -3,7 +3,7 @@
 #include "Cube.hpp"
 #include "SimplexNoise.hpp"
 
-SimplexNoise s = SimplexNoise(0.06f, 1.0f, 2.0f, 0.25f);
+SimplexNoise s = SimplexNoise(0.1f, 1.0f, 2.0f, 0.25f);
 
 Chunk::Chunk(glm::i32vec2 pos)
 {
@@ -19,7 +19,7 @@ Chunk::Chunk(glm::i32vec2 pos)
 
 				float hH = s.fractal(1, pos.x / 10, pos.y / 10, pos.z / 10);
 				for (int i = 2; i < 6; i++) {
-					hH += s.fractal(1, pos.x / (i * 5), pos.y / (i * 5), pos.z / (i * 5)) * (i / 6);
+					hH += s.fractal(1, pos.x / (i * 5), pos.y / (i * 5), pos.z / (i * 5)) * (i / 16);
 				}
 
 				float pH = s.fractal(1, pos.x / 10, pos.y / 10, pos.z / 10);
@@ -37,7 +37,21 @@ Chunk::Chunk(glm::i32vec2 pos)
 					path *= s.fractal(1, dP.x / i, dP.y / i, dP.z / i) * (i / 6);
 				}
 
-				result = -pos.y + (pH / 2 + hH) * (CHUNK_SIZE/2) * mm + path * 10;
+				glm::vec3 cP = glm::vec3(pos.x / 2 - 523.432, pos.y - 2.827, z / 2 + 5516.0f);
+				float cave = s.fractal(1, cP.x / 5, cP.y / 5, cP.z / 5);
+				for (int i = 0; i < 6; i++) {
+					cave += s.fractal(1, cP.x / (i * 2), cP.y / (i * 2), cP.z / (i * 2)) * (i / 6);
+				}
+
+				if (abs(floor(cave * 50)) - 30 > 0) {
+					cave = abs(cave * 10);
+				}
+				else {
+					cave = 0;
+				}
+
+				result = -pos.y + (pH / 2 + hH) * (CHUNK_SIZE/2) * mm + path * 10 - cave * abs(mm);
+//				result = -pos.y + (pH / 2 + hH) * (CHUNK_SIZE/2) * mm + path * 10;
 
 				getBlock(x, y, z) = (y == 0 || result > 0.0f ? 1 : 0);
 			}
