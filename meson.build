@@ -3,7 +3,10 @@ project('ft_vox', 'cpp',
 	default_options: ['warning_level=3', 'cpp_std=c++17'])
 
 srcs = [
-	'src/main.cpp'
+	'src/main.cpp',
+	'src/core/rendering/RenderingEngine.cpp',
+	'src/core/rendering/primitives/CubePrimitive.cpp',
+	'src/Scene.cpp'
 ]
 
 cmake = import('cmake')
