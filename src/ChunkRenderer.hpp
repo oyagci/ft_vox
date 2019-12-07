@@ -45,6 +45,8 @@ public:
 	// Setters
 	void setShader(Shader *shader);
 
+	Chunk *getChunk(glm::u32vec2 pos);
+
 private:
 	std::vector<Chunk> _chunks;
 	Shader *_shader;

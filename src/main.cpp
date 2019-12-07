@@ -37,10 +37,10 @@ int main()
 	ChunkFactory cf;
 
 	std::vector<std::unique_ptr<Chunk>> chunks;
-	for (std::size_t i = 0; i < 2; i++) {
-		std::unique_ptr<Chunk> c = cf.getChunk();
+//	for (std::size_t i = 0; i < 1; i++) {
+		std::unique_ptr<Chunk> c = cf.getChunk(camPos);
 		chunks.push_back(std::move(c));
-	}
+//	}
 
 	ChunkRenderer chunkRenderer;
 

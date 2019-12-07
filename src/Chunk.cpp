@@ -5,7 +5,7 @@
 
 SimplexNoise s = SimplexNoise(0.06f, 1.0f, 2.0f, 0.25f);
 
-Chunk::Chunk(glm::vec2 pos)
+Chunk::Chunk(glm::u32vec2 pos)
 {
 	_blocks = std::make_unique<std::array<Block, CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE>>();
 	_worldPos = std::move(pos);
