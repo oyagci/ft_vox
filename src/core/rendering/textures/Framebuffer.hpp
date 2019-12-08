@@ -8,10 +8,10 @@ private:
     int _width;
     int _height;
 
-    GLuint _fbo;
-    GLuint _rbo;
-    GLuint _cbo;
-    GLuint _dbo;
+    GLuint              _fbo;
+    GLuint              _rbo;
+    std::vector<GLuint> _cbos;
+    GLuint              _dbo;
 
 public:
     Framebuffer();
@@ -21,14 +21,15 @@ public:
 
     void genFramebuffer();
     void genRenderbuffer(GLuint type, GLuint attachment);
-    void genColorTexture(GLuint filterMode, GLuint wrapMode);
+    void genColorTexture(GLuint internalFormat, GLint format, GLuint type, GLuint filterMode, GLuint wrapMode);
     void genDepthTexture(GLuint filterMode, GLuint wrapMode);
+    void drawBuffers(std::vector<GLenum> attachments);
 
     void bind();
     void unbind();
 
     GLuint getFramebuffer() const { return _fbo; }
     GLuint getRenderbuffer() const { return _rbo; }
-    GLuint getColorTexture() const { return _cbo; }
+    GLuint getColorTexture(int id) const { return _cbos[id]; }
     GLuint getDepthTexture() const { return _dbo; }
 };

@@ -2,7 +2,7 @@
 
 #include <lazy.hpp>
 
-#include "./pipeline/RenderingPipeline.hpp"
+#include "./RenderingPipeline.hpp"
 #include "./primitives/QuadPrimitive.hpp"
 #include "Scene.hpp"
 
