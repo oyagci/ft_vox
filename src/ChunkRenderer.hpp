@@ -60,7 +60,7 @@ public:
 
 	void registerChunk(std::shared_ptr<Chunk> chunk);
 
-	Chunk *getChunk(glm::u32vec2 pos);
+	std::shared_ptr<ChunkInfo> getChunk(glm::i32vec2 pos);
 
 private:
 	std::vector<ChunkInfo> _chunks;
