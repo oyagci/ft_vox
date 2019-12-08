@@ -269,14 +269,3 @@ void ChunkRenderer::buildChunkMesh(Chunk &chunk)
 	mesh.build();
 	_meshes.push_back(std::move(mesh));
 }
-
-std::shared_ptr<ChunkInfo> ChunkRenderer::getChunk(glm::i32vec2 pos)
-{
-	for (auto &c : _chunks) {
-		if (static_cast<unsigned int>(c.getChunk()->getPos().x) == pos.x
-			&& static_cast<unsigned int>(c.getChunk()->getPos().y) == pos.y) {
-			return c;
-		}
-	}
-	return nullptr;
-}
