@@ -12,7 +12,10 @@ ChunkRenderer::ChunkRenderer()
 
 void ChunkRenderer::registerChunk(std::shared_ptr<Chunk> chunk)
 {
-	_chunks.push_back(std::move(chunk));
+	ChunkInfo ci(chunk);
+
+	ci.setChanged(true);
+	_chunks.push_back(std::move(ci));
 }
 
 void ChunkRenderer::onRender()
@@ -45,10 +48,12 @@ int ChunkRenderer::getVisibleFaces(Chunk &chunk, int x, int y, int z)
 
 void ChunkRenderer::update()
 {
-	_meshes.clear();
 	for (auto &c : _chunks) {
-		updateChunk(*c);
-		buildChunkMesh(*c);
+		if (c.hasChanged()) {
+			updateChunk(*c.getChunk());
+			buildChunkMesh(*c.getChunk());
+			c.setChanged(false);
+		}
 	}
 }
 
@@ -273,9 +278,9 @@ void ChunkRenderer::buildChunkMesh(Chunk &chunk)
 Chunk *ChunkRenderer::getChunk(glm::u32vec2 pos)
 {
 	for (auto &c : _chunks) {
-		if (static_cast<unsigned int>(c->getPos().x) == pos.x
-			&& static_cast<unsigned int>(c->getPos().y) == pos.y) {
-			return c.get();
+		if (static_cast<unsigned int>(c.getChunk()->getPos().x) == pos.x
+			&& static_cast<unsigned int>(c.getChunk()->getPos().y) == pos.y) {
+			return c.getChunk().get();
 		}
 	}
 	return nullptr;

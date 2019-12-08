@@ -4,6 +4,24 @@
 #include "Chunk.hpp"
 #include <glm/vec3.hpp>
 
+class ChunkInfo
+{
+public:
+	ChunkInfo(std::shared_ptr<Chunk> chunk)
+	{
+		_chunk = chunk;
+		_hasChanged = false;
+	}
+
+	void setChanged(bool changed) { _hasChanged = changed; }
+	const bool hasChanged() const { return _hasChanged; }
+	const auto &getChunk() const { return _chunk; }
+
+private:
+	std::shared_ptr<Chunk> _chunk;
+	bool _hasChanged;
+};
+
 class ChunkRenderer
 {
 private:
@@ -45,7 +63,7 @@ public:
 	Chunk *getChunk(glm::u32vec2 pos);
 
 private:
-	std::vector<std::shared_ptr<Chunk>> _chunks;
+	std::vector<ChunkInfo> _chunks;
 	std::vector<Mesh> _meshes;
 	std::vector<Face> _faces;
 };
