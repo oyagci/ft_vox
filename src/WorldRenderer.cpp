@@ -26,8 +26,6 @@ WorldRenderer::WorldRenderer(Camera &camera, glm::vec3 &camPos) : _camPos(camPos
 	_shouldJoin.store(false);
 }
 
-std::ostream& operator<<(std::ostream& os, const glm::vec3& v);
-
 void WorldRenderer::renderChunks()
 {
 	_shader->bind();
