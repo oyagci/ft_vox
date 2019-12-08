@@ -14,7 +14,7 @@ public:
 	}
 
 	void setChanged(bool changed) { _hasChanged = changed; }
-	const bool hasChanged() const { return _hasChanged; }
+	bool hasChanged() const { return _hasChanged; }
 	const auto &getChunk() const { return _chunk; }
 
 private:
