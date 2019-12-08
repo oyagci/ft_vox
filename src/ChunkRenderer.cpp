@@ -54,7 +54,6 @@ void ChunkRenderer::update()
 
 void ChunkRenderer::updateChunk(Chunk &chunk)
 {
-	_faces.clear();
 	for (std::size_t x = 0; x < Chunk::CHUNK_SIZE; x++) {
 		for (std::size_t y = 0; y < Chunk::CHUNK_SIZE; y++) {
 			for (std::size_t z = 0; z < Chunk::CHUNK_SIZE; z++) {
@@ -265,6 +264,7 @@ void ChunkRenderer::buildChunkMesh(Chunk &chunk)
 			break;
 		}
 	}
+	_faces.clear();
 
 	mesh.build();
 	_meshes.push_back(std::move(mesh));
