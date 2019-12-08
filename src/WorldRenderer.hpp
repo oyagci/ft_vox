@@ -4,6 +4,8 @@
 #include "ChunkFactory.hpp"
 #include "ChunkRenderer.hpp"
 #include "Chunk.hpp"
+#include <thread>
+#include <atomic>
 
 using namespace lazy::graphics;
 
@@ -17,10 +19,17 @@ public:
 	void setPos(glm::vec3 pos);
 
 private:
+	const int RENDER_DISTANCE = 1;
+
 	glm::vec3 &_camPos;
 	std::unique_ptr<Shader> _shader;
 	std::unique_ptr<ChunkFactory> _factory;
 	std::unique_ptr<ChunkRenderer> _renderer;
 	std::vector<std::shared_ptr<Chunk>> _chunks;
 	Camera &_camera;
+
+	std::vector<glm::vec3> _chunksToGenerate;
+	std::thread _workerThread;
+	std::atomic_bool _isWorking;
+	std::atomic_bool _shouldJoin;
 };
