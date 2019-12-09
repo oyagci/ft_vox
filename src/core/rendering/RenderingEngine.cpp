@@ -25,18 +25,7 @@ void RenderingEngine::update()
 
 void RenderingEngine::renderScene(Scene &_scene)
 {
-    _pipeline.bind();
-
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-    _pipeline.getShader().bind();
-    _pipeline.getShader().setUniform4x4f("projectionMatrix", _camera.getProjectionMatrix());
-    _pipeline.getShader().setUniform4x4f("viewMatrix", _camera.getViewMatrix());
-    _pipeline.getShader().setUniform4x4f("viewProjectionMatrix", _camera.getViewProjectionMatrix());
-    Shader shader = _pipeline.getShader();
-    _scene.render(shader);
-    
-    _pipeline.unbind();
+    _pipeline.renderScene(_camera, _scene);
 }
 
 void RenderingEngine::render()

@@ -2,6 +2,8 @@
 
 #include <lazy.hpp>
 
+#include "Scene.hpp"
+#include "core/rendering/primitives/QuadPrimitive.hpp"
 #include "core/rendering/textures/Framebuffer.hpp"
 
 using namespace lazy;
@@ -19,7 +21,9 @@ private:
     int             _width;
     int             _height;
     Framebuffer     _gbuffer;
-    Shader          _shader;
+    Shader          _gbufferShader;
+    Shader          _quadShader;
+    QuadPrimitive   _quad;
 
 public:
     DeferredRenderer();
@@ -28,9 +32,10 @@ public:
     void resize(int width, int height);
 
     void update();
-    void bind();
-    void unbind();
+    void renderScene(Camera &camera, Scene &scene);
+    void renderDebug();
+    void bind(Shader &shader);
 
-    Shader getShader() const { return _shader; }
+    Shader getGBufferShader() const { return _gbufferShader; }
     Framebuffer getGBuffer() const { return _gbuffer; }
 };

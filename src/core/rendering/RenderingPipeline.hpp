@@ -2,9 +2,13 @@
 
 #include <lazy.hpp>
 
+#include "Scene.hpp"
 #include "core/rendering/primitives/QuadPrimitive.hpp"
 #include "core/rendering/textures/Framebuffer.hpp"
 #include "core/rendering/DeferredRenderer.hpp"
+
+using namespace lazy;
+using namespace graphics;
 
 class RenderingPipeline
 {
@@ -25,7 +29,10 @@ public:
     void bind();
     void unbind();
 
+    void renderScene(Camera &camera, Scene &scene);
+    void renderDeferred();
+    void renderScreenQuad();
     void render();
 
-    Shader getShader() const { return _deferred.getShader(); }
+    Shader getShader() const { return _deferred.getGBufferShader(); }
 };

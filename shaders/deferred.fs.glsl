@@ -1,15 +1,17 @@
 #version 330 core
 
-layout (location = 0) out vec3 g_position;
-layout (location = 1) out vec3 g_normal;
-layout (location = 2) out vec4 g_albedo;
+out vec4 frag_color;
 
-in vec3 fragpos;
-in vec3 v_normal;
+in vec3 v_position;
+
+uniform sampler2D position;
+uniform sampler2D normal;
+uniform sampler2D albedo;
 
 void main()
 {
-	g_position = fragpos;
-	g_normal = v_normal;
-	g_albedo = vec4(1, 0, 1, 1);
+	frag_color = vec4(0, 0, 0, 1);
+	frag_color += texture(position, v_position.xy);
+	frag_color += texture(normal, vec2(v_position.x + 1, v_position.y));
+	frag_color += texture(albedo, vec2(v_position.x + 1, v_position.y + 1));
 }

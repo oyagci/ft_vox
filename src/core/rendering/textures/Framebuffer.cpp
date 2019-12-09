@@ -1,11 +1,19 @@
 #include "./Framebuffer.hpp"
 
 Framebuffer::Framebuffer()
+    : _fbo(-1), _rbo(-1), _dbo(-1)
 {}
 
 Framebuffer::~Framebuffer()
 {
-    glDeleteFramebuffers(1, &_fbo);
+    if (_fbo > 0)
+        glDeleteFramebuffers(1, &_fbo);
+    if (_cbos.size() > 0)
+        glDeleteTextures(_cbos.size(), &_cbos[0]);
+    if (_dbo > 0)
+        glDeleteTextures(1, &_dbo);
+    if (_rbo > 0)
+        glDeleteRenderbuffers(1, &_rbo);
 }
 
 void Framebuffer::setSize(int width, int height)
@@ -39,7 +47,7 @@ void Framebuffer::genColorTexture(GLuint internalFormat, GLint format, GLuint ty
     glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, _width, _height, 0, format, type, NULL);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filterMode);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filterMode);
-    if (wrapMode != NULL)
+    if (wrapMode)
     {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrapMode);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrapMode);
@@ -59,21 +67,25 @@ void Framebuffer::genDepthTexture(GLuint filterMode, GLuint wrapMode)
     glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, _width, _height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filterMode);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filterMode);
-    if (wrapMode != NULL)
+    if (wrapMode)
     {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrapMode);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrapMode);
     }
     glBindTexture(GL_TEXTURE_2D, 0);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, _dbo, 0);
-    glDrawBuffer(GL_NONE);
-    glReadBuffer(GL_NONE);
     this->unbind();
 }
 
 void Framebuffer::drawBuffers(std::vector<GLenum> attachments)
 {
+    this->bind();
+    std::cout << attachments.data()[2] << "\n";
     glDrawBuffers(attachments.size(), attachments.data());
+    this->unbind();
+    
+    // unsigned int att[3] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2 };
+    // glDrawBuffers(3, att);
 }
 
 void Framebuffer::bind()
@@ -83,5 +95,7 @@ void Framebuffer::bind()
 
 void Framebuffer::unbind()
 {
+    if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+        std::cout << "Framebuffer error" << "\n";
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
