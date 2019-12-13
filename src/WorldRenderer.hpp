@@ -7,6 +7,7 @@
 #include "ChunkRenderer.hpp"
 #include "Chunk.hpp"
 #include "IRenderer.hpp"
+#include "threadpool/threadpool.hpp"
 
 using namespace lazy::graphics;
 
@@ -19,6 +20,9 @@ public:
 	void generateChunks();
 	void render() override;
 	void setPos(glm::vec3 pos);
+
+private:
+	std::vector<glm::vec3> getChunksFront();
 
 private:
 	const int RENDER_DISTANCE = 5;
@@ -34,4 +38,6 @@ private:
 	std::thread _workerThread;
 	std::atomic_bool _isWorking;
 	std::atomic_bool _shouldJoin;
+
+	thread_pool _pool;
 };

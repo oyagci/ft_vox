@@ -11,16 +11,8 @@ WorldRenderer::WorldRenderer(Camera &camera, glm::vec3 &camPos) : _camPos(camPos
 		.addFragmentShader("shaders/basic.fs.glsl");
 	_shader->link();
 
-	glm::i32vec3 gridPos(camPos / 64);
-	for (int j = -RENDER_DISTANCE; j < RENDER_DISTANCE; j++) {
-		for (int i = -RENDER_DISTANCE; i < RENDER_DISTANCE; i++) {
-			glm::vec3 pos = glm::vec3(
-					(gridPos.x + j) * 64,
-					gridPos.y * 64,
-					(gridPos.z + i) * 64);
-			_chunksToGenerate.push_back(std::move(pos));
-		}
-	}
+	std::vector<glm::vec3> chunks = getChunksFront();
+	_chunksToGenerate.insert(_chunksToGenerate.end(), chunks.begin(), chunks.end());
 
 	_isWorking.store(false);
 	_shouldJoin.store(false);
@@ -49,25 +41,43 @@ void WorldRenderer::render()
 
 void WorldRenderer::generateChunks()
 {
-	if (!_chunksToGenerate.empty() && !_isWorking.load()) {
-		_isWorking.store(true);
-		_workerThread = std::thread([&] {
-			auto pos = _chunksToGenerate.back();
-			std::shared_ptr<Chunk> chunk = _factory->getChunk(pos);
+	if (!_chunksToGenerate.empty()) {
+
+		glm::vec3 chunkPos = glm::vec3(_chunksToGenerate.back());
+		_chunksToGenerate.pop_back();
+		_pool.enqueue_work([=] {
+			std::shared_ptr<Chunk> chunk = _factory->getChunk(std::move(chunkPos));
 			_chunks.push_back(chunk);
-			_renderer->addChunk(chunk);
-			_chunksToGenerate.pop_back();
-			_shouldJoin.store(true);
 		});
 	}
-	else if (_shouldJoin.load()) {
-		_workerThread.join();
-		_isWorking.store(false);
-		_shouldJoin.store(false);
+
+	if (!_chunks.empty()) {
+		_renderer->addChunk(_chunks.back());
+		_chunks.pop_back();
 	}
 }
 
 void WorldRenderer::setPos(glm::vec3 pos)
 {
 	_camPos = std::move(pos);
+}
+
+std::vector<glm::vec3> WorldRenderer::getChunksFront()
+{
+	glm::i32vec3 dir = { 0, 0, -1 };
+	std::vector<glm::vec3> chunks;
+
+	for (int j = -3; j < 3; j++) {
+		for (int i = 14; i >= 0; i--) {
+			glm::i32vec3 gridPos = _camPos / Chunk::CHUNK_SIZE;
+
+			gridPos += (dir * i);
+			gridPos *= Chunk::CHUNK_SIZE;
+			gridPos += j * 64;
+
+			chunks.push_back(glm::vec3(gridPos));
+		}
+	}
+
+	return chunks;
 }
