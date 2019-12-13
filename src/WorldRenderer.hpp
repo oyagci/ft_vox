@@ -1,25 +1,26 @@
 #pragma once
 
+#include <thread>
+#include <atomic>
 #include "lazy.hpp"
 #include "ChunkFactory.hpp"
 #include "ChunkRenderer.hpp"
 #include "Chunk.hpp"
-#include <thread>
-#include <atomic>
+#include "IRenderer.hpp"
 
 using namespace lazy::graphics;
 
-class WorldRenderer
+class WorldRenderer : public IRenderer
 {
 public:
 	WorldRenderer(Camera &camera, glm::vec3 &camPos);
 
 	void generateChunks();
-	void renderChunks();
+	void render() override;
 	void setPos(glm::vec3 pos);
 
 private:
-	const int RENDER_DISTANCE = 1;
+	const int RENDER_DISTANCE = 5;
 
 	glm::vec3 &_camPos;
 	std::unique_ptr<Shader> _shader;

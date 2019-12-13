@@ -26,14 +26,17 @@ WorldRenderer::WorldRenderer(Camera &camera, glm::vec3 &camPos) : _camPos(camPos
 	_shouldJoin.store(false);
 }
 
-void WorldRenderer::renderChunks()
+void WorldRenderer::render()
 {
+	generateChunks();
 	_shader->bind();
 	_shader->setUniform4x4f("projectionMatrix", _camera.getProjectionMatrix());
 	_shader->setUniform4x4f("viewMatrix", _camera.getViewMatrix());
 	_shader->setUniform4x4f("viewProjectionMatrix", _camera.getViewProjectionMatrix());
 	_shader->setUniform4x4f("modelMatrix", glm::mat4(1.0f));
-	_renderer->onRender();
+
+	_renderer->render();
+
 	_shader->unbind();
 }
 
@@ -45,7 +48,7 @@ void WorldRenderer::generateChunks()
 			auto pos = _chunksToGenerate.back();
 			std::shared_ptr<Chunk> chunk = _factory->getChunk(pos);
 			_chunks.push_back(chunk);
-			_renderer->registerChunk(chunk);
+			_renderer->addChunk(chunk);
 			_chunksToGenerate.pop_back();
 			_shouldJoin.store(true);
 		});
@@ -54,7 +57,6 @@ void WorldRenderer::generateChunks()
 		_workerThread.join();
 		_isWorking.store(false);
 		_shouldJoin.store(false);
-		_renderer->update();
 	}
 }
 

@@ -8,7 +8,7 @@
 #include "ChunkFactory.hpp"
 #include "TextRenderer.hpp"
 #include "FPSCounter.hpp"
-#include "WorldRenderer.hpp"
+#include "World.hpp"
 
 using namespace lazy;
 using namespace graphics;
@@ -30,9 +30,7 @@ int main()
 	Camera camera(display, (maths::transform){camPos, glm::quat(), glm::vec3(1), nullptr});
 	camera.setProjection(70.0f, 0.1f, 1000.0f);
 
-	WorldRenderer wr(camera, camPos);
-
-	wr.generateChunks();
+	World wr(camera, camPos);
 
 	FPSCounter fpsCounter;
 
@@ -78,8 +76,7 @@ int main()
 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		wr.generateChunks();
-		wr.renderChunks();
+		wr.render();
 
 		tr.drawText(std::to_string(fpsCounter.getFPS()) + " FPS", glm::vec2(10, 10), .3f, glm::vec3(1.0f));
 	}
