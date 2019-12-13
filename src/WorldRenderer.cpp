@@ -26,6 +26,13 @@ WorldRenderer::WorldRenderer(Camera &camera, glm::vec3 &camPos) : _camPos(camPos
 	_shouldJoin.store(false);
 }
 
+WorldRenderer::~WorldRenderer()
+{
+	if (_workerThread.joinable()) {
+		_workerThread.join();
+	}
+}
+
 void WorldRenderer::render()
 {
 	generateChunks();

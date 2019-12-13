@@ -14,6 +14,7 @@ class WorldRenderer : public IRenderer
 {
 public:
 	WorldRenderer(Camera &camera, glm::vec3 &camPos);
+	~WorldRenderer();
 
 	void generateChunks();
 	void render() override;
