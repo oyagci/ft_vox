@@ -25,11 +25,6 @@ int main()
 
 	TextRenderer tr;
 
-	Shader shader;
-	shader.addVertexShader("shaders/basic.vs.glsl")
-			.addFragmentShader("shaders/basic.fs.glsl");
-	shader.link();
-
 	glm::vec3 camPos(0, 64, 300);
 
 	Camera camera(display, (maths::transform){camPos, glm::quat(), glm::vec3(1), nullptr});
