@@ -1,6 +1,5 @@
 #include <iostream>
 #include "lazy.hpp"
-#include "Cube.hpp"
 #include "Chunk.hpp"
 #include "Time.hpp"
 #include "Chunk.hpp"
@@ -47,27 +46,27 @@ int main()
 		fpsCounter.update(deltaTime);
 
 		if (input::getKeyboard().getKey(GLFW_KEY_W)) {
-			camPos += deltaTime * vec3(0, 0, 1) * -ms;
+			camPos += deltaTime * glm::vec3(0, 0, 1) * -ms;
 			camera.setPosition(std::move(camPos));
 		}
 		if (input::getKeyboard().getKey(GLFW_KEY_S)) {
-			camPos += deltaTime * vec3(0, 0, 1) * ms;
+			camPos += deltaTime * glm::vec3(0, 0, 1) * ms;
 			camera.setPosition(std::move(camPos));
 		}
 		if (input::getKeyboard().getKey(GLFW_KEY_D)) {
-			camPos += deltaTime * vec3(1, 0, 0) * ms;
+			camPos += deltaTime * glm::vec3(1, 0, 0) * ms;
 			camera.setPosition(std::move(camPos));
 		}
 		if (input::getKeyboard().getKey(GLFW_KEY_A)) {
-			camPos += deltaTime * vec3(1, 0, 0) * -ms;
+			camPos += deltaTime * glm::vec3(1, 0, 0) * -ms;
 			camera.setPosition(std::move(camPos));
 		}
 		if (input::getKeyboard().getKey(GLFW_KEY_SPACE)) {
-			camPos += deltaTime * vec3(0, 1, 0) * ms;
+			camPos += deltaTime * glm::vec3(0, 1, 0) * ms;
 			camera.setPosition(std::move(camPos));
 		}
 		if (input::getKeyboard().getKey(GLFW_KEY_LEFT_CONTROL)) {
-			camPos += deltaTime * vec3(0, 1, 0) * -ms;
+			camPos += deltaTime * glm::vec3(0, 1, 0) * -ms;
 			camera.setPosition(std::move(camPos));
 		}
 		if (input::getKeyboard().getKey(GLFW_KEY_ESCAPE)) {

@@ -3,7 +3,6 @@
 #include "lazy.hpp"
 #include <glm/vec3.hpp>
 #include <glm/matrix.hpp>
-#include "InstancedMesh.hpp"
 #include <memory>
 
 using namespace lazy::graphics;

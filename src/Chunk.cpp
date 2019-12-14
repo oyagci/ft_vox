@@ -1,6 +1,5 @@
 #include "Chunk.hpp"
 #include <cstdint>
-#include "Cube.hpp"
 #include "SimplexNoise.hpp"
 
 SimplexNoise s = SimplexNoise(0.1f, 1.0f, 2.0f, 0.25f);
