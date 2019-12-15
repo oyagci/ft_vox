@@ -11,5 +11,5 @@ void main()
 {
 	g_position = fragpos;
 	g_normal = normalize(v_normal);
-	g_albedo = vec4(1, 0, 1, 1);
+	g_albedo = vec4(1, 0, 0, 1);
 }

@@ -4,7 +4,6 @@
 
 #include "Scene.hpp"
 #include "core/rendering/primitives/QuadPrimitive.hpp"
-#include "core/rendering/textures/Framebuffer.hpp"
 #include "core/rendering/DeferredRenderer.hpp"
 
 using namespace lazy;

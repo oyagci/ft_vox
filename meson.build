@@ -7,7 +7,6 @@ srcs = [
 	'src/core/rendering/RenderingEngine.cpp',
 	'src/core/rendering/RenderingPipeline.cpp',
 	'src/core/rendering/DeferredRenderer.cpp',
-	'src/core/rendering/textures/Framebuffer.cpp',
 	'src/core/rendering/primitives/CubePrimitive.cpp',
 	'src/core/rendering/primitives/QuadPrimitive.cpp',
 	'src/Scene.cpp'

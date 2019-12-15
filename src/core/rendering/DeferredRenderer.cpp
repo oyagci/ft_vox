@@ -6,7 +6,7 @@ DeferredRenderer::DeferredRenderer()
 			.addFragmentShader("shaders/gbuffer.fs.glsl");
 	_gbufferShader.link();
     _quadShader.addVertexShader("shaders/deferred.vs.glsl")
-			    .addFragmentShader("shaders/deferred.fs.glsl");
+			.addFragmentShader("shaders/deferred.fs.glsl");
 	_quadShader.link();
 
     _gbuffer.genFramebuffer();

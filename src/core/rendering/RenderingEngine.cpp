@@ -21,6 +21,17 @@ RenderingEngine::~RenderingEngine()
 void RenderingEngine::update()
 {
     _camera.update();
+    if (_display.isFocused())
+    {
+        _camera.input(0.1f, 0.01f, {
+            GLFW_KEY_W,
+            GLFW_KEY_S,
+            GLFW_KEY_A,
+            GLFW_KEY_D,
+            GLFW_KEY_LEFT_SHIFT,
+            GLFW_KEY_SPACE
+        });
+    }
 }
 
 void RenderingEngine::renderScene(Scene &_scene)
