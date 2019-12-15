@@ -4,7 +4,7 @@
 #include "Chunk.hpp"
 #include <glm/vec3.hpp>
 #include "IRenderer.hpp"
-#include "ChunkData.hpp"
+#include "ChunkBuilder.hpp"
 
 class ChunkRenderer : public IRenderer
 {
@@ -15,5 +15,5 @@ public:
 	void addChunk(std::shared_ptr<Chunk> chunk);
 
 private:
-	std::vector<ChunkData> _chunks;
+	std::vector<ChunkBuilder> _chunks;
 };

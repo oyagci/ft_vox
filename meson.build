@@ -12,7 +12,7 @@ srcs = [
 	'src/FPSCounter.cpp',
 	'src/WorldRenderer.cpp',
 	'src/World.cpp',
-	'src/ChunkData.cpp',
+	'src/ChunkBuilder.cpp',
 ]
 
 cmake = import('cmake')

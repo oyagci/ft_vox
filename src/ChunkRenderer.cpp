@@ -6,7 +6,7 @@ ChunkRenderer::ChunkRenderer()
 
 void ChunkRenderer::addChunk(std::shared_ptr<Chunk> chunk)
 {
-	ChunkData ci(chunk);
+	ChunkBuilder ci(chunk);
 
 	_chunks.push_back(std::move(ci));
 }

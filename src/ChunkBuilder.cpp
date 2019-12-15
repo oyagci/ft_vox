@@ -1,11 +1,11 @@
-#include "ChunkData.hpp"
+#include "ChunkBuilder.hpp"
 
-ChunkData::ChunkData(std::shared_ptr<Chunk> chunk) :
+ChunkBuilder::ChunkBuilder(std::shared_ptr<Chunk> chunk) :
 	_hasChanged(false), _chunk(chunk), _isUpdating(true), _z(0)
 {
 }
 
-void ChunkData::update()
+void ChunkBuilder::update()
 {
 	if (_isUpdating) {
 		updateChunk();
@@ -17,13 +17,13 @@ void ChunkData::update()
 	}
 }
 
-void ChunkData::render()
+void ChunkBuilder::render()
 {
 	update();
 	_mesh.draw();
 }
 
-int ChunkData::getVisibleFaces(int x, int y, int z)
+int ChunkBuilder::getVisibleFaces(int x, int y, int z)
 {
 	int result = 0;
 
@@ -44,7 +44,7 @@ int ChunkData::getVisibleFaces(int x, int y, int z)
 	return result;
 }
 
-void ChunkData::updateChunk()
+void ChunkBuilder::updateChunk()
 {
 	if (!_isUpdating) {
 		_isUpdating = true;
@@ -89,7 +89,7 @@ void ChunkData::updateChunk()
 	}
 }
 
-void ChunkData::buildTopFace(Mesh &mesh, glm::vec3 pos, std::size_t indOffset)
+void ChunkBuilder::buildTopFace(Mesh &mesh, glm::vec3 pos, std::size_t indOffset)
 {
 	// Offset of the face inside the cube
 	pos.y += 0.5;
@@ -111,7 +111,7 @@ void ChunkData::buildTopFace(Mesh &mesh, glm::vec3 pos, std::size_t indOffset)
 	}
 }
 
-void ChunkData::buildBotFace(Mesh &mesh, glm::vec3 pos, std::size_t indOffset)
+void ChunkBuilder::buildBotFace(Mesh &mesh, glm::vec3 pos, std::size_t indOffset)
 {
 	// Offset of the face inside the cube
 	pos.y += 0.5;
@@ -133,7 +133,7 @@ void ChunkData::buildBotFace(Mesh &mesh, glm::vec3 pos, std::size_t indOffset)
 	}
 }
 
-void ChunkData::buildFrontFace(Mesh &mesh, glm::vec3 pos, std::size_t indOffset)
+void ChunkBuilder::buildFrontFace(Mesh &mesh, glm::vec3 pos, std::size_t indOffset)
 {
 	// Offset of the face inside the cube
 	pos.y += 0.5;
@@ -155,7 +155,7 @@ void ChunkData::buildFrontFace(Mesh &mesh, glm::vec3 pos, std::size_t indOffset)
 	}
 }
 
-void ChunkData::buildBackFace(Mesh &mesh, glm::vec3 pos, std::size_t indOffset)
+void ChunkBuilder::buildBackFace(Mesh &mesh, glm::vec3 pos, std::size_t indOffset)
 {
 	// Offset of the face inside the cube
 	pos.y += 0.5;
@@ -177,7 +177,7 @@ void ChunkData::buildBackFace(Mesh &mesh, glm::vec3 pos, std::size_t indOffset)
 	}
 }
 
-void ChunkData::buildRightFace(Mesh &mesh, glm::vec3 pos, std::size_t indOffset)
+void ChunkBuilder::buildRightFace(Mesh &mesh, glm::vec3 pos, std::size_t indOffset)
 {
 	// Offset of the face inside the cube
 	pos.y += 0.5;
@@ -199,7 +199,7 @@ void ChunkData::buildRightFace(Mesh &mesh, glm::vec3 pos, std::size_t indOffset)
 	}
 }
 
-void ChunkData::buildLeftFace(Mesh &mesh, glm::vec3 pos, std::size_t indOffset)
+void ChunkBuilder::buildLeftFace(Mesh &mesh, glm::vec3 pos, std::size_t indOffset)
 {
 	// Offset of the face inside the cube
 	pos.y += 0.5;
@@ -221,7 +221,7 @@ void ChunkData::buildLeftFace(Mesh &mesh, glm::vec3 pos, std::size_t indOffset)
 	}
 }
 
-void ChunkData::buildChunkMesh()
+void ChunkBuilder::buildChunkMesh()
 {
 	Mesh mesh;
 	std::size_t nTris = 0;
@@ -261,7 +261,7 @@ void ChunkData::buildChunkMesh()
 	_mesh = std::move(mesh);
 }
 
-void ChunkData::addFaceToRender(glm::vec3 pos, FaceDirection f)
+void ChunkBuilder::addFaceToRender(glm::vec3 pos, FaceDirection f)
 {
 	Face face = { pos, f };
 

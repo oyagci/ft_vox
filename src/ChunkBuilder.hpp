@@ -5,7 +5,7 @@
 #include "IRenderer.hpp"
 #include "Chunk.hpp"
 
-class ChunkData : public IRenderer
+class ChunkBuilder : public IRenderer
 {
 private:
 	enum FaceDirection {
@@ -22,7 +22,7 @@ private:
 	};
 
 public:
-	ChunkData(std::shared_ptr<Chunk> chunk);
+	ChunkBuilder(std::shared_ptr<Chunk> chunk);
 
 	const auto &getChunk() const { return _chunk; }
 
