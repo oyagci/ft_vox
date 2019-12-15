@@ -48,7 +48,4 @@ private:
 	std::shared_ptr<Chunk> _chunk;
 	std::vector<Face> _faces;
 	Mesh _mesh;
-
-	bool _isUpdating;
-	std::size_t _z;
 };

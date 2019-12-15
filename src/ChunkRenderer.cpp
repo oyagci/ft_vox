@@ -13,7 +13,7 @@ void ChunkRenderer::addChunk(std::shared_ptr<Chunk> chunk)
 
 void ChunkRenderer::render()
 {
-	for (auto &c : _chunks) {
-		c.render();
+	for (auto &m : _meshes) {
+		m.draw();
 	}
 }

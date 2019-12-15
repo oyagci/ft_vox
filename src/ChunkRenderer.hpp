@@ -16,4 +16,5 @@ public:
 
 private:
 	std::vector<ChunkBuilder> _chunks;
+	std::vector<Mesh> _meshes;
 };

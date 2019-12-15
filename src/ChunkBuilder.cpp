@@ -1,17 +1,14 @@
 #include "ChunkBuilder.hpp"
 
 ChunkBuilder::ChunkBuilder(std::shared_ptr<Chunk> chunk) :
-	_hasChanged(false), _chunk(chunk), _isUpdating(true), _z(0)
+	_hasChanged(false), _chunk(chunk)
 {
 }
 
 void ChunkBuilder::update()
 {
-	if (_isUpdating) {
-		updateChunk();
-	}
-
 	if (_hasChanged) {
+		updateChunk();
 		buildChunkMesh();
 		_hasChanged = false;
 	}
@@ -46,46 +43,36 @@ int ChunkBuilder::getVisibleFaces(int x, int y, int z)
 
 void ChunkBuilder::updateChunk()
 {
-	if (!_isUpdating) {
-		_isUpdating = true;
-		_z = 0;
-	}
-
-	std::size_t z = _z;
-
 	for (std::size_t x = 0; x < Chunk::CHUNK_SIZE; x++) {
 		for (std::size_t y = 0; y < Chunk::CHUNK_SIZE; y++) {
+			for (std::size_t z = 0; z < Chunk::CHUNK_SIZE; z++) {
 
-			Chunk::Block b = _chunk->getBlock(x, y, z);
+				Chunk::Block b = _chunk->getBlock(x, y, z);
 
-			if (b != 0) { continue; }
+				if (b != 0) { continue; }
 
-			int faces = getVisibleFaces(x, y, z);
+				int faces = getVisibleFaces(x, y, z);
 
-			if (faces & (1 << 0)) { // Top
-				addFaceToRender(std::move(glm::u32vec3(x, y + 1, z)), FD_BOT);
-			}
-			if (faces & (1 << 1)) { // Bottom
-				addFaceToRender(std::move(glm::u32vec3(x, y - 1, z)), FD_TOP);
-			}
-			if (faces & (1 << 2)) { // Left
-				addFaceToRender(std::move(glm::u32vec3(x - 1, y, z)), FD_RIGHT);
-			}
-			if (faces & (1 << 3)) { // Right
-				addFaceToRender(std::move(glm::u32vec3(x + 1, y, z)), FD_LEFT);
-			}
-			if (faces & (1 << 4)) { // Front
-				addFaceToRender(std::move(glm::u32vec3(x, y, z + 1)), FD_BACK);
-			}
-			if (faces & (1 << 5)) { // Back
-				addFaceToRender(std::move(glm::u32vec3(x, y, z - 1)), FD_FRONT);
+				if (faces & (1 << 0)) { // Top
+					addFaceToRender(std::move(glm::u32vec3(x, y + 1, z)), FD_BOT);
+				}
+				if (faces & (1 << 1)) { // Bottom
+					addFaceToRender(std::move(glm::u32vec3(x, y - 1, z)), FD_TOP);
+				}
+				if (faces & (1 << 2)) { // Left
+					addFaceToRender(std::move(glm::u32vec3(x - 1, y, z)), FD_RIGHT);
+				}
+				if (faces & (1 << 3)) { // Right
+					addFaceToRender(std::move(glm::u32vec3(x + 1, y, z)), FD_LEFT);
+				}
+				if (faces & (1 << 4)) { // Front
+					addFaceToRender(std::move(glm::u32vec3(x, y, z + 1)), FD_BACK);
+				}
+				if (faces & (1 << 5)) { // Back
+					addFaceToRender(std::move(glm::u32vec3(x, y, z - 1)), FD_FRONT);
+				}
 			}
 		}
-	}
-	_z++;
-	if (_z == Chunk::CHUNK_SIZE) {
-		_isUpdating = false;
-		_hasChanged = true;
 	}
 }
 
