@@ -41,20 +41,18 @@ void RenderingPipeline::renderScene(Camera &camera, Scene &scene)
 
 void RenderingPipeline::renderDeferred()
 {
-     glBindTexture(GL_TEXTURE_2D, _deferred.getGBuffer().getColorTexture(0));
-    _quadShader.bind();
-    _screenQuad.draw();
+    _deferred.render();
 }
 
 void RenderingPipeline::renderScreenQuad()
 {
-    glBindTexture(GL_TEXTURE_2D, _deferred.getGBuffer().getColorTexture(0));
     _quadShader.bind();
+    _deferred.bind(_quadShader);
     _screenQuad.draw();
 }
 
 void RenderingPipeline::render()
 {
-    _deferred.renderDebug();
-    // renderScreenQuad();
+    // _deferred.renderDebug();
+    renderDeferred();
 }

@@ -30,8 +30,11 @@ int main()
 			scene.update();
 			startTime = currentTime;
 		}
-		renderingEngine.renderScene(scene);
-		renderingEngine.render();
+		else
+		{
+			renderingEngine.renderScene(scene);
+			renderingEngine.render();
+		}
 	}
 	return 0;
 }
