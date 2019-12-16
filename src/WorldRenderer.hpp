@@ -8,6 +8,8 @@
 #include "Chunk.hpp"
 #include "IRenderer.hpp"
 #include "threadpool/threadpool.hpp"
+#include "threadpool/blocking_queue.hpp"
+#include <queue>
 
 using namespace lazy::graphics;
 
@@ -19,10 +21,12 @@ public:
 
 	void generateChunks();
 	void render() override;
+	void update();
 	void setPos(glm::vec3 pos);
 
 private:
 	std::vector<glm::vec3> getChunksFront();
+	std::vector<glm::vec3> getChunksAround();
 
 private:
 	const int RENDER_DISTANCE = 5;
@@ -31,7 +35,7 @@ private:
 	std::unique_ptr<Shader> _shader;
 	std::unique_ptr<ChunkFactory> _factory;
 	std::unique_ptr<ChunkRenderer> _renderer;
-	std::vector<std::shared_ptr<Chunk>> _chunks;
+	blocking_queue<std::shared_ptr<Chunk>> _chunks;
 	Camera &_camera;
 
 	std::vector<glm::vec3> _chunksToGenerate;

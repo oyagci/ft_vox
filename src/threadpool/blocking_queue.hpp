@@ -24,7 +24,7 @@ public:
 		while (m_count--)
 		{
 			m_data[m_popIndex].~T();
-			m_popIndex = ++m_popIndex % m_size;
+			m_popIndex = (m_popIndex + 1) % m_size;
 		}
 		operator delete(m_data);
 	}
@@ -39,7 +39,7 @@ public:
         {
             std::lock_guard<std::mutex> lock(m_cs);
             new (m_data + m_pushIndex) T (item);
-            m_pushIndex = ++m_pushIndex % m_size;
+            m_pushIndex = (m_pushIndex + 1) % m_size;
             ++m_count;
         }
         m_fullSlots.post();
@@ -63,7 +63,7 @@ public:
 				m_openSlots.post();
 				throw;
 			}
-			m_pushIndex = ++m_pushIndex % m_size;
+			m_pushIndex = (m_pushIndex + 1) % m_size;
             ++m_count;
 		}
 		m_fullSlots.post();
@@ -79,7 +79,7 @@ public:
         {
             std::lock_guard<std::mutex> lock(m_cs);
             new (m_data + m_pushIndex) T (std::move(item));
-            m_pushIndex = ++m_pushIndex % m_size;
+            m_pushIndex = (m_pushIndex + 1) % m_size;
             ++m_count;
         }
         m_fullSlots.post();
@@ -103,7 +103,7 @@ public:
                 m_openSlots.post();
                 throw;
             }
-            m_pushIndex = ++m_pushIndex % m_size;
+            m_pushIndex = (m_pushIndex + 1) % m_size;
             ++m_count;
         }
         m_fullSlots.post();
@@ -120,7 +120,7 @@ public:
             std::lock_guard<std::mutex> lock(m_cs);
             item = m_data[m_popIndex];
             m_data[m_popIndex].~T();
-            m_popIndex = ++m_popIndex % m_size;
+            m_popIndex = (m_popIndex + 1) % m_size;
             --m_count;
         }
         m_openSlots.post();
@@ -145,7 +145,7 @@ public:
                 throw;
             }
             m_data[m_popIndex].~T();
-            m_popIndex = ++m_popIndex % m_size;
+            m_popIndex = (m_popIndex + 1) % m_size;
             --m_count;
         }
         m_openSlots.post();
@@ -162,7 +162,7 @@ public:
             std::lock_guard<std::mutex> lock(m_cs);
             item = std::move(m_data[m_popIndex]);
             m_data[m_popIndex].~T();
-            m_popIndex = ++m_popIndex % m_size;
+            m_popIndex = (m_popIndex + 1) % m_size;
             --m_count;
         }
         m_openSlots.post();
@@ -187,7 +187,7 @@ public:
 				throw;
 			}
 			m_data[m_popIndex].~T();
-			m_popIndex = ++m_popIndex % m_size;
+			m_popIndex = (m_popIndex + 1) % m_size;
             --m_count;
 		}
 		m_openSlots.post();
@@ -226,5 +226,5 @@ private:
  
     fast_semaphore m_openSlots;
 	fast_semaphore m_fullSlots;
-    std::mutex m_cs;
+    mutable std::mutex m_cs;
 };

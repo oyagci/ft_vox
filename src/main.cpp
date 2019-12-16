@@ -21,19 +21,20 @@ int main()
 	display.enableCap(GL_CULL_FACE);
 	display.enableCap(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	display.setFullscreen(true);
 
 	TextRenderer tr;
 
-	glm::vec3 camPos(0, 64, 300);
+	glm::vec3 camPos(32, 64, 32);
+	maths::transform t = { camPos, glm::quat(), glm::vec3(1), nullptr };
 
-	Camera camera(display, (maths::transform){camPos, glm::quat(), glm::vec3(1), nullptr});
+	Camera camera(display, std::move(t));
 	camera.setProjection(70.0f, 0.1f, 1000.0f);
 
 	World wr(camera, camPos);
 
 	FPSCounter fpsCounter;
 
-	float ms = 30.0f;
 	while (!display.isClosed())
 	{
 		Time::instance().update();
@@ -44,6 +45,11 @@ int main()
 		float deltaTime = Time::getDeltaTime();
 
 		fpsCounter.update(deltaTime);
+
+		float ms = 30.0f;
+		if (input::getKeyboard().getKey(GLFW_KEY_LEFT_SHIFT)) {
+			ms = 500.0f;
+		}
 
 		if (input::getKeyboard().getKey(GLFW_KEY_W)) {
 			camPos += deltaTime * glm::vec3(0, 0, 1) * -ms;
@@ -75,6 +81,7 @@ int main()
 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+		wr.update();
 		wr.render();
 
 		tr.drawText(std::to_string(fpsCounter.getFPS()) + " FPS", glm::vec2(10, 10), .3f, glm::vec3(1.0f));

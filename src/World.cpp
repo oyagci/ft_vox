@@ -9,3 +9,8 @@ void World::render()
 {
 	_renderer->render();
 }
+
+void World::update()
+{
+	_renderer->update();
+}

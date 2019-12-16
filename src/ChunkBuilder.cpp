@@ -1,23 +1,17 @@
 #include "ChunkBuilder.hpp"
 
-ChunkBuilder::ChunkBuilder(std::shared_ptr<Chunk> chunk) :
-	_hasChanged(false), _chunk(chunk)
+ChunkBuilder::ChunkBuilder()
 {
 }
 
-void ChunkBuilder::update()
+Mesh ChunkBuilder::build()
 {
-	if (_hasChanged) {
-		updateChunk();
-		buildChunkMesh();
-		_hasChanged = false;
-	}
-}
+	assert(_chunk.get() != nullptr);
 
-void ChunkBuilder::render()
-{
-	update();
-	_mesh.draw();
+	std::vector<Face> faces = genChunkFaces();
+	Mesh mesh = buildChunkMesh(std::move(faces));
+
+	return mesh;
 }
 
 int ChunkBuilder::getVisibleFaces(int x, int y, int z)
@@ -41,8 +35,17 @@ int ChunkBuilder::getVisibleFaces(int x, int y, int z)
 	return result;
 }
 
-void ChunkBuilder::updateChunk()
+auto ChunkBuilder::genFaceToRender(glm::vec3 pos, FaceDirection f) -> Face
 {
+	Face face = { pos, f };
+
+	return face;
+}
+
+auto ChunkBuilder::genChunkFaces() -> std::vector<Face>
+{
+	std::vector<Face> faces;
+
 	for (std::size_t x = 0; x < Chunk::CHUNK_SIZE; x++) {
 		for (std::size_t y = 0; y < Chunk::CHUNK_SIZE; y++) {
 			for (std::size_t z = 0; z < Chunk::CHUNK_SIZE; z++) {
@@ -51,29 +54,30 @@ void ChunkBuilder::updateChunk()
 
 				if (b != 0) { continue; }
 
-				int faces = getVisibleFaces(x, y, z);
+				int visibleFaces = getVisibleFaces(x, y, z);
 
-				if (faces & (1 << 0)) { // Top
-					addFaceToRender(std::move(glm::u32vec3(x, y + 1, z)), FD_BOT);
+				if (visibleFaces & (1 << 0)) { // Top
+					faces.push_back(genFaceToRender(std::move(glm::u32vec3(x, y + 1, z)), FD_BOT));
 				}
-				if (faces & (1 << 1)) { // Bottom
-					addFaceToRender(std::move(glm::u32vec3(x, y - 1, z)), FD_TOP);
+				if (visibleFaces & (1 << 1)) { // Bottom
+					faces.push_back(genFaceToRender(std::move(glm::u32vec3(x, y - 1, z)), FD_TOP));
 				}
-				if (faces & (1 << 2)) { // Left
-					addFaceToRender(std::move(glm::u32vec3(x - 1, y, z)), FD_RIGHT);
+				if (visibleFaces & (1 << 2)) { // Left
+					faces.push_back(genFaceToRender(std::move(glm::u32vec3(x - 1, y, z)), FD_RIGHT));
 				}
-				if (faces & (1 << 3)) { // Right
-					addFaceToRender(std::move(glm::u32vec3(x + 1, y, z)), FD_LEFT);
+				if (visibleFaces & (1 << 3)) { // Right
+					faces.push_back(genFaceToRender(std::move(glm::u32vec3(x + 1, y, z)), FD_LEFT));
 				}
-				if (faces & (1 << 4)) { // Front
-					addFaceToRender(std::move(glm::u32vec3(x, y, z + 1)), FD_BACK);
+				if (visibleFaces & (1 << 4)) { // Front
+					faces.push_back(genFaceToRender(std::move(glm::u32vec3(x, y, z + 1)), FD_BACK));
 				}
-				if (faces & (1 << 5)) { // Back
-					addFaceToRender(std::move(glm::u32vec3(x, y, z - 1)), FD_FRONT);
+				if (visibleFaces & (1 << 5)) { // Back
+					faces.push_back(genFaceToRender(std::move(glm::u32vec3(x, y, z - 1)), FD_FRONT));
 				}
 			}
 		}
 	}
+	return faces;
 }
 
 void ChunkBuilder::buildTopFace(Mesh &mesh, glm::vec3 pos, std::size_t indOffset)
@@ -208,13 +212,13 @@ void ChunkBuilder::buildLeftFace(Mesh &mesh, glm::vec3 pos, std::size_t indOffse
 	}
 }
 
-void ChunkBuilder::buildChunkMesh()
+Mesh ChunkBuilder::buildChunkMesh(std::vector<Face> faces)
 {
 	Mesh mesh;
 	std::size_t nTris = 0;
 	glm::vec3 worldPos = glm::vec3(_chunk->getPos().x, 0, _chunk->getPos().y);
 
-	for (auto &f : _faces) {
+	for (auto &f : faces) {
 		switch (f.dir) {
 		case FD_TOP:
 			buildTopFace(mesh, f.pos + worldPos, nTris);
@@ -243,14 +247,6 @@ void ChunkBuilder::buildChunkMesh()
 			break;
 		}
 	}
-	_faces.clear();
 	mesh.build();
-	_mesh = std::move(mesh);
-}
-
-void ChunkBuilder::addFaceToRender(glm::vec3 pos, FaceDirection f)
-{
-	Face face = { pos, f };
-
-	_faces.push_back(std::move(face));
+	return mesh;
 }

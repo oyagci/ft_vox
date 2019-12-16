@@ -13,8 +13,10 @@ public:
 
 	void render() override;
 	void addChunk(std::shared_ptr<Chunk> chunk);
+	void update();
 
 private:
-	std::vector<ChunkBuilder> _chunks;
+	std::unique_ptr<ChunkBuilder> _builder;
 	std::vector<Mesh> _meshes;
+	std::vector<std::shared_ptr<Chunk>> _chunks;
 };

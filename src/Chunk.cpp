@@ -9,7 +9,7 @@ float simplexNoise(size_t octaves, glm::vec3 pos)
 	return s.fractal(octaves, pos.x, pos.y, pos.z);
 }
 
-Chunk::Chunk(glm::i32vec2 pos)
+Chunk::Chunk(glm::i32vec2 pos) : _shouldBeRebuilt(true)
 {
 	_blocks = std::make_unique<std::array<Block, CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE>>();
 	_worldPos = std::move(pos);

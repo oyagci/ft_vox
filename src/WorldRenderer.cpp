@@ -1,7 +1,7 @@
 #include "WorldRenderer.hpp"
 
 WorldRenderer::WorldRenderer(Camera &camera, glm::vec3 &camPos) : _camPos(camPos),
-	_camera(camera)
+	_chunks(50), _camera(camera)
 {
 	_factory = std::make_unique<ChunkFactory>();
 	_renderer = std::make_unique<ChunkRenderer>();
@@ -11,8 +11,11 @@ WorldRenderer::WorldRenderer(Camera &camera, glm::vec3 &camPos) : _camPos(camPos
 		.addFragmentShader("shaders/basic.fs.glsl");
 	_shader->link();
 
-	std::vector<glm::vec3> chunks = getChunksFront();
+	std::vector<glm::vec3> chunks = getChunksAround();
 	_chunksToGenerate.insert(_chunksToGenerate.end(), chunks.begin(), chunks.end());
+
+//	chunks = getChunksFront();
+//	_chunksToGenerate.insert(_chunksToGenerate.end(), chunks.begin(), chunks.end());
 
 	_isWorking.store(false);
 	_shouldJoin.store(false);
@@ -23,6 +26,12 @@ WorldRenderer::~WorldRenderer()
 	if (_workerThread.joinable()) {
 		_workerThread.join();
 	}
+}
+
+void WorldRenderer::update()
+{
+	generateChunks();
+	_renderer->update();
 }
 
 void WorldRenderer::render()
@@ -42,18 +51,17 @@ void WorldRenderer::render()
 void WorldRenderer::generateChunks()
 {
 	if (!_chunksToGenerate.empty()) {
-
 		glm::vec3 chunkPos = glm::vec3(_chunksToGenerate.back());
 		_chunksToGenerate.pop_back();
 		_pool.enqueue_work([=] {
 			std::shared_ptr<Chunk> chunk = _factory->getChunk(std::move(chunkPos));
-			_chunks.push_back(chunk);
+			_chunks.push(chunk);
 		});
 	}
 
 	if (!_chunks.empty()) {
-		_renderer->addChunk(_chunks.back());
-		_chunks.pop_back();
+		auto chunk = _chunks.pop();
+		_renderer->addChunk(std::move(chunk));
 	}
 }
 
@@ -77,6 +85,31 @@ std::vector<glm::vec3> WorldRenderer::getChunksFront()
 
 			chunks.push_back(glm::vec3(gridPos));
 		}
+	}
+
+	return chunks;
+}
+
+std::vector<glm::vec3> WorldRenderer::getChunksAround()
+{
+	std::vector<glm::vec3> chunks;
+	glm::i32vec3 gridPos = _camPos / Chunk::CHUNK_SIZE;
+
+	std::array<glm::i32vec3, 9> positions = {
+		glm::i32vec3(gridPos.x,     gridPos.y, gridPos.z    ), // Center
+		glm::i32vec3(gridPos.x - 1, gridPos.y, gridPos.z    ), // Left
+		glm::i32vec3(gridPos.x + 1, gridPos.y, gridPos.z    ), // Right
+		glm::i32vec3(gridPos.x,     gridPos.y, gridPos.z + 1), // Front
+		glm::i32vec3(gridPos.x,     gridPos.y, gridPos.z - 1), // Back
+		glm::i32vec3(gridPos.x - 1, gridPos.y, gridPos.z + 1), // Front Left
+		glm::i32vec3(gridPos.x + 1, gridPos.y, gridPos.z + 1), // Front Right
+		glm::i32vec3(gridPos.x - 1, gridPos.y, gridPos.z - 1), // Back Left
+		glm::i32vec3(gridPos.x + 1, gridPos.y, gridPos.z - 1), // Back Right
+	};
+
+	for (auto &p : positions) {
+		glm::vec3 finalPos = glm::vec3(p) * Chunk::CHUNK_SIZE;
+		chunks.push_back(glm::vec3(finalPos));
 	}
 
 	return chunks;

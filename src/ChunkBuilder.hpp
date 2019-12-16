@@ -2,10 +2,10 @@
 
 #include <glm/vec3.hpp>
 #include <memory>
-#include "IRenderer.hpp"
 #include "Chunk.hpp"
+#include <cassert>
 
-class ChunkBuilder : public IRenderer
+class ChunkBuilder
 {
 private:
 	enum FaceDirection {
@@ -22,18 +22,19 @@ private:
 	};
 
 public:
-	ChunkBuilder(std::shared_ptr<Chunk> chunk);
+	ChunkBuilder();
 
 	const auto &getChunk() const { return _chunk; }
 
-	void render() override;
+	void setChunk(std::shared_ptr<Chunk> chunk) { _chunk = chunk; }
+	Mesh build();
 
 private:
-	void update();
-	void updateChunk();
+	std::vector<Face> genChunkFaces();
+	int getVisibleFaces(int x, int y, int z);
+	Face genFaceToRender(glm::vec3 pos, FaceDirection f);
 
-	void addFaceToRender(glm::vec3 pos, FaceDirection f);
-	void buildChunkMesh();
+	Mesh buildChunkMesh(std::vector<Face> faces);
 	void buildTopFace(Mesh &mesh, glm::vec3 pos, std::size_t indOffset);
 	void buildFrontFace(Mesh &mesh, glm::vec3 pos, std::size_t indOffset);
 	void buildBotFace(Mesh &mesh, glm::vec3 pos, std::size_t indOffset);
@@ -41,11 +42,5 @@ private:
 	void buildRightFace(Mesh &mesh, glm::vec3 pos, std::size_t indOffset);
 	void buildLeftFace(Mesh &mesh, glm::vec3 pos, std::size_t indOffset);
 
-	int getVisibleFaces(int x, int y, int z);
-
-	bool _hasChanged;
-
 	std::shared_ptr<Chunk> _chunk;
-	std::vector<Face> _faces;
-	Mesh _mesh;
 };

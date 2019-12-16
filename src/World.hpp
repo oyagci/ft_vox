@@ -9,6 +9,7 @@ public:
 	World(Camera &cam, glm::vec3 &camPos);
 
 	void render() override;
+	void update();
 
 private:
 	std::unique_ptr<WorldRenderer> _renderer;
