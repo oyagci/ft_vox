@@ -29,7 +29,7 @@ int main()
 	maths::transform t = { camPos, glm::quat(), glm::vec3(1), nullptr };
 
 	Camera camera(display, std::move(t));
-	camera.setProjection(70.0f, 0.1f, 1000.0f);
+	camera.setProjection(glm::radians(80.0f), 0.1f, 1000.0f);
 
 	World wr(camera, camPos);
 
@@ -50,34 +50,19 @@ int main()
 		if (input::getKeyboard().getKey(GLFW_KEY_LEFT_SHIFT)) {
 			ms = 500.0f;
 		}
-
-		if (input::getKeyboard().getKey(GLFW_KEY_W)) {
-			camPos += deltaTime * glm::vec3(0, 0, 1) * -ms;
-			camera.setPosition(std::move(camPos));
-		}
-		if (input::getKeyboard().getKey(GLFW_KEY_S)) {
-			camPos += deltaTime * glm::vec3(0, 0, 1) * ms;
-			camera.setPosition(std::move(camPos));
-		}
-		if (input::getKeyboard().getKey(GLFW_KEY_D)) {
-			camPos += deltaTime * glm::vec3(1, 0, 0) * ms;
-			camera.setPosition(std::move(camPos));
-		}
-		if (input::getKeyboard().getKey(GLFW_KEY_A)) {
-			camPos += deltaTime * glm::vec3(1, 0, 0) * -ms;
-			camera.setPosition(std::move(camPos));
-		}
-		if (input::getKeyboard().getKey(GLFW_KEY_SPACE)) {
-			camPos += deltaTime * glm::vec3(0, 1, 0) * ms;
-			camera.setPosition(std::move(camPos));
-		}
-		if (input::getKeyboard().getKey(GLFW_KEY_LEFT_CONTROL)) {
-			camPos += deltaTime * glm::vec3(0, 1, 0) * -ms;
-			camera.setPosition(std::move(camPos));
-		}
 		if (input::getKeyboard().getKey(GLFW_KEY_ESCAPE)) {
 			glfwSetWindowShouldClose(display.getWindow(), GLFW_TRUE);
 		}
+
+		camera.input(ms * deltaTime, 0.001f, {
+			GLFW_KEY_W,
+			GLFW_KEY_S,
+			GLFW_KEY_A,
+			GLFW_KEY_D,
+			GLFW_KEY_LEFT_CONTROL,
+			GLFW_KEY_SPACE
+		});
+
 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
