@@ -28,8 +28,13 @@ private:
 	std::vector<glm::vec3> getChunksFront();
 	std::vector<glm::vec3> getChunksAround();
 
+	std::vector<glm::vec3> getChunksTriangleNorth();
+	std::vector<glm::vec3> getChunksTriangleSouth();
+	std::vector<glm::vec3> getChunksTriangleEast();
+	std::vector<glm::vec3> getChunksTriangleWest();
+
 private:
-	const int RENDER_DISTANCE = 5;
+	const int RENDER_DISTANCE = 14;
 
 	glm::vec3 &_camPos;
 	std::unique_ptr<Shader> _shader;
@@ -38,7 +43,7 @@ private:
 	blocking_queue<std::shared_ptr<Chunk>> _chunks;
 	Camera &_camera;
 
-	std::vector<glm::vec3> _chunksToGenerate;
+	std::queue<glm::vec3> _chunksToGenerate;
 	std::thread _workerThread;
 	std::atomic_bool _isWorking;
 	std::atomic_bool _shouldJoin;
