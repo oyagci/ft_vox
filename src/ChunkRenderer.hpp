@@ -29,7 +29,7 @@ private:
 
 	using Faces = std::vector<ChunkBuilder::Face>;
 
-	std::mutex _f;
+	std::mutex _cf;
 	std::queue<std::tuple<glm::vec2, Faces>> _chunkFaces;
 
 	thread_pool _pool;

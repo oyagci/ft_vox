@@ -23,10 +23,16 @@ void ChunkRenderer::update()
 
 	for (auto &c : _chunks) {
 		if (c->shouldBeRebuilt()) {
-			c->setShouldBeRebuilt(false);
 
-			_builder->setChunk(c);
-			_chunkFaces.push(std::make_tuple(glm::vec2(c->getPos()), _builder->genChunkFaces()));
+			if (!_pool.isFull()) {
+				c->setShouldBeRebuilt(false);
+				_pool.enqueue_work([=] {
+					ChunkBuilder builder;
+					builder.setChunk(c);
+					std::unique_lock l(_cf);
+					_chunkFaces.push(std::make_tuple(glm::vec2(c->getPos()), builder.genChunkFaces()));
+				});
+			}
 		}
 	}
 	buildChunks();
@@ -37,10 +43,10 @@ void ChunkRenderer::update()
 
 void ChunkRenderer::buildChunks()
 {
-	if (!_chunkFaces.empty()) {
-//		std::unique_lock<std::mutex> l_f(_f);
-		std::tuple<glm::vec2, Faces> faces = _chunkFaces.front();
+	std::unique_lock l(_cf);
 
+	if (!_chunkFaces.empty()) {
+		std::tuple<glm::vec2, Faces> faces = _chunkFaces.front();
 		Mesh mesh = _builder->build(std::get<0>(faces), std::get<1>(faces));
 		_meshes.push_back(std::move(mesh));
 		_chunkFaces.pop();

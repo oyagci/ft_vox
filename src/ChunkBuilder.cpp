@@ -6,8 +6,6 @@ ChunkBuilder::ChunkBuilder()
 
 Mesh ChunkBuilder::build(glm::vec2 pos, std::vector<Face> faces)
 {
-	assert(_chunk.get() != nullptr);
-
 	Mesh mesh = buildChunkMesh(std::move(pos), std::move(faces));
 
 	return mesh;
