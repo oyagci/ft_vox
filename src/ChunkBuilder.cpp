@@ -4,12 +4,11 @@ ChunkBuilder::ChunkBuilder()
 {
 }
 
-Mesh ChunkBuilder::build()
+Mesh ChunkBuilder::build(glm::vec2 pos, std::vector<Face> faces)
 {
 	assert(_chunk.get() != nullptr);
 
-	std::vector<Face> faces = genChunkFaces();
-	Mesh mesh = buildChunkMesh(std::move(faces));
+	Mesh mesh = buildChunkMesh(std::move(pos), std::move(faces));
 
 	return mesh;
 }
@@ -212,11 +211,11 @@ void ChunkBuilder::buildLeftFace(Mesh &mesh, glm::vec3 pos, std::size_t indOffse
 	}
 }
 
-Mesh ChunkBuilder::buildChunkMesh(std::vector<Face> faces)
+Mesh ChunkBuilder::buildChunkMesh(glm::vec2 chunkPos, std::vector<Face> faces)
 {
 	Mesh mesh;
 	std::size_t nTris = 0;
-	glm::vec3 worldPos = glm::vec3(_chunk->getPos().x, 0, _chunk->getPos().y);
+	glm::vec3 worldPos = glm::vec3(chunkPos.x, 0, chunkPos.y);
 
 	for (auto &f : faces) {
 		switch (f.dir) {

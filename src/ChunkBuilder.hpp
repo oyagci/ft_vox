@@ -7,7 +7,7 @@
 
 class ChunkBuilder
 {
-private:
+public:
 	enum FaceDirection {
 		FD_TOP,
 		FD_BOT,
@@ -27,14 +27,15 @@ public:
 	const auto &getChunk() const { return _chunk; }
 
 	void setChunk(std::shared_ptr<Chunk> chunk) { _chunk = chunk; }
-	Mesh build();
+	Mesh build(glm::vec2 pos, std::vector<Face> faces);
+
+	std::vector<Face> genChunkFaces();
 
 private:
-	std::vector<Face> genChunkFaces();
 	int getVisibleFaces(int x, int y, int z);
 	Face genFaceToRender(glm::vec3 pos, FaceDirection f);
 
-	Mesh buildChunkMesh(std::vector<Face> faces);
+	Mesh buildChunkMesh(glm::vec2 chunkPos, std::vector<Face> faces);
 	void buildTopFace(Mesh &mesh, glm::vec3 pos, std::size_t indOffset);
 	void buildFrontFace(Mesh &mesh, glm::vec3 pos, std::size_t indOffset);
 	void buildBotFace(Mesh &mesh, glm::vec3 pos, std::size_t indOffset);

@@ -1,7 +1,7 @@
 #include "WorldRenderer.hpp"
 
 WorldRenderer::WorldRenderer(Camera &camera, glm::vec3 &camPos) : _camPos(camPos),
-	_chunks(50), _camera(camera)
+	_chunks(255), _camera(camera), _pool(1)
 {
 	_factory = std::make_unique<ChunkFactory>();
 	_renderer = std::make_unique<ChunkRenderer>();
@@ -35,16 +35,10 @@ WorldRenderer::WorldRenderer(Camera &camera, glm::vec3 &camPos) : _camPos(camPos
 	for (auto &c : chunks) {
 		_chunksToGenerate.push(std::move(c));
 	}
-
-	_isWorking.store(false);
-	_shouldJoin.store(false);
 }
 
 WorldRenderer::~WorldRenderer()
 {
-	if (_workerThread.joinable()) {
-		_workerThread.join();
-	}
 }
 
 void WorldRenderer::update()
@@ -69,10 +63,11 @@ void WorldRenderer::render()
 
 void WorldRenderer::generateChunks()
 {
-	if (!_chunksToGenerate.empty()) {
-		glm::vec3 chunkPos = glm::vec3(_chunksToGenerate.front());
-		_chunksToGenerate.pop();
-		_pool.enqueue_work([=] {
+	if (!_chunksToGenerate.empty() && !_pool.isFull()) {
+		_pool.enqueue_work([&] {
+			glm::vec3 chunkPos = glm::vec3(_chunksToGenerate.front());
+			_chunksToGenerate.pop();
+
 			std::shared_ptr<Chunk> chunk = _factory->getChunk(std::move(chunkPos));
 			_chunks.push(chunk);
 		});

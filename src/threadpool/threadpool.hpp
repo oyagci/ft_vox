@@ -61,6 +61,10 @@ public:
 		return res;
 	}
 
+	bool isFull() {
+		return _workQueue.size() == _workQueue.max_size();
+	}
+
 private:
 	using ThreadPool = std::vector<std::thread>;
 	ThreadPool _threads;

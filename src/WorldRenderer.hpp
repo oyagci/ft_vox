@@ -44,9 +44,6 @@ private:
 	Camera &_camera;
 
 	std::queue<glm::vec3> _chunksToGenerate;
-	std::thread _workerThread;
-	std::atomic_bool _isWorking;
-	std::atomic_bool _shouldJoin;
 
 	thread_pool _pool;
 };
