@@ -4,6 +4,7 @@
 
 #include "Scene.hpp"
 #include "core/rendering/primitives/QuadPrimitive.hpp"
+#include "core/rendering/lights/Light.hpp"
 
 using namespace lazy;
 using namespace graphics;
@@ -35,7 +36,7 @@ public:
     void renderDebug();
     void bind(Shader &shader);
     void unbind();
-    void render();
+    void render(const Light &light);
 
     Shader getGBufferShader() const { return _gbufferShader; }
     Framebuffer getGBuffer() const { return _gbuffer; }

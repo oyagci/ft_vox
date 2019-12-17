@@ -42,5 +42,5 @@ void RenderingEngine::renderScene(Scene &_scene)
 void RenderingEngine::render()
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    _pipeline.render();
+    _pipeline.render(_ligths);
 }

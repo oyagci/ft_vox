@@ -62,7 +62,7 @@ void DeferredRenderer::renderDebug()
     _quad.draw();
 }
 
-void DeferredRenderer::render()
+void DeferredRenderer::render(const Light &light)
 {
     _quadShader.bind(); 
     this->bind(_quadShader);

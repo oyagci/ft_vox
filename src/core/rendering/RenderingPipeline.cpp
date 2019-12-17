@@ -51,7 +51,7 @@ void RenderingPipeline::renderScreenQuad()
     _screenQuad.draw();
 }
 
-void RenderingPipeline::render()
+void RenderingPipeline::render(const std::vector<Light> &lights)
 {
     // _deferred.renderDebug();
     renderDeferred();

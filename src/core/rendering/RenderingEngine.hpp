@@ -1,9 +1,11 @@
 #pragma once
 
 #include <lazy.hpp>
+#include <vector>
 
 #include "./RenderingPipeline.hpp"
 #include "./primitives/QuadPrimitive.hpp"
+#include "./lights/Light.hpp"
 #include "Scene.hpp"
 
 using namespace lazy;
@@ -16,6 +18,8 @@ private:
     RenderingPipeline   _pipeline;
     Shader              _basicShader;
     Camera              _camera;
+
+    std::vector<Light>  _lights;
 
 public:
     RenderingEngine(const Display &display);

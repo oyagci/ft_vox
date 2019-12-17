@@ -31,7 +31,7 @@ public:
     void renderScene(Camera &camera, Scene &scene);
     void renderDeferred();
     void renderScreenQuad();
-    void render();
+    void render(const std::vector<Light> &lights);
 
     Shader getShader() const { return _deferred.getGBufferShader(); }
 };
