@@ -36,6 +36,7 @@ private:
 	Face genFaceToRender(glm::vec3 pos, FaceDirection f);
 
 	Mesh buildChunkMesh(glm::vec2 chunkPos, std::vector<Face> faces);
+	Mesh buildChunkFaces(glm::vec2 chunkPos, std::vector<Face> faces);
 	void buildTopFace(Mesh &mesh, glm::vec3 pos, std::size_t indOffset);
 	void buildFrontFace(Mesh &mesh, glm::vec3 pos, std::size_t indOffset);
 	void buildBotFace(Mesh &mesh, glm::vec3 pos, std::size_t indOffset);

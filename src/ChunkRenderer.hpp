@@ -9,6 +9,22 @@
 #include <queue>
 #include <tuple>
 
+struct ChunkMesh {
+	Mesh mesh;
+	bool isBuilt;
+
+	ChunkMesh(Mesh mesh, bool isBuilt = false) : mesh(std::move(mesh)), isBuilt(isBuilt) {}
+	void build() {
+		if (!isBuilt) {
+			mesh.build();
+			isBuilt = true;
+		}
+	}
+	void draw() {
+		mesh.draw();
+	}
+};
+
 class ChunkRenderer : public IRenderer
 {
 public:
@@ -24,7 +40,7 @@ private:
 private:
 	std::unique_ptr<ChunkBuilder> _builder;
 
-	std::vector<Mesh> _meshes;
+	std::vector<ChunkMesh> _meshes;
 	std::vector<std::shared_ptr<Chunk>> _chunks;
 
 	using Faces = std::vector<ChunkBuilder::Face>;
@@ -33,4 +49,7 @@ private:
 	std::queue<std::tuple<glm::vec2, Faces>> _chunkFaces;
 
 	thread_pool _pool;
+
+	std::mutex _cm;
+	std::queue<ChunkMesh> _chunkMeshes;
 };

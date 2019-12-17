@@ -6,7 +6,7 @@ ChunkBuilder::ChunkBuilder()
 
 Mesh ChunkBuilder::build(glm::vec2 pos, std::vector<Face> faces)
 {
-	Mesh mesh = buildChunkMesh(std::move(pos), std::move(faces));
+	Mesh mesh = buildChunkFaces(std::move(pos), std::move(faces));
 
 	return mesh;
 }
@@ -209,41 +209,50 @@ void ChunkBuilder::buildLeftFace(Mesh &mesh, glm::vec3 pos, std::size_t indOffse
 	}
 }
 
-Mesh ChunkBuilder::buildChunkMesh(glm::vec2 chunkPos, std::vector<Face> faces)
+Mesh ChunkBuilder::buildChunkFaces(glm::vec2 chunkPos, std::vector<Face> faces)
 {
 	Mesh mesh;
-	std::size_t nTris = 0;
+	std::size_t nVert = 0;
 	glm::vec3 worldPos = glm::vec3(chunkPos.x, 0, chunkPos.y);
 
 	for (auto &f : faces) {
 		switch (f.dir) {
 		case FD_TOP:
-			buildTopFace(mesh, f.pos + worldPos, nTris);
-			nTris += 4;
+			buildTopFace(mesh, f.pos + worldPos, nVert);
+			nVert += 4;
 			break ;
 		case FD_BOT:
-			buildBotFace(mesh, f.pos + worldPos, nTris);
-			nTris += 4;
+			buildBotFace(mesh, f.pos + worldPos, nVert);
+			nVert += 4;
 			break ;
 		case FD_FRONT:
-			buildFrontFace(mesh, f.pos + worldPos, nTris);
-			nTris += 4;
+			buildFrontFace(mesh, f.pos + worldPos, nVert);
+			nVert += 4;
 			break ;
 		case FD_BACK:
-			buildBackFace(mesh, f.pos + worldPos, nTris);
-			nTris += 4;
+			buildBackFace(mesh, f.pos + worldPos, nVert);
+			nVert += 4;
 			break ;
 		case FD_RIGHT:
-			buildRightFace(mesh, f.pos + worldPos, nTris);
-			nTris += 4;
+			buildRightFace(mesh, f.pos + worldPos, nVert);
+			nVert += 4;
 			break ;
 		case FD_LEFT:
-			buildLeftFace(mesh, f.pos + worldPos, nTris);
-			nTris += 4;
+			buildLeftFace(mesh, f.pos + worldPos, nVert);
+			nVert += 4;
 		default:
 			break;
 		}
 	}
+
+	return mesh;
+}
+
+Mesh ChunkBuilder::buildChunkMesh(glm::vec2 chunkPos, std::vector<Face> faces)
+{
+	Mesh mesh;
+
+	mesh = std::move(buildChunkFaces(std::move(chunkPos), std::move(faces)));
 	mesh.build();
 	return mesh;
 }

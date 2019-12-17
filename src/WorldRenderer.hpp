@@ -34,7 +34,7 @@ private:
 	std::vector<glm::vec3> getChunksTriangleWest();
 
 private:
-	const int RENDER_DISTANCE = 14;
+	const int RENDER_DISTANCE = 6;
 
 	glm::vec3 &_camPos;
 	std::unique_ptr<Shader> _shader;
