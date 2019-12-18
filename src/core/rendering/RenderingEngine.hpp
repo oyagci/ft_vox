@@ -6,6 +6,7 @@
 #include "./RenderingPipeline.hpp"
 #include "./primitives/QuadPrimitive.hpp"
 #include "./lights/Light.hpp"
+#include "./lights/PointLight.hpp"
 #include "Scene.hpp"
 
 using namespace lazy;
@@ -19,11 +20,13 @@ private:
     Shader              _basicShader;
     Camera              _camera;
 
-    std::vector<Light>  _lights;
+    std::vector<Light*>  _lights;
 
 public:
     RenderingEngine(const Display &display);
     ~RenderingEngine();
+
+    void addLight(Light *light);
 
     void update();
     void renderScene(Scene &_scene);

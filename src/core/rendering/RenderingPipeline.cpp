@@ -6,7 +6,7 @@ RenderingPipeline::RenderingPipeline()
 			    .addFragmentShader("shaders/screen_quad.fs.glsl");
 	_quadShader.link();
 
-    // _fbo.genFramebuffer();
+    _fbo.genFramebuffer();
 }
 
 RenderingPipeline::~RenderingPipeline()
@@ -39,20 +39,41 @@ void RenderingPipeline::renderScene(Camera &camera, Scene &scene)
     _deferred.renderScene(camera, scene);
 }
 
-void RenderingPipeline::renderDeferred()
+void RenderingPipeline::renderDeferred(Light &light)
 {
-    _deferred.render();
+    _deferred.render(light);
+}
+
+void RenderingPipeline::renderForward(std::vector<Light*> &lights)
+{
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_ONE, GL_ONE);
+    glDepthMask(false);
+    glDepthFunc(GL_EQUAL);
+
+    for (Light *light : lights)
+    {
+        renderDeferred(*light);
+    }
+
+    glDepthFunc(GL_LESS);
+    glDepthMask(true);
+    glDisable(GL_BLEND);
 }
 
 void RenderingPipeline::renderScreenQuad()
 {
+    glBindTexture(GL_TEXTURE_2D, _fbo.getColorTexture(0));
     _quadShader.bind();
-    _deferred.bind(_quadShader);
     _screenQuad.draw();
 }
 
-void RenderingPipeline::render(const std::vector<Light> &lights)
+void RenderingPipeline::render(std::vector<Light*> &lights)
 {
-    // _deferred.renderDebug();
-    renderDeferred();
+    bind();
+    renderForward(lights);
+    unbind();
+    renderScreenQuad();
 }
