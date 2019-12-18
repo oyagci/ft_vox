@@ -12,6 +12,8 @@ RenderingEngine::RenderingEngine(const Display &display)
 
     addLight(new PointLight(glm::vec4(1, 0, 0, 1), 1, glm::vec3(5, 0, 0)));
     addLight(new PointLight(glm::vec4(0, 0, 1, 1), 1, glm::vec3(-5, 0, 0)));
+    addLight(new PointLight(glm::vec4(0, 1, 0, 1), 1, glm::vec3(0, 5, 0)));
+    addLight(new PointLight(glm::vec4(1, 0, 1, 1), 1, glm::vec3(0, -5, 0)));
 }
 
 RenderingEngine::~RenderingEngine()
