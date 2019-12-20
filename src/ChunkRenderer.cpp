@@ -1,4 +1,5 @@
 #include "ChunkRenderer.hpp"
+#include "GreedyRenderer.hpp"
 
 ChunkRenderer::ChunkRenderer() : _pool(1)
 {
@@ -27,8 +28,9 @@ void ChunkRenderer::update()
 					ChunkBuilder builder;
 					builder.setChunk(c);
 
-					std::vector<ChunkBuilder::Face> faces = builder.genChunkFaces();
-					Mesh mesh = _builder->build(glm::vec2(c->getPos()), faces);
+					GreedyRenderer grdy;
+					std::vector<VoxelQuad> vq = grdy.greedy(c);
+					Mesh mesh = grdy.generateMesh(std::move(vq));
 
 					std::unique_lock<std::mutex> lcm(_cm);
 					_chunkMeshes.push(ChunkMesh(mesh));

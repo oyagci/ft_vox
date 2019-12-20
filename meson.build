@@ -13,6 +13,7 @@ srcs = [
 	'src/WorldRenderer.cpp',
 	'src/World.cpp',
 	'src/ChunkBuilder.cpp',
+	'src/GreedyRenderer.cpp',
 ]
 
 cmake = import('cmake')
