@@ -1,6 +1,7 @@
 #pragma once
 #include <memory>
 #include "WorldRenderer.hpp"
+#include "WorldBuilder.hpp"
 #include "IRenderer.hpp"
 
 class World : public IRenderer
@@ -13,4 +14,5 @@ public:
 
 private:
 	std::unique_ptr<WorldRenderer> _renderer;
+	std::unique_ptr<WorldBuilder> _builder;
 };

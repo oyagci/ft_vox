@@ -1,40 +1,14 @@
 #include "WorldRenderer.hpp"
 
 WorldRenderer::WorldRenderer(Camera &camera, glm::vec3 &camPos) : _camPos(camPos),
-	_chunks(255), _camera(camera), _pool(1)
+	_camera(camera)
 {
-	_factory = std::make_unique<ChunkFactory>();
 	_renderer = std::make_unique<ChunkRenderer>();
 
 	_shader = std::make_unique<Shader>();
 	_shader->addVertexShader("shaders/basic.vs.glsl")
 		.addFragmentShader("shaders/basic.fs.glsl");
 	_shader->link();
-
-	std::vector<glm::vec3> chunks = getChunksAround();
-	for (auto &c : chunks) {
-		_chunksToGenerate.push(std::move(c));
-	}
-
-	chunks = getChunksTriangleNorth();
-	for (auto &c : chunks) {
-		_chunksToGenerate.push(std::move(c));
-	}
-
-	chunks = getChunksTriangleSouth();
-	for (auto &c : chunks) {
-		_chunksToGenerate.push(std::move(c));
-	}
-
-	chunks = getChunksTriangleEast();
-	for (auto &c : chunks) {
-		_chunksToGenerate.push(std::move(c));
-	}
-
-	chunks = getChunksTriangleWest();
-	for (auto &c : chunks) {
-		_chunksToGenerate.push(std::move(c));
-	}
 }
 
 WorldRenderer::~WorldRenderer()
@@ -43,13 +17,15 @@ WorldRenderer::~WorldRenderer()
 
 void WorldRenderer::update()
 {
-	generateChunks();
+	if (!_chunks.empty()) {
+		_renderer->addChunk(_chunks.back());
+		_chunks.pop_back();
+	}
 	_renderer->update();
 }
 
 void WorldRenderer::render()
 {
-	generateChunks();
 	_shader->bind();
 	_shader->setUniform4x4f("projectionMatrix", _camera.getProjectionMatrix());
 	_shader->setUniform4x4f("viewMatrix", _camera.getViewMatrix());
@@ -61,134 +37,16 @@ void WorldRenderer::render()
 	_shader->unbind();
 }
 
-void WorldRenderer::generateChunks()
-{
-	if (!_chunksToGenerate.empty() && !_pool.isFull()) {
-		_pool.enqueue_work([&] {
-			glm::vec3 chunkPos = glm::vec3(_chunksToGenerate.front());
-			_chunksToGenerate.pop();
-
-			std::shared_ptr<Chunk> chunk = _factory->getChunk(std::move(chunkPos));
-			_chunks.push(chunk);
-		});
-	}
-
-	if (!_chunks.empty()) {
-		auto chunk = _chunks.pop();
-		_renderer->addChunk(std::move(chunk));
-	}
-}
-
 void WorldRenderer::setPos(glm::vec3 pos)
 {
 	_camPos = std::move(pos);
 }
 
-std::vector<glm::vec3> WorldRenderer::getChunksFront()
+void WorldRenderer::giveChunks(std::queue<std::shared_ptr<Chunk>> chunks)
 {
-	glm::i32vec3 dir = { 0, 0, -1 };
-	std::vector<glm::vec3> chunks;
-
-	for (int j = -3; j < 3; j++) {
-		for (int i = 14; i >= 0; i--) {
-			glm::i32vec3 gridPos = _camPos / Chunk::CHUNK_SIZE;
-
-			gridPos += (dir * i);
-			gridPos *= Chunk::CHUNK_SIZE;
-			gridPos += j * 64;
-
-			chunks.push_back(glm::vec3(gridPos));
-		}
+	while (!chunks.empty()) {
+		std::shared_ptr<Chunk> c = chunks.front();
+		_chunks.push_back(c);
+		chunks.pop();
 	}
-
-	return chunks;
-}
-
-std::vector<glm::vec3> WorldRenderer::getChunksAround()
-{
-	std::vector<glm::vec3> chunks;
-	glm::i32vec3 gridPos = _camPos / Chunk::CHUNK_SIZE;
-
-	std::array<glm::i32vec3, 9> positions = {
-		glm::i32vec3(gridPos.x,     gridPos.y, gridPos.z    ), // Center
-		glm::i32vec3(gridPos.x - 1, gridPos.y, gridPos.z    ), // Left
-		glm::i32vec3(gridPos.x + 1, gridPos.y, gridPos.z    ), // Right
-		glm::i32vec3(gridPos.x,     gridPos.y, gridPos.z + 1), // Front
-		glm::i32vec3(gridPos.x,     gridPos.y, gridPos.z - 1), // Back
-		glm::i32vec3(gridPos.x - 1, gridPos.y, gridPos.z + 1), // Front Left
-		glm::i32vec3(gridPos.x + 1, gridPos.y, gridPos.z + 1), // Front Right
-		glm::i32vec3(gridPos.x - 1, gridPos.y, gridPos.z - 1), // Back Left
-		glm::i32vec3(gridPos.x + 1, gridPos.y, gridPos.z - 1), // Back Right
-	};
-
-	for (auto &p : positions) {
-		glm::vec3 finalPos = glm::vec3(p) * Chunk::CHUNK_SIZE;
-		chunks.push_back(glm::vec3(finalPos));
-	}
-
-	return chunks;
-}
-
-std::vector<glm::vec3> WorldRenderer::getChunksTriangleNorth()
-{
-	std::vector<glm::vec3> chunks;
-
-	for (int xoff = 0; xoff < RENDER_DISTANCE; xoff++) {
-		glm::i32vec3 gridPos = _camPos / Chunk::CHUNK_SIZE;
-
-		gridPos.z += xoff;
-		for (int yoff = xoff; yoff > -xoff - 1; yoff--) {
-			glm::vec3 chunkPos = glm::vec3(gridPos.x + yoff, gridPos.y, gridPos.z) * 64.0f;
-			chunks.push_back(std::move(chunkPos));
-		}
-	}
-	return chunks;
-}
-
-std::vector<glm::vec3> WorldRenderer::getChunksTriangleSouth()
-{
-	std::vector<glm::vec3> chunks;
-
-	for (int xoff = 0; xoff < RENDER_DISTANCE; xoff++) {
-		glm::i32vec3 gridPos = _camPos / Chunk::CHUNK_SIZE;
-
-		gridPos.z -= xoff;
-		for (int yoff = xoff; yoff > -xoff - 1; yoff--) {
-			glm::vec3 chunkPos = glm::vec3(gridPos.x + yoff, gridPos.y, gridPos.z) * 64.0f;
-			chunks.push_back(std::move(chunkPos));
-		}
-	}
-	return chunks;
-}
-
-std::vector<glm::vec3> WorldRenderer::getChunksTriangleEast()
-{
-	std::vector<glm::vec3> chunks;
-
-	for (int xoff = 0; xoff < RENDER_DISTANCE; xoff++) {
-		glm::i32vec3 gridPos = _camPos / Chunk::CHUNK_SIZE;
-
-		gridPos.x += xoff;
-		for (int yoff = xoff; yoff > -xoff - 1; yoff--) {
-			glm::vec3 chunkPos = glm::vec3(gridPos.x, gridPos.y, gridPos.z + yoff) * 64.0f;
-			chunks.push_back(std::move(chunkPos));
-		}
-	}
-	return chunks;
-}
-
-std::vector<glm::vec3> WorldRenderer::getChunksTriangleWest()
-{
-	std::vector<glm::vec3> chunks;
-
-	for (int xoff = 0; xoff < RENDER_DISTANCE; xoff++) {
-		glm::i32vec3 gridPos = _camPos / Chunk::CHUNK_SIZE;
-
-		gridPos.x -= xoff;
-		for (int yoff = xoff; yoff > -xoff - 1; yoff--) {
-			glm::vec3 chunkPos = glm::vec3(gridPos.x, gridPos.y, gridPos.z + yoff) * 64.0f;
-			chunks.push_back(std::move(chunkPos));
-		}
-	}
-	return chunks;
 }

@@ -23,27 +23,14 @@ public:
 	void render() override;
 	void update();
 	void setPos(glm::vec3 pos);
-
-private:
-	std::vector<glm::vec3> getChunksFront();
-	std::vector<glm::vec3> getChunksAround();
-
-	std::vector<glm::vec3> getChunksTriangleNorth();
-	std::vector<glm::vec3> getChunksTriangleSouth();
-	std::vector<glm::vec3> getChunksTriangleEast();
-	std::vector<glm::vec3> getChunksTriangleWest();
+	void giveChunks(std::queue<std::shared_ptr<Chunk>> chunks);
 
 private:
 	const int RENDER_DISTANCE = 6;
 
 	glm::vec3 &_camPos;
 	std::unique_ptr<Shader> _shader;
-	std::unique_ptr<ChunkFactory> _factory;
 	std::unique_ptr<ChunkRenderer> _renderer;
-	blocking_queue<std::shared_ptr<Chunk>> _chunks;
+	std::vector<std::shared_ptr<Chunk>> _chunks;
 	Camera &_camera;
-
-	std::queue<glm::vec3> _chunksToGenerate;
-
-	thread_pool _pool;
 };
