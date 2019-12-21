@@ -3,8 +3,12 @@
 ChunkMesh::ChunkMesh() : Mesh()
 {
 }
-
-bool ChunkMesh::isInView(Camera &camera)
+glm::vec3 const &ChunkMesh::getPosition() const
 {
-	return true;
+	return _position;
+}
+
+void ChunkMesh::setPosition(glm::vec3 position)
+{
+	_position = std::move(position);
 }

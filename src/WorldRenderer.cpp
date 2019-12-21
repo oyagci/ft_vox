@@ -32,7 +32,7 @@ void WorldRenderer::render()
 	_shader->setUniform4x4f("viewProjectionMatrix", _camera.getViewProjectionMatrix());
 	_shader->setUniform4x4f("modelMatrix", glm::mat4(1.0f));
 
-	_renderer->render();
+	_renderer->render(_camera);
 
 	_shader->unbind();
 }

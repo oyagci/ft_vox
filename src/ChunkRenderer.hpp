@@ -9,19 +9,21 @@
 #include "ChunkBuilder.hpp"
 #include "threadpool/threadpool.hpp"
 #include "ChunkMesh.hpp"
+#include "TextRenderer.hpp"
 
-class ChunkRenderer : public IRenderer
+class ChunkRenderer
 {
 public:
 	ChunkRenderer();
 	~ChunkRenderer();
 
-	void render() override;
+	void render(Camera &camera);
 	void addChunk(std::shared_ptr<Chunk> chunk);
 	void update();
 
 private:
 	void buildChunks();
+	bool isInView(Camera &camera, ChunkMesh &mesh);
 
 private:
 	std::unique_ptr<ChunkBuilder> _builder;
@@ -40,4 +42,5 @@ private:
 	std::queue<ChunkMesh> _chunkMeshes;
 
 	GLuint _texture;
+	TextRenderer tr;
 };

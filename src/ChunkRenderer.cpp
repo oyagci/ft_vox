@@ -33,13 +33,33 @@ void ChunkRenderer::addChunk(std::shared_ptr<Chunk> chunk)
 	_chunks.push_back(chunk);
 }
 
-void ChunkRenderer::render()
+bool ChunkRenderer::isInView(Camera &camera, ChunkMesh &mesh)
 {
-	for (auto &m : _meshes) {
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, _texture);
-		m.draw();
+	glm::vec3 pos = mesh.getPosition();
+	auto vp = camera.getViewProjectionMatrix();
+	glm::vec4 clipPos = vp * glm::vec4(pos, 1.0f);
+
+	float radius = Chunk::CHUNK_SIZE;
+
+	if ((-clipPos.w <= pos.x + radius && pos.x - radius <= clipPos.w) ||
+		(-clipPos.w <= pos.y + radius && pos.y - radius <= clipPos.w) ||
+		(-clipPos.w <= pos.z + radius && pos.z - radius <= clipPos.w)) {
+		return true;
 	}
+	return false;
+}
+void ChunkRenderer::render(Camera &camera)
+{
+	int n = 0;
+	for (auto &m : _meshes) {
+		if (isInView(camera, m)) {
+			glActiveTexture(GL_TEXTURE0);
+			glBindTexture(GL_TEXTURE_2D, _texture);
+			m.draw();
+			n++;
+		}
+	}
+	tr.drawText(std::to_string(n) + " Visible Chunks" , glm::vec2(10.0f, 30.0f), .3f, glm::vec3(1.0f, 1.0f, 1.0f));
 }
 
 void ChunkRenderer::update()

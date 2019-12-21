@@ -340,6 +340,8 @@ ChunkMesh ChunkBuilder::buildChunkFaces(glm::vec2 chunkPos, std::vector<Face> fa
 	std::size_t nVert = 0;
 	glm::vec3 worldPos = glm::vec3(chunkPos.x, 0, chunkPos.y);
 
+	mesh.setPosition(glm::vec3(chunkPos.x, 0, chunkPos.y));
+
 	for (auto &f : faces) {
 		switch (f.dir) {
 		case FD_TOP:
