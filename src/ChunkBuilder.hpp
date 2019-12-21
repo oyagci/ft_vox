@@ -3,6 +3,7 @@
 #include <glm/vec3.hpp>
 #include <memory>
 #include "Chunk.hpp"
+#include "ChunkMesh.hpp"
 #include <cassert>
 
 class ChunkBuilder
@@ -40,7 +41,7 @@ public:
 	const auto &getChunk() const { return _chunk; }
 
 	void setChunk(std::shared_ptr<Chunk> chunk) { _chunk = chunk; }
-	Mesh build(glm::vec2 pos, std::vector<Face> faces);
+	ChunkMesh build(glm::vec2 pos, std::vector<Face> faces);
 
 	std::vector<Face> genChunkFaces();
 
@@ -48,8 +49,7 @@ private:
 	int getVisibleFaces(int x, int y, int z);
 	Face genFaceToRender(glm::vec3 pos, FaceDirection f, Chunk::Block const &block);
 
-	Mesh buildChunkMesh(glm::vec2 chunkPos, std::vector<Face> faces);
-	Mesh buildChunkFaces(glm::vec2 chunkPos, std::vector<Face> faces);
+	ChunkMesh buildChunkFaces(glm::vec2 chunkPos, std::vector<Face> faces);
 	void buildTopFace(Face const &face, Mesh &mesh, glm::vec3 pos, std::size_t indOffset);
 	void buildFrontFace(Face const &face, Mesh &mesh, glm::vec3 pos, std::size_t indOffset);
 	void buildBotFace(Face const &face, Mesh &mesh, glm::vec3 pos, std::size_t indOffset);

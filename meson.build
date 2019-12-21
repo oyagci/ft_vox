@@ -21,6 +21,7 @@ srcs = [
 	'src/ChunkBuilder.cpp',
 	'src/WorldGenerator.cpp',
 	'src/stb_image.cpp',
+	'src/ChunkMesh.cpp',
 ]
 
 cmake = import('cmake')

@@ -4,11 +4,9 @@ ChunkBuilder::ChunkBuilder()
 {
 }
 
-Mesh ChunkBuilder::build(glm::vec2 pos, std::vector<Face> faces)
+ChunkMesh ChunkBuilder::build(glm::vec2 pos, std::vector<Face> faces)
 {
-	Mesh mesh = buildChunkFaces(std::move(pos), std::move(faces));
-
-	return mesh;
+	return buildChunkFaces(std::move(pos), std::move(faces));
 }
 
 int ChunkBuilder::getVisibleFaces(int x, int y, int z)
@@ -336,9 +334,9 @@ void ChunkBuilder::buildLeftFace(Face const &face, Mesh &mesh, glm::vec3 pos, st
 	}
 }
 
-Mesh ChunkBuilder::buildChunkFaces(glm::vec2 chunkPos, std::vector<Face> faces)
+ChunkMesh ChunkBuilder::buildChunkFaces(glm::vec2 chunkPos, std::vector<Face> faces)
 {
-	Mesh mesh;
+	ChunkMesh mesh;
 	std::size_t nVert = 0;
 	glm::vec3 worldPos = glm::vec3(chunkPos.x, 0, chunkPos.y);
 
@@ -372,14 +370,5 @@ Mesh ChunkBuilder::buildChunkFaces(glm::vec2 chunkPos, std::vector<Face> faces)
 		}
 	}
 
-	return mesh;
-}
-
-Mesh ChunkBuilder::buildChunkMesh(glm::vec2 chunkPos, std::vector<Face> faces)
-{
-	Mesh mesh;
-
-	mesh = std::move(buildChunkFaces(std::move(chunkPos), std::move(faces)));
-	mesh.build();
 	return mesh;
 }

@@ -1,29 +1,14 @@
 #pragma once
 
 #include <memory>
-#include "Chunk.hpp"
+#include <queue>
+#include <tuple>
 #include <glm/vec3.hpp>
+#include "Chunk.hpp"
 #include "IRenderer.hpp"
 #include "ChunkBuilder.hpp"
 #include "threadpool/threadpool.hpp"
-#include <queue>
-#include <tuple>
-
-struct ChunkMesh {
-	Mesh mesh;
-	bool isBuilt;
-
-	ChunkMesh(Mesh mesh, bool isBuilt = false) : mesh(std::move(mesh)), isBuilt(isBuilt) {}
-	void build() {
-		if (!isBuilt) {
-			mesh.build();
-			isBuilt = true;
-		}
-	}
-	void draw() {
-		mesh.draw();
-	}
-};
+#include "ChunkMesh.hpp"
 
 class ChunkRenderer : public IRenderer
 {
