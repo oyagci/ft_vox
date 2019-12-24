@@ -9,5 +9,5 @@ public:
     PointLight(const glm::vec4 &color, float intensity, const glm::vec3 &position);
     ~PointLight();
 
-    void bind();
+    void bind(Camera &camera);
 };

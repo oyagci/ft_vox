@@ -20,6 +20,6 @@ void Scene::update()
 
 void Scene::render(Shader &shader)
 {
-    shader.setUniform4x4f("modelMatrix", glm::rotate(rotation * 0.01f, glm::vec3(1, 1, 0)));
+    shader.setUniform4x4f("modelMatrix", glm::scale(glm::vec3(10, 1, 10)));
     _basicCube.draw();
 }

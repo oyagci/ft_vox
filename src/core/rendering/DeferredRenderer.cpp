@@ -62,9 +62,9 @@ void DeferredRenderer::renderDebug()
     _quad.draw();
 }
 
-void DeferredRenderer::render(Light &light)
+void DeferredRenderer::render(Light &light, Camera &camera)
 {
-    light.bind();
+    light.bind(camera);
     this->bind(light.getShader());
     _quad.draw();
     this->unbind();

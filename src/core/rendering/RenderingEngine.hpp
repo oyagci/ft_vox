@@ -6,7 +6,6 @@
 #include "./RenderingPipeline.hpp"
 #include "./primitives/QuadPrimitive.hpp"
 #include "./lights/Light.hpp"
-#include "./lights/PointLight.hpp"
 #include "Scene.hpp"
 
 using namespace lazy;
@@ -28,6 +27,7 @@ public:
 
     void addLight(Light *light);
 
+    void handleResize();
     void update();
     void renderScene(Scene &_scene);
     void render();

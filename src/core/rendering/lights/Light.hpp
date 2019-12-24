@@ -18,7 +18,7 @@ public:
     Light(const std::string &name, const glm::vec4 &color, float intensity);
     virtual ~Light();
 
-    virtual void bind();
+    virtual void bind(Camera &camera);
 
     Shader  &getShader() { return _shader; }
 };

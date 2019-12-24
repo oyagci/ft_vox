@@ -19,9 +19,5 @@ Light::Light(const std::string &name, const glm::vec4 &color, float intensity)
 Light::~Light()
 {}
 
-void Light::bind()
-{
-    _shader.bind();
-    _shader.setUniform1f("light.intensity", _intensity);
-    _shader.setUniform4f("light.color", _color);
-}
+void Light::bind(Camera &camera)
+{}

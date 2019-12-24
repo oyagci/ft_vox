@@ -36,7 +36,7 @@ public:
     void renderDebug();
     void bind(Shader &shader);
     void unbind();
-    void render(Light &light);
+    void render(Light &light, Camera &camera);
 
     Shader getGBufferShader() const { return _gbufferShader; }
     Framebuffer getGBuffer() const { return _gbuffer; }

@@ -1,6 +1,7 @@
 #include "./RenderingPipeline.hpp"
 
 RenderingPipeline::RenderingPipeline()
+:   _resized(false)
 {
     _quadShader.addVertexShader("shaders/screen_quad.vs.glsl")
 			    .addFragmentShader("shaders/screen_quad.fs.glsl");
@@ -21,6 +22,7 @@ void RenderingPipeline::resize(int width, int height)
     _fbo.setSize(width, height);
     _fbo.genColorTexture(GL_RGB, GL_RGB, GL_UNSIGNED_BYTE, GL_LINEAR, GL_REPEAT);
     _fbo.genRenderbuffer(GL_DEPTH, GL_DEPTH_COMPONENT);
+    _resized = true;
 }
 
 void RenderingPipeline::bind()
@@ -39,12 +41,12 @@ void RenderingPipeline::renderScene(Camera &camera, Scene &scene)
     _deferred.renderScene(camera, scene);
 }
 
-void RenderingPipeline::renderDeferred(Light &light)
+void RenderingPipeline::renderDeferred(Light &light, Camera &camera)
 {
-    _deferred.render(light);
+    _deferred.render(light, camera);
 }
 
-void RenderingPipeline::renderForward(std::vector<Light*> &lights)
+void RenderingPipeline::renderForward(std::vector<Light*> &lights, Camera &camera)
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -55,7 +57,7 @@ void RenderingPipeline::renderForward(std::vector<Light*> &lights)
 
     for (Light *light : lights)
     {
-        renderDeferred(*light);
+        renderDeferred(*light, camera);
     }
 
     glDepthFunc(GL_LESS);
@@ -70,10 +72,10 @@ void RenderingPipeline::renderScreenQuad()
     _screenQuad.draw();
 }
 
-void RenderingPipeline::render(std::vector<Light*> &lights)
+void RenderingPipeline::render(std::vector<Light*> &lights, Camera &camera)
 {
     bind();
-    renderForward(lights);
+    renderForward(lights, camera);
     unbind();
     renderScreenQuad();
 }

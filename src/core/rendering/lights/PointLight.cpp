@@ -9,12 +9,12 @@ PointLight::PointLight(const glm::vec4 &color, float intensity, const glm::vec3 
 {}
 
 PointLight::~PointLight()
-{
-    
-}
+{}
 
-void PointLight::bind()
+void PointLight::bind(Camera &camera)
 {
-    Light::bind();
+    _shader.bind();
+    _shader.setUniform4f("light.light.color", _color);
+    _shader.setUniform1f("light.light.intensity", _intensity);
     _shader.setUniform3f("light.position", _position);
 }

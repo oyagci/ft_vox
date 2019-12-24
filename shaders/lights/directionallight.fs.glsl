@@ -9,7 +9,7 @@ uniform sampler2D position;
 uniform sampler2D normal;
 uniform sampler2D albedo;
 
-uniform PointLight light;
+uniform DirectionalLight light;
 
 void main()
 {
@@ -18,6 +18,6 @@ void main()
 	vec3 normal = texture(normal, quad_texcoord).xyz;
 	vec3 albedo = texture(albedo, quad_texcoord).xyz;
 
-	vec4 finalLight = calcPointLight(light, normal, fragPos);
+	vec4 finalLight = calcDirectionalLight(light, normal, fragPos);
 	frag_color = finalLight;
 }
