@@ -39,4 +39,4 @@ void main()
         col += vec3(texture(screen, v_texcoord.st + offsets[i])) * kernel[i];
     
     frag_color = vec4(col, 1.0);
-}  
+}
