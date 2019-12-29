@@ -3,6 +3,7 @@
 #include "WorldRenderer.hpp"
 #include "WorldBuilder.hpp"
 #include "IRenderer.hpp"
+#include <list>
 
 class World : public IRenderer
 {
@@ -15,4 +16,6 @@ public:
 private:
 	std::unique_ptr<WorldRenderer> _renderer;
 	std::unique_ptr<WorldBuilder> _builder;
+
+	std::list<std::shared_ptr<Chunk>> _chunks;
 };

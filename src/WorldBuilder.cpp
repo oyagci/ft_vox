@@ -165,13 +165,13 @@ void WorldBuilder::setCameraPosition(glm::vec3 pos)
 	_camPos = std::move(pos);
 }
 
-std::queue<std::shared_ptr<Chunk>> WorldBuilder::takeChunks()
+std::list<std::shared_ptr<Chunk>> WorldBuilder::takeChunks()
 {
-	std::queue<std::shared_ptr<Chunk>> tmp;
+	std::list<std::shared_ptr<Chunk>> tmp;
 
 	while (!_chunks.empty()) {
 		std::shared_ptr<Chunk> c = _chunks.front();
-		tmp.push(c);
+		tmp.push_front(c);
 		_chunks.pop();
 	}
 

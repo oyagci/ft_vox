@@ -7,6 +7,7 @@
 #include <mutex>
 #include "ChunkFactory.hpp"
 #include "threadpool/threadpool.hpp"
+#include <list>
 
 class WorldBuilder
 {
@@ -15,7 +16,7 @@ public:
 
 	void update();
 	void setCameraPosition(glm::vec3 pos);
-	std::queue<std::shared_ptr<Chunk>> takeChunks();
+	std::list<std::shared_ptr<Chunk>> takeChunks();
 
 private:
 	std::vector<glm::vec3> getChunksFront();
