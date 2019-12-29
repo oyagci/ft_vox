@@ -15,7 +15,14 @@ void World::update()
 {
 	_builder->update();
 	auto chunks = _builder->takeChunks();
-	_chunks.insert(_chunks.end(), chunks.begin(), chunks.end());
-	_renderer->giveChunks(std::move(chunks));
+	if (!chunks.empty()) {
+		// New chunks have been created
+		// Add them to list of chunks
+		_chunks.insert(_chunks.end(), chunks.begin(), chunks.end());
+
+		// Register the new chunks to the renderer
+		_renderer->registerChunks(chunks);
+	}
+
 	_renderer->update();
 }

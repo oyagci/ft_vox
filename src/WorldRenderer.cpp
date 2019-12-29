@@ -42,11 +42,7 @@ void WorldRenderer::setPos(glm::vec3 pos)
 	_camPos = std::move(pos);
 }
 
-void WorldRenderer::giveChunks(std::queue<std::shared_ptr<Chunk>> chunks)
+void WorldRenderer::registerChunks(std::list<std::shared_ptr<Chunk>> chunks)
 {
-	while (!chunks.empty()) {
-		std::shared_ptr<Chunk> c = chunks.front();
-		_chunks.push_back(c);
-		chunks.pop();
-	}
+	_chunks.insert(_chunks.end(), chunks.begin(), chunks.end());
 }

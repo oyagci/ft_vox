@@ -44,11 +44,6 @@ void WorldBuilder::update()
 			_chunks.push(chunk);
 		});
 	}
-//	if (!_chunks.empty()) {
-//		auto chunk = _chunks.front();
-//		_renderer->addChunk(std::move(chunk));
-//		_chunks.pop();
-//	}
 }
 
 std::vector<glm::vec3> WorldBuilder::getChunksFront()

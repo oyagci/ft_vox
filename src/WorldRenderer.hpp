@@ -10,6 +10,7 @@
 #include "threadpool/threadpool.hpp"
 #include "threadpool/blocking_queue.hpp"
 #include <queue>
+#include <list>
 
 using namespace lazy::graphics;
 
@@ -23,7 +24,7 @@ public:
 	void render() override;
 	void update();
 	void setPos(glm::vec3 pos);
-	void giveChunks(std::queue<std::shared_ptr<Chunk>> chunks);
+	void registerChunks(std::list<std::shared_ptr<Chunk>> chunks);
 
 private:
 	const int RENDER_DISTANCE = 6;
