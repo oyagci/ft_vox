@@ -8,6 +8,7 @@ in vec3 v_position;
 uniform sampler2D position;
 uniform sampler2D normal;
 uniform sampler2D albedo;
+uniform sampler2D depth;
 
 uniform DirectionalLight light;
 

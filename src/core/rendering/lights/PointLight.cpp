@@ -11,6 +11,11 @@ PointLight::PointLight(const glm::vec4 &color, float intensity, const glm::vec3 
 PointLight::~PointLight()
 {}
 
+glm::mat4 PointLight::getViewMatrix()
+{
+    return glm::mat4(1);
+}
+
 void PointLight::bind(Camera &camera)
 {
     _shader.bind();

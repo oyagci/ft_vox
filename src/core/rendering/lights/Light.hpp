@@ -19,6 +19,7 @@ public:
     virtual ~Light();
 
     virtual void bind(Camera &camera);
+    virtual glm::mat4 getViewMatrix();
 
     Shader  &getShader() { return _shader; }
 };

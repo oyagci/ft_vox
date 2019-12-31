@@ -34,7 +34,11 @@ vec4 calcLight(Light light, vec3 direction, vec3 normal, vec3 fragPos)
 vec4 calcPointLight(PointLight light, vec3 normal, vec3 fragPos)
 {
 	vec3 direction = normalize(fragPos - light.position);
-	return calcLight(light.light, direction, normal, fragPos);
+	float dist = distance(light.position, fragPos);
+	float intensity = 1.0 / dist * light.light.intensity;
+	direction = normalize(direction);
+	vec4 color = calcLight(light.light, direction, normal, fragPos);
+	return color * intensity;
 }
 
 vec4 calcDirectionalLight(DirectionalLight light, vec3 normal, vec3 fragPos)

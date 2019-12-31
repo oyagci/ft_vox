@@ -21,3 +21,8 @@ Light::~Light()
 
 void Light::bind(Camera &camera)
 {}
+
+glm::mat4 Light::getViewMatrix()
+{
+    return glm::mat4(1);
+}

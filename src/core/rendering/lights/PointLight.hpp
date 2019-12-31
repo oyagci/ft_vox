@@ -10,4 +10,5 @@ public:
     ~PointLight();
 
     void bind(Camera &camera);
+    glm::mat4 getViewMatrix();
 };

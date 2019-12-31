@@ -26,6 +26,7 @@ void DeferredRenderer::resize(int width, int height)
     _gbuffer.genColorTexture(GL_RGB16F, GL_RGB, GL_FLOAT, GL_NEAREST, GL_CLAMP_TO_BORDER);
     _gbuffer.genColorTexture(GL_RGB16F, GL_RGB, GL_FLOAT, GL_NEAREST, GL_CLAMP_TO_BORDER);
     _gbuffer.genColorTexture(GL_RGB, GL_RGB, GL_UNSIGNED_BYTE, GL_LINEAR, GL_CLAMP_TO_BORDER);
+    _gbuffer.genDepthTexture(GL_NEAREST, 0);
     _gbuffer.genRenderbuffer(GL_DEPTH, GL_DEPTH_COMPONENT);
     _gbuffer.drawBuffers({
         GL_COLOR_ATTACHMENT0,
@@ -81,6 +82,9 @@ void DeferredRenderer::bind(Shader &shader)
     shader.setUniform1i("albedo", 2);
     glActiveTexture(GL_TEXTURE2);
     glBindTexture(GL_TEXTURE_2D, _gbuffer.getColorTexture(2));
+    shader.setUniform1i("depth", 3);
+    glActiveTexture(GL_TEXTURE3);
+    glBindTexture(GL_TEXTURE_2D, _gbuffer.getDepthTexture());
 }
 
 void DeferredRenderer::unbind()

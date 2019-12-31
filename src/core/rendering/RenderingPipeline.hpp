@@ -14,7 +14,7 @@ class RenderingPipeline
 private:
     Framebuffer         _fbo;
     DeferredRenderer    _deferred;
-    QuadPrimitive       _screenQuad;
+    QuadPrimitive       _quad;
     Shader              _quadShader;
     int                 _width;
     int                 _height;
@@ -30,6 +30,7 @@ public:
     void unbind();
 
     void renderScene(Camera &camera, Scene &scene);
+    void renderShadows(Light &light, Camera &camera, Scene &scene);
     void renderDeferred(Light &light, Camera &camera);
     void renderForward(std::vector<Light*> &lights, Camera &camera);
     void renderScreenQuad();

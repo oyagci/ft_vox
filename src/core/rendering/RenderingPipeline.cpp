@@ -3,8 +3,8 @@
 RenderingPipeline::RenderingPipeline()
 :   _resized(false)
 {
-    _quadShader.addVertexShader("shaders/screen_quad.vs.glsl")
-			    .addFragmentShader("shaders/screen_quad.fs.glsl");
+    _quadShader.addVertexShader("shaders/quad.vs.glsl")
+			    .addFragmentShader("shaders/quad.fs.glsl");
 	_quadShader.link();
 }
 
@@ -41,6 +41,11 @@ void RenderingPipeline::renderScene(Camera &camera, Scene &scene)
     _deferred.renderScene(camera, scene);
 }
 
+void RenderingPipeline::renderShadows(Light &light, Camera &camera, Scene &scene)
+{
+    _deferred.renderScene(camera, scene);
+}
+
 void RenderingPipeline::renderDeferred(Light &light, Camera &camera)
 {
     _deferred.render(light, camera);
@@ -67,9 +72,11 @@ void RenderingPipeline::renderForward(std::vector<Light*> &lights, Camera &camer
 
 void RenderingPipeline::renderScreenQuad()
 {
-    glBindTexture(GL_TEXTURE_2D, _fbo.getColorTexture(0));
     _quadShader.bind();
-    _screenQuad.draw();
+    glBindTexture(GL_TEXTURE_2D, _fbo.getColorTexture(0));
+    _quadShader.setUniform4x4f("modelViewMatrix", glm::mat4(1));
+    _quad.draw();
+    _quadShader.unbind();
 }
 
 void RenderingPipeline::render(std::vector<Light*> &lights, Camera &camera)
@@ -78,4 +85,10 @@ void RenderingPipeline::render(std::vector<Light*> &lights, Camera &camera)
     renderForward(lights, camera);
     unbind();
     renderScreenQuad();
+
+    _quadShader.bind();
+    glBindTexture(GL_TEXTURE_2D, _fbo.getDepthTexture());
+    _quadShader.setUniform4x4f("modelViewMatrix", glm::translate(glm::vec3(-1 + 0.3f)) * glm::scale(glm::vec3(0.3f)));
+    _quad.draw();
+    _quadShader.unbind();
 }

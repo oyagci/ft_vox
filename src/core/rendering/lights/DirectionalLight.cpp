@@ -18,3 +18,12 @@ void DirectionalLight::bind(Camera &camera)
     _shader.setUniform1f("light.light.intensity", _intensity);
     _shader.setUniform3f("light.direction", glm::vec3(glm::vec4(0.0f, 0.0f, -1.0f, 0.0f) * glm::toMat4(_rotation)));
 }
+
+glm::mat4 DirectionalLight::getViewMatrix()
+{
+    glm::mat4 projectionMatrix = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, -10.0f, 10.0f);
+    glm::mat4 rotationMatrix = glm::toMat4(_rotation);
+    glm::mat4 result = projectionMatrix * rotationMatrix;
+
+    return result;
+}

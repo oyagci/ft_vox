@@ -6,15 +6,15 @@ RenderingEngine::RenderingEngine(const Display &display)
 :   _display(display),
     _camera(Camera(display, (maths::transform){glm::vec3(0, 0, 5), glm::quat(), glm::vec3(1), nullptr}))
 {
-    _camera.setProjection(70.0f, 0.1f, 1000.0f);
+    _camera.setProjection(70.0f, 0.5f, 1000.0f);
 	_basicShader.addVertexShader("shaders/basic.vs.glsl")
 			    .addFragmentShader("shaders/basic.fs.glsl");
 	_basicShader.link();
     _pipeline.resize(display.getWidth(), display.getHeight());
 
-    // addLight(new PointLight(glm::vec4(1, 0, 0, 1), 1, glm::vec3(3, 5, 0)));
-    // addLight(new PointLight(glm::vec4(0, 0, 1, 1), 1, glm::vec3(-3, 5, 0)));
-    // addLight(new PointLight(glm::vec4(0, 1, 0, 1), 1, glm::vec3(0, 5, 0)));
+    addLight(new PointLight(glm::vec4(1, 0, 0, 1), 10, glm::vec3(3, -0.5, 0)));
+    addLight(new PointLight(glm::vec4(0, 0, 1, 1), 1, glm::vec3(-3, 5, 0)));
+    addLight(new PointLight(glm::vec4(0, 1, 0, 1), 1, glm::vec3(0, 5, 0)));
     addLight(new DirectionalLight(glm::vec4(0, 1, 1, 1), 1, glm::quat(glm::vec3(1, 1, 1))));
 }
 
