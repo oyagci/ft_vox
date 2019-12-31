@@ -22,7 +22,6 @@ int main()
 	double startTime = glfwGetTime();
 	while (!display.isClosed())
 	{
-		display.update();
 		double currentTime = glfwGetTime();
 		if (currentTime - startTime >= 1.0 / 60.0)
 		{
@@ -33,6 +32,8 @@ int main()
 		}
 		else
 		{
+			display.update();
+			renderingEngine.handleResize();
 			renderingEngine.renderScene(scene);
 			renderingEngine.render();
 		}

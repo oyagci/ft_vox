@@ -8,8 +8,6 @@ DeferredRenderer::DeferredRenderer()
     _quadShader.addVertexShader("shaders/deferred.vs.glsl")
 			.addFragmentShader("shaders/deferred.fs.glsl");
 	_quadShader.link();
-
-    _gbuffer.genFramebuffer();
 }
 
 DeferredRenderer::~DeferredRenderer()
@@ -22,6 +20,8 @@ void DeferredRenderer::resize(int width, int height)
     _width = width;
     _height = height;
 
+    _gbuffer.clean();
+    _gbuffer.genFramebuffer();
     _gbuffer.setSize(width, height);
     _gbuffer.genColorTexture(GL_RGB16F, GL_RGB, GL_FLOAT, GL_NEAREST, GL_CLAMP_TO_BORDER);
     _gbuffer.genColorTexture(GL_RGB16F, GL_RGB, GL_FLOAT, GL_NEAREST, GL_CLAMP_TO_BORDER);

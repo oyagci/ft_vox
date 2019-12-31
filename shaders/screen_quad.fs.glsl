@@ -9,6 +9,7 @@ uniform sampler2D screen;
 
 void main()
 {
+	// frag_color = vec4(v_texcoord.x, v_texcoord.y, 0, 1);
 	frag_color = texture(screen, v_texcoord);
 }
 
@@ -33,7 +34,7 @@ void main()
 //         -1,  9, -1,
 //         -1, -1, -1
 //     );
-    
+
 //     vec3 col = vec3(0.0);
 //     for(int i = 0; i < 9; i++)
 //         col += vec3(texture(screen, v_texcoord.st + offsets[i])) * kernel[i];

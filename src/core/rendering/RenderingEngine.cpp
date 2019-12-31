@@ -12,16 +12,15 @@ RenderingEngine::RenderingEngine(const Display &display)
 	_basicShader.link();
     _pipeline.resize(display.getWidth(), display.getHeight());
 
-    addLight(new PointLight(glm::vec4(1, 0, 0, 1), 1, glm::vec3(3, 5, 0)));
-    addLight(new PointLight(glm::vec4(0, 0, 1, 1), 1, glm::vec3(-3, 5, 0)));
-    addLight(new PointLight(glm::vec4(0, 1, 0, 1), 1, glm::vec3(0, 5, 0)));
+    // addLight(new PointLight(glm::vec4(1, 0, 0, 1), 1, glm::vec3(3, 5, 0)));
+    // addLight(new PointLight(glm::vec4(0, 0, 1, 1), 1, glm::vec3(-3, 5, 0)));
+    // addLight(new PointLight(glm::vec4(0, 1, 0, 1), 1, glm::vec3(0, 5, 0)));
     addLight(new DirectionalLight(glm::vec4(0, 1, 1, 1), 1, glm::quat(glm::vec3(1, 1, 1))));
 }
 
 RenderingEngine::~RenderingEngine()
 {
-    for (Light *light : _lights)
-        delete light;
+    _lights.clear();
 }
 
 void RenderingEngine::addLight(Light *light)
@@ -33,14 +32,13 @@ void RenderingEngine::handleResize()
 {
     if (_display.hasResized())
     {
+        _camera.updateProjection();
         _pipeline.resize(_display.getWidth(), _display.getHeight());
     }
 }
 
 void RenderingEngine::update()
 {
-    handleResize();
-    _camera.update();
     if (_display.isFocused())
     {
         _camera.input(0.1f, 0.01f, {
