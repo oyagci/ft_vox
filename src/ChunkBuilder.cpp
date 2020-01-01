@@ -49,27 +49,47 @@ auto ChunkBuilder::genChunkFaces() -> std::vector<Face>
 
 				Chunk::Block b = _chunk->getBlock(x, y, z);
 
-				if (b != 0) { continue; }
+				if (b) {
+					if (y == 0) {
+						faces.push_back(genFaceToRender(std::move(glm::u32vec3(x, y, z)), FD_BOT));
+					}
+					if (y == Chunk::CHUNK_SIZE - 1) {
+						faces.push_back(genFaceToRender(std::move(glm::u32vec3(x, y, z)), FD_TOP));
+					}
+					if (x == 0) {
+						faces.push_back(genFaceToRender(std::move(glm::u32vec3(x, y, z)), FD_LEFT));
+					}
+					if (x == Chunk::CHUNK_SIZE - 1) {
+						faces.push_back(genFaceToRender(std::move(glm::u32vec3(x, y, z)), FD_RIGHT));
+					}
+					if (z == Chunk::CHUNK_SIZE - 1) {
+						faces.push_back(genFaceToRender(std::move(glm::u32vec3(x, y, z)), FD_FRONT));
+					}
+					if (z == 0) {
+						faces.push_back(genFaceToRender(std::move(glm::u32vec3(x, y, z)), FD_BACK));
+					}
+				}
+				else {
+					int visibleFaces = getVisibleFaces(x, y, z);
 
-				int visibleFaces = getVisibleFaces(x, y, z);
-
-				if (visibleFaces & (1 << 0)) { // Top
-					faces.push_back(genFaceToRender(std::move(glm::u32vec3(x, y + 1, z)), FD_BOT));
-				}
-				if (visibleFaces & (1 << 1)) { // Bottom
-					faces.push_back(genFaceToRender(std::move(glm::u32vec3(x, y - 1, z)), FD_TOP));
-				}
-				if (visibleFaces & (1 << 2)) { // Left
-					faces.push_back(genFaceToRender(std::move(glm::u32vec3(x - 1, y, z)), FD_RIGHT));
-				}
-				if (visibleFaces & (1 << 3)) { // Right
-					faces.push_back(genFaceToRender(std::move(glm::u32vec3(x + 1, y, z)), FD_LEFT));
-				}
-				if (visibleFaces & (1 << 4)) { // Front
-					faces.push_back(genFaceToRender(std::move(glm::u32vec3(x, y, z + 1)), FD_BACK));
-				}
-				if (visibleFaces & (1 << 5)) { // Back
-					faces.push_back(genFaceToRender(std::move(glm::u32vec3(x, y, z - 1)), FD_FRONT));
+					if (visibleFaces & (1 << 0)) { // Top
+						faces.push_back(genFaceToRender(std::move(glm::u32vec3(x, y + 1, z)), FD_BOT));
+					}
+					if (visibleFaces & (1 << 1)) { // Bottom
+						faces.push_back(genFaceToRender(std::move(glm::u32vec3(x, y - 1, z)), FD_TOP));
+					}
+					if (visibleFaces & (1 << 2)) { // Left
+						faces.push_back(genFaceToRender(std::move(glm::u32vec3(x - 1, y, z)), FD_RIGHT));
+					}
+					if (visibleFaces & (1 << 3)) { // Right
+						faces.push_back(genFaceToRender(std::move(glm::u32vec3(x + 1, y, z)), FD_LEFT));
+					}
+					if (visibleFaces & (1 << 4)) { // Front
+						faces.push_back(genFaceToRender(std::move(glm::u32vec3(x, y, z + 1)), FD_BACK));
+					}
+					if (visibleFaces & (1 << 5)) { // Back
+						faces.push_back(genFaceToRender(std::move(glm::u32vec3(x, y, z - 1)), FD_FRONT));
+					}
 				}
 			}
 		}
