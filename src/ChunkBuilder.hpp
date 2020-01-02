@@ -8,6 +8,12 @@
 class ChunkBuilder
 {
 public:
+	enum BlockType {
+		AIR,
+		DIRT,
+		GRASS,
+		STONE
+	};
 	enum FaceDirection {
 		FD_TOP,
 		FD_BOT,
@@ -19,6 +25,7 @@ public:
 	struct Face {
 		glm::vec3 pos;
 		FaceDirection dir;
+		BlockType type;
 	};
 
 public:
@@ -33,16 +40,16 @@ public:
 
 private:
 	int getVisibleFaces(int x, int y, int z);
-	Face genFaceToRender(glm::vec3 pos, FaceDirection f);
+	Face genFaceToRender(glm::vec3 pos, FaceDirection f, Chunk::Block const &block);
 
 	Mesh buildChunkMesh(glm::vec2 chunkPos, std::vector<Face> faces);
 	Mesh buildChunkFaces(glm::vec2 chunkPos, std::vector<Face> faces);
-	void buildTopFace(Mesh &mesh, glm::vec3 pos, std::size_t indOffset);
-	void buildFrontFace(Mesh &mesh, glm::vec3 pos, std::size_t indOffset);
-	void buildBotFace(Mesh &mesh, glm::vec3 pos, std::size_t indOffset);
-	void buildBackFace(Mesh &mesh, glm::vec3 pos, std::size_t indOffset);
-	void buildRightFace(Mesh &mesh, glm::vec3 pos, std::size_t indOffset);
-	void buildLeftFace(Mesh &mesh, glm::vec3 pos, std::size_t indOffset);
+	void buildTopFace(Face const &face, Mesh &mesh, glm::vec3 pos, std::size_t indOffset);
+	void buildFrontFace(Face const &face, Mesh &mesh, glm::vec3 pos, std::size_t indOffset);
+	void buildBotFace(Face const &face, Mesh &mesh, glm::vec3 pos, std::size_t indOffset);
+	void buildBackFace(Face const &face, Mesh &mesh, glm::vec3 pos, std::size_t indOffset);
+	void buildRightFace(Face const &face, Mesh &mesh, glm::vec3 pos, std::size_t indOffset);
+	void buildLeftFace(Face const &face, Mesh &mesh, glm::vec3 pos, std::size_t indOffset);
 
 	std::shared_ptr<Chunk> _chunk;
 };

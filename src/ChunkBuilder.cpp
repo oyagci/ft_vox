@@ -32,9 +32,16 @@ int ChunkBuilder::getVisibleFaces(int x, int y, int z)
 	return result;
 }
 
-auto ChunkBuilder::genFaceToRender(glm::vec3 pos, FaceDirection f) -> Face
+auto ChunkBuilder::genFaceToRender(glm::vec3 pos, FaceDirection f, Chunk::Block const &block) -> Face
 {
-	Face face = { pos, f };
+	Face face = { pos, f, AIR };
+
+	if (block == 1) {
+		face.type = GRASS;
+	}
+	else if (block == 2) {
+		face.type = STONE;
+	}
 
 	return face;
 }
@@ -51,44 +58,52 @@ auto ChunkBuilder::genChunkFaces() -> std::vector<Face>
 
 				if (b) {
 					if (y == 0) {
-						faces.push_back(genFaceToRender(std::move(glm::u32vec3(x, y, z)), FD_BOT));
+						faces.push_back(genFaceToRender(std::move(glm::u32vec3(x, y, z)), FD_BOT, b));
 					}
-					if (y == Chunk::CHUNK_SIZE - 1) {
-						faces.push_back(genFaceToRender(std::move(glm::u32vec3(x, y, z)), FD_TOP));
+					else if (y == Chunk::CHUNK_SIZE - 1) {
+						faces.push_back(genFaceToRender(std::move(glm::u32vec3(x, y, z)), FD_TOP, b));
 					}
+
 					if (x == 0) {
-						faces.push_back(genFaceToRender(std::move(glm::u32vec3(x, y, z)), FD_LEFT));
+						faces.push_back(genFaceToRender(std::move(glm::u32vec3(x, y, z)), FD_LEFT, b));
 					}
-					if (x == Chunk::CHUNK_SIZE - 1) {
-						faces.push_back(genFaceToRender(std::move(glm::u32vec3(x, y, z)), FD_RIGHT));
+					else if (x == Chunk::CHUNK_SIZE - 1) {
+						faces.push_back(genFaceToRender(std::move(glm::u32vec3(x, y, z)), FD_RIGHT, b));
 					}
+
 					if (z == Chunk::CHUNK_SIZE - 1) {
-						faces.push_back(genFaceToRender(std::move(glm::u32vec3(x, y, z)), FD_FRONT));
+						faces.push_back(genFaceToRender(std::move(glm::u32vec3(x, y, z)), FD_FRONT, b));
 					}
-					if (z == 0) {
-						faces.push_back(genFaceToRender(std::move(glm::u32vec3(x, y, z)), FD_BACK));
+					else if (z == 0) {
+						faces.push_back(genFaceToRender(std::move(glm::u32vec3(x, y, z)), FD_BACK, b));
 					}
 				}
 				else {
 					int visibleFaces = getVisibleFaces(x, y, z);
 
 					if (visibleFaces & (1 << 0)) { // Top
-						faces.push_back(genFaceToRender(std::move(glm::u32vec3(x, y + 1, z)), FD_BOT));
+						faces.push_back(genFaceToRender(std::move(glm::u32vec3(x, y + 1, z)), FD_BOT,
+							_chunk->getBlock(x, y + 1, z)));
 					}
 					if (visibleFaces & (1 << 1)) { // Bottom
-						faces.push_back(genFaceToRender(std::move(glm::u32vec3(x, y - 1, z)), FD_TOP));
+						faces.push_back(genFaceToRender(std::move(glm::u32vec3(x, y - 1, z)), FD_TOP,
+							_chunk->getBlock(x, y - 1, z)));
 					}
 					if (visibleFaces & (1 << 2)) { // Left
-						faces.push_back(genFaceToRender(std::move(glm::u32vec3(x - 1, y, z)), FD_RIGHT));
+						faces.push_back(genFaceToRender(std::move(glm::u32vec3(x - 1, y, z)), FD_RIGHT,
+							_chunk->getBlock(x - 1, y, z)));
 					}
 					if (visibleFaces & (1 << 3)) { // Right
-						faces.push_back(genFaceToRender(std::move(glm::u32vec3(x + 1, y, z)), FD_LEFT));
+						faces.push_back(genFaceToRender(std::move(glm::u32vec3(x + 1, y, z)), FD_LEFT,
+							_chunk->getBlock(x + 1, y, z)));
 					}
 					if (visibleFaces & (1 << 4)) { // Front
-						faces.push_back(genFaceToRender(std::move(glm::u32vec3(x, y, z + 1)), FD_BACK));
+						faces.push_back(genFaceToRender(std::move(glm::u32vec3(x, y, z + 1)), FD_BACK,
+							_chunk->getBlock(x, y, z + 1)));
 					}
 					if (visibleFaces & (1 << 5)) { // Back
-						faces.push_back(genFaceToRender(std::move(glm::u32vec3(x, y, z - 1)), FD_FRONT));
+						faces.push_back(genFaceToRender(std::move(glm::u32vec3(x, y, z - 1)), FD_FRONT,
+							_chunk->getBlock(x, y, z - 1)));
 					}
 				}
 			}
@@ -97,7 +112,7 @@ auto ChunkBuilder::genChunkFaces() -> std::vector<Face>
 	return faces;
 }
 
-void ChunkBuilder::buildTopFace(Mesh &mesh, glm::vec3 pos, std::size_t indOffset)
+void ChunkBuilder::buildTopFace(Face const &face, Mesh &mesh, glm::vec3 pos, std::size_t indOffset)
 {
 	std::array<glm::vec3, 4> vertices = {
 		glm::vec3(1, 1, 0) + pos, glm::vec3(0, 1, 0) + pos,
@@ -108,17 +123,27 @@ void ChunkBuilder::buildTopFace(Mesh &mesh, glm::vec3 pos, std::size_t indOffset
 		glm::u32vec3(1 + indOffset, 2 + indOffset, 3 + indOffset)
 	};
 
-	float xoff = 8.0f * (16.0f / 256.0f);
-	float w = 15.0f / 256.0f;
+	unsigned int xindex = 0;
+	unsigned int yindex = 0;
 
-	float yoff = 4.0f * (16.0f / 256.0f);
-	float h = 15.0f / 256.0f;
+	if (face.type == GRASS) {
+		xindex = 8;
+		yindex = 4;
+	}
+	else if (face.type == STONE) {
+		xindex = 1;
+		yindex = 15;
+	}
+
+	float side = 16.0f / 256.0f;
+	float xoff = xindex * side;
+	float yoff = yindex * side;
 
 	std::array<glm::vec2, 4> texture = {
-		glm::vec2(w + xoff, yoff),
-		glm::vec2(xoff, yoff),
-		glm::vec2(w + xoff, h + yoff),
-		glm::vec2(xoff, h + yoff),
+		glm::vec2(side + xoff, yoff),
+		glm::vec2(       xoff, yoff),
+		glm::vec2(side + xoff, side + yoff),
+		glm::vec2(       xoff, side + yoff),
 	};
 
 	for (auto &v : vertices) {
@@ -133,7 +158,7 @@ void ChunkBuilder::buildTopFace(Mesh &mesh, glm::vec3 pos, std::size_t indOffset
 	}
 }
 
-void ChunkBuilder::buildBotFace(Mesh &mesh, glm::vec3 pos, std::size_t indOffset)
+void ChunkBuilder::buildBotFace(Face const &face, Mesh &mesh, glm::vec3 pos, std::size_t indOffset)
 {
 	std::array<glm::vec3, 4> vertices = {
 		glm::vec3(1, 0, 0) + pos, glm::vec3(0, 0, 0) + pos,
@@ -144,17 +169,27 @@ void ChunkBuilder::buildBotFace(Mesh &mesh, glm::vec3 pos, std::size_t indOffset
 		glm::u32vec3(1 + indOffset, 3 + indOffset, 2 + indOffset)
 	};
 
-	float xoff = 2 * (16 / 256.0f);
-	float w = 16 / 256.0f;
+	unsigned int xindex = 0;
+	unsigned int yindex = 0;
 
-	float yoff = 15 * (16 / 256.0f);
-	float h = 16 / 256.0f;
+	if (face.type == GRASS) {
+		xindex = 2;
+		yindex = 15;
+	}
+	else if (face.type == STONE) {
+		xindex = 1;
+		yindex = 15;
+	}
+
+	float side = 16.0f / 256.0f;
+	float xoff = xindex * side;
+	float yoff = yindex * side;
 
 	std::array<glm::vec2, 4> texture = {
-		glm::vec2(w + xoff, yoff),
+		glm::vec2(side + xoff, yoff),
 		glm::vec2(xoff, yoff),
-		glm::vec2(w + xoff, h + yoff),
-		glm::vec2(xoff, h + yoff),
+		glm::vec2(side + xoff, side + yoff),
+		glm::vec2(xoff, side + yoff),
 	};
 
 	for (auto &v : vertices) {
@@ -169,7 +204,7 @@ void ChunkBuilder::buildBotFace(Mesh &mesh, glm::vec3 pos, std::size_t indOffset
 	}
 }
 
-void ChunkBuilder::buildFrontFace(Mesh &mesh, glm::vec3 pos, std::size_t indOffset)
+void ChunkBuilder::buildFrontFace(Face const &face, Mesh &mesh, glm::vec3 pos, std::size_t indOffset)
 {
 	std::array<glm::vec3, 4> vertices = {
 		glm::vec3(0, 0, 0) + pos, glm::vec3(1, 0, 0) + pos,
@@ -180,17 +215,27 @@ void ChunkBuilder::buildFrontFace(Mesh &mesh, glm::vec3 pos, std::size_t indOffs
 		glm::u32vec3(0 + indOffset, 2 + indOffset, 3 + indOffset)
 	};
 
-	float xoff = 3 * (16 / 256.0f);
-	float w = 16 / 256.0f;
+	unsigned int xindex = 0;
+	unsigned int yindex = 0;
 
-	float yoff = 15 * (16 / 256.0f);
-	float h = 16 / 256.0f;
+	if (face.type == GRASS) {
+		xindex = 3;
+		yindex = 15;
+	}
+	else if (face.type == STONE) {
+		xindex = 1;
+		yindex = 15;
+	}
+
+	float side = 16.0f / 256.0f;
+	float xoff = xindex * side;
+	float yoff = yindex * side;
 
 	std::array<glm::vec2, 4> texture = {
 		glm::vec2(xoff, yoff),
-		glm::vec2(w + xoff, yoff),
-		glm::vec2(w + xoff, h + yoff),
-		glm::vec2(xoff, h + yoff),
+		glm::vec2(side + xoff, yoff),
+		glm::vec2(side + xoff, side + yoff),
+		glm::vec2(xoff, side + yoff),
 	};
 
 	for (auto &v : vertices) {
@@ -205,7 +250,7 @@ void ChunkBuilder::buildFrontFace(Mesh &mesh, glm::vec3 pos, std::size_t indOffs
 	}
 }
 
-void ChunkBuilder::buildBackFace(Mesh &mesh, glm::vec3 pos, std::size_t indOffset)
+void ChunkBuilder::buildBackFace(Face const &face, Mesh &mesh, glm::vec3 pos, std::size_t indOffset)
 {
 	std::array<glm::vec3, 4> vertices = {
 		glm::vec3(0, 0, -1) + pos, glm::vec3(1, 0, -1) + pos,
@@ -216,17 +261,27 @@ void ChunkBuilder::buildBackFace(Mesh &mesh, glm::vec3 pos, std::size_t indOffse
 		glm::u32vec3(0 + indOffset, 3 + indOffset, 2 + indOffset)
 	};
 
-	float xoff = 3 * (16 / 256.0f);
-	float w = 16 / 256.0f;
+	unsigned int xindex = 0;
+	unsigned int yindex = 0;
 
-	float yoff = 15 * (16 / 256.0f);
-	float h = 16 / 256.0f;
+	if (face.type == GRASS) {
+		xindex = 3;
+		yindex = 15;
+	}
+	else if (face.type == STONE) {
+		xindex = 1;
+		yindex = 15;
+	}
+
+	float side = 16.0f / 256.0f;
+	float xoff = xindex * side;
+	float yoff = yindex * side;
 
 	std::array<glm::vec2, 4> texture = {
 		glm::vec2(xoff, yoff),
-		glm::vec2(w + xoff, yoff),
-		glm::vec2(w + xoff, h + yoff),
-		glm::vec2(xoff, h + yoff),
+		glm::vec2(side + xoff, yoff),
+		glm::vec2(side + xoff, side + yoff),
+		glm::vec2(xoff, side + yoff),
 	};
 
 	for (auto &v : vertices) {
@@ -241,7 +296,7 @@ void ChunkBuilder::buildBackFace(Mesh &mesh, glm::vec3 pos, std::size_t indOffse
 	}
 }
 
-void ChunkBuilder::buildRightFace(Mesh &mesh, glm::vec3 pos, std::size_t indOffset)
+void ChunkBuilder::buildRightFace(Face const &face, Mesh &mesh, glm::vec3 pos, std::size_t indOffset)
 {
 	std::array<glm::vec3, 4> vertices = {
 		glm::vec3(1, 0, 0) + pos, glm::vec3(1, 0, -1) + pos,
@@ -252,17 +307,27 @@ void ChunkBuilder::buildRightFace(Mesh &mesh, glm::vec3 pos, std::size_t indOffs
 		glm::u32vec3(0 + indOffset, 2 + indOffset, 3 + indOffset)
 	};
 
-	float xoff = 3 * (16 / 256.0f);
-	float w = 16 / 256.0f;
+	unsigned int xindex = 0;
+	unsigned int yindex = 0;
 
-	float yoff = 15 * (16 / 256.0f);
-	float h = 16 / 256.0f;
+	if (face.type == GRASS) {
+		xindex = 3;
+		yindex = 15;
+	}
+	else if (face.type == STONE) {
+		xindex = 1;
+		yindex = 15;
+	}
+
+	float side = 16.0f / 256.0f;
+	float xoff = xindex * side;
+	float yoff = yindex * side;
 
 	std::array<glm::vec2, 4> texture = {
 		glm::vec2(xoff, yoff),
-		glm::vec2(w + xoff, yoff),
-		glm::vec2(w + xoff, h + yoff),
-		glm::vec2(xoff, h + yoff),
+		glm::vec2(side + xoff, yoff),
+		glm::vec2(side + xoff, side + yoff),
+		glm::vec2(xoff, side + yoff),
 	};
 
 	for (auto &v : vertices) {
@@ -277,7 +342,7 @@ void ChunkBuilder::buildRightFace(Mesh &mesh, glm::vec3 pos, std::size_t indOffs
 	}
 }
 
-void ChunkBuilder::buildLeftFace(Mesh &mesh, glm::vec3 pos, std::size_t indOffset)
+void ChunkBuilder::buildLeftFace(Face const &face, Mesh &mesh, glm::vec3 pos, std::size_t indOffset)
 {
 	std::array<glm::vec3, 4> vertices = {
 		glm::vec3(0, 0, 0) + pos, glm::vec3(0, 0, -1) + pos,
@@ -288,17 +353,27 @@ void ChunkBuilder::buildLeftFace(Mesh &mesh, glm::vec3 pos, std::size_t indOffse
 		glm::u32vec3(0 + indOffset, 3 + indOffset, 2 + indOffset)
 	};
 
-	float xoff = 3 * (16 / 256.0f);
-	float w = 16 / 256.0f;
+	unsigned int xindex = 0;
+	unsigned int yindex = 0;
 
-	float yoff = 15 * (16 / 256.0f);
-	float h = 16 / 256.0f;
+	if (face.type == GRASS) {
+		xindex = 3;
+		yindex = 15;
+	}
+	else if (face.type == STONE) {
+		xindex = 1;
+		yindex = 15;
+	}
+
+	float side = 16.0f / 256.0f;
+	float xoff = xindex * side;
+	float yoff = yindex * side;
 
 	std::array<glm::vec2, 4> texture = {
 		glm::vec2(xoff, yoff),
-		glm::vec2(w + xoff, yoff),
-		glm::vec2(w + xoff, h + yoff),
-		glm::vec2(xoff, h + yoff),
+		glm::vec2(side + xoff, yoff),
+		glm::vec2(side + xoff, side + yoff),
+		glm::vec2(xoff, side + yoff),
 	};
 
 	for (auto &v : vertices) {
@@ -322,27 +397,27 @@ Mesh ChunkBuilder::buildChunkFaces(glm::vec2 chunkPos, std::vector<Face> faces)
 	for (auto &f : faces) {
 		switch (f.dir) {
 		case FD_TOP:
-			buildTopFace(mesh, f.pos + worldPos, nVert);
+			buildTopFace(f, mesh, f.pos + worldPos, nVert);
 			nVert += 4;
 			break ;
 		case FD_BOT:
-			buildBotFace(mesh, f.pos + worldPos, nVert);
+			buildBotFace(f, mesh, f.pos + worldPos, nVert);
 			nVert += 4;
 			break ;
 		case FD_FRONT:
-			buildFrontFace(mesh, f.pos + worldPos, nVert);
+			buildFrontFace(f, mesh, f.pos + worldPos, nVert);
 			nVert += 4;
 			break ;
 		case FD_BACK:
-			buildBackFace(mesh, f.pos + worldPos, nVert);
+			buildBackFace(f, mesh, f.pos + worldPos, nVert);
 			nVert += 4;
 			break ;
 		case FD_RIGHT:
-			buildRightFace(mesh, f.pos + worldPos, nVert);
+			buildRightFace(f, mesh, f.pos + worldPos, nVert);
 			nVert += 4;
 			break ;
 		case FD_LEFT:
-			buildLeftFace(mesh, f.pos + worldPos, nVert);
+			buildLeftFace(f, mesh, f.pos + worldPos, nVert);
 			nVert += 4;
 		default:
 			break;
