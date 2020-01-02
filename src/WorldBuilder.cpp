@@ -10,25 +10,25 @@ WorldBuilder::WorldBuilder() : _pool(1)
 		_chunksToGenerate.push(std::move(c));
 	}
 
-	chunks = getChunksTriangleNorth();
-	for (auto &c : chunks) {
-		_chunksToGenerate.push(std::move(c));
-	}
-
-	chunks = getChunksTriangleSouth();
-	for (auto &c : chunks) {
-		_chunksToGenerate.push(std::move(c));
-	}
-
-	chunks = getChunksTriangleEast();
-	for (auto &c : chunks) {
-		_chunksToGenerate.push(std::move(c));
-	}
-
-	chunks = getChunksTriangleWest();
-	for (auto &c : chunks) {
-		_chunksToGenerate.push(std::move(c));
-	}
+//	chunks = getChunksTriangleNorth();
+//	for (auto &c : chunks) {
+//		_chunksToGenerate.push(std::move(c));
+//	}
+//
+//	chunks = getChunksTriangleSouth();
+//	for (auto &c : chunks) {
+//		_chunksToGenerate.push(std::move(c));
+//	}
+//
+//	chunks = getChunksTriangleEast();
+//	for (auto &c : chunks) {
+//		_chunksToGenerate.push(std::move(c));
+//	}
+//
+//	chunks = getChunksTriangleWest();
+//	for (auto &c : chunks) {
+//		_chunksToGenerate.push(std::move(c));
+//	}
 }
 
 void WorldBuilder::update()

@@ -14,6 +14,7 @@ srcs = [
 	'src/World.cpp',
 	'src/ChunkBuilder.cpp',
 	'src/WorldBuilder.cpp',
+	'src/stb_image.cpp',
 ]
 
 cmake = import('cmake')

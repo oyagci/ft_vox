@@ -29,6 +29,7 @@ class ChunkRenderer : public IRenderer
 {
 public:
 	ChunkRenderer();
+	~ChunkRenderer();
 
 	void render() override;
 	void addChunk(std::shared_ptr<Chunk> chunk);
@@ -52,4 +53,6 @@ private:
 
 	std::mutex _cm;
 	std::queue<ChunkMesh> _chunkMeshes;
+
+	GLuint _texture;
 };

@@ -99,9 +99,6 @@ auto ChunkBuilder::genChunkFaces() -> std::vector<Face>
 
 void ChunkBuilder::buildTopFace(Mesh &mesh, glm::vec3 pos, std::size_t indOffset)
 {
-	// Offset of the face inside the cube
-	pos.y += 0.5;
-
 	std::array<glm::vec3, 4> vertices = {
 		glm::vec3(1, 1, 0) + pos, glm::vec3(0, 1, 0) + pos,
 		glm::vec3(1, 1, -1) + pos, glm::vec3(0, 1, -1) + pos
@@ -111,19 +108,33 @@ void ChunkBuilder::buildTopFace(Mesh &mesh, glm::vec3 pos, std::size_t indOffset
 		glm::u32vec3(1 + indOffset, 2 + indOffset, 3 + indOffset)
 	};
 
+	float xoff = 8.0f * (16.0f / 256.0f);
+	float w = 15.0f / 256.0f;
+
+	float yoff = 4.0f * (16.0f / 256.0f);
+	float h = 15.0f / 256.0f;
+
+	std::array<glm::vec2, 4> texture = {
+		glm::vec2(w + xoff, yoff),
+		glm::vec2(xoff, yoff),
+		glm::vec2(w + xoff, h + yoff),
+		glm::vec2(xoff, h + yoff),
+	};
+
 	for (auto &v : vertices) {
 		mesh.addPosition(v);
+		mesh.addNormal(glm::vec3(0.0f, 1.0f, 0.0f));
 	}
 	for (auto &t : triangles) {
 		mesh.addTriangle(t);
+	}
+	for (auto &t : texture) {
+		mesh.addUv(t);
 	}
 }
 
 void ChunkBuilder::buildBotFace(Mesh &mesh, glm::vec3 pos, std::size_t indOffset)
 {
-	// Offset of the face inside the cube
-	pos.y += 0.5;
-
 	std::array<glm::vec3, 4> vertices = {
 		glm::vec3(1, 0, 0) + pos, glm::vec3(0, 0, 0) + pos,
 		glm::vec3(1, 0, -1) + pos, glm::vec3(0, 0, -1) + pos
@@ -133,19 +144,33 @@ void ChunkBuilder::buildBotFace(Mesh &mesh, glm::vec3 pos, std::size_t indOffset
 		glm::u32vec3(1 + indOffset, 3 + indOffset, 2 + indOffset)
 	};
 
+	float xoff = 2 * (16 / 256.0f);
+	float w = 16 / 256.0f;
+
+	float yoff = 15 * (16 / 256.0f);
+	float h = 16 / 256.0f;
+
+	std::array<glm::vec2, 4> texture = {
+		glm::vec2(w + xoff, yoff),
+		glm::vec2(xoff, yoff),
+		glm::vec2(w + xoff, h + yoff),
+		glm::vec2(xoff, h + yoff),
+	};
+
 	for (auto &v : vertices) {
 		mesh.addPosition(v);
+		mesh.addNormal(glm::vec3(0.0f, -1.0f, 0.0f));
 	}
 	for (auto &t : triangles) {
 		mesh.addTriangle(t);
+	}
+	for (auto &t : texture) {
+		mesh.addUv(t);
 	}
 }
 
 void ChunkBuilder::buildFrontFace(Mesh &mesh, glm::vec3 pos, std::size_t indOffset)
 {
-	// Offset of the face inside the cube
-	pos.y += 0.5;
-
 	std::array<glm::vec3, 4> vertices = {
 		glm::vec3(0, 0, 0) + pos, glm::vec3(1, 0, 0) + pos,
 		glm::vec3(1, 1, 0) + pos, glm::vec3(0, 1, 0) + pos
@@ -155,19 +180,33 @@ void ChunkBuilder::buildFrontFace(Mesh &mesh, glm::vec3 pos, std::size_t indOffs
 		glm::u32vec3(0 + indOffset, 2 + indOffset, 3 + indOffset)
 	};
 
+	float xoff = 3 * (16 / 256.0f);
+	float w = 16 / 256.0f;
+
+	float yoff = 15 * (16 / 256.0f);
+	float h = 16 / 256.0f;
+
+	std::array<glm::vec2, 4> texture = {
+		glm::vec2(xoff, yoff),
+		glm::vec2(w + xoff, yoff),
+		glm::vec2(w + xoff, h + yoff),
+		glm::vec2(xoff, h + yoff),
+	};
+
 	for (auto &v : vertices) {
 		mesh.addPosition(v);
+		mesh.addNormal(glm::vec3(0.0f, 0.0f, -1.0f));
 	}
 	for (auto &t : triangles) {
 		mesh.addTriangle(t);
+	}
+	for (auto &t : texture) {
+		mesh.addUv(t);
 	}
 }
 
 void ChunkBuilder::buildBackFace(Mesh &mesh, glm::vec3 pos, std::size_t indOffset)
 {
-	// Offset of the face inside the cube
-	pos.y += 0.5;
-
 	std::array<glm::vec3, 4> vertices = {
 		glm::vec3(0, 0, -1) + pos, glm::vec3(1, 0, -1) + pos,
 		glm::vec3(1, 1, -1) + pos, glm::vec3(0, 1, -1) + pos
@@ -177,19 +216,33 @@ void ChunkBuilder::buildBackFace(Mesh &mesh, glm::vec3 pos, std::size_t indOffse
 		glm::u32vec3(0 + indOffset, 3 + indOffset, 2 + indOffset)
 	};
 
+	float xoff = 3 * (16 / 256.0f);
+	float w = 16 / 256.0f;
+
+	float yoff = 15 * (16 / 256.0f);
+	float h = 16 / 256.0f;
+
+	std::array<glm::vec2, 4> texture = {
+		glm::vec2(xoff, yoff),
+		glm::vec2(w + xoff, yoff),
+		glm::vec2(w + xoff, h + yoff),
+		glm::vec2(xoff, h + yoff),
+	};
+
 	for (auto &v : vertices) {
 		mesh.addPosition(v);
+		mesh.addNormal(glm::vec3(0.0f, 0.0f, 1.0f));
 	}
 	for (auto &t : triangles) {
 		mesh.addTriangle(t);
+	}
+	for (auto &t : texture) {
+		mesh.addUv(t);
 	}
 }
 
 void ChunkBuilder::buildRightFace(Mesh &mesh, glm::vec3 pos, std::size_t indOffset)
 {
-	// Offset of the face inside the cube
-	pos.y += 0.5;
-
 	std::array<glm::vec3, 4> vertices = {
 		glm::vec3(1, 0, 0) + pos, glm::vec3(1, 0, -1) + pos,
 		glm::vec3(1, 1, -1) + pos, glm::vec3(1, 1, 0) + pos
@@ -199,19 +252,33 @@ void ChunkBuilder::buildRightFace(Mesh &mesh, glm::vec3 pos, std::size_t indOffs
 		glm::u32vec3(0 + indOffset, 2 + indOffset, 3 + indOffset)
 	};
 
+	float xoff = 3 * (16 / 256.0f);
+	float w = 16 / 256.0f;
+
+	float yoff = 15 * (16 / 256.0f);
+	float h = 16 / 256.0f;
+
+	std::array<glm::vec2, 4> texture = {
+		glm::vec2(xoff, yoff),
+		glm::vec2(w + xoff, yoff),
+		glm::vec2(w + xoff, h + yoff),
+		glm::vec2(xoff, h + yoff),
+	};
+
 	for (auto &v : vertices) {
 		mesh.addPosition(v);
+		mesh.addNormal(glm::vec3(1.0f, 0.0f, 0.0f));
 	}
 	for (auto &t : triangles) {
 		mesh.addTriangle(t);
+	}
+	for (auto &t : texture) {
+		mesh.addUv(t);
 	}
 }
 
 void ChunkBuilder::buildLeftFace(Mesh &mesh, glm::vec3 pos, std::size_t indOffset)
 {
-	// Offset of the face inside the cube
-	pos.y += 0.5;
-
 	std::array<glm::vec3, 4> vertices = {
 		glm::vec3(0, 0, 0) + pos, glm::vec3(0, 0, -1) + pos,
 		glm::vec3(0, 1, -1) + pos, glm::vec3(0, 1, 0) + pos
@@ -221,11 +288,28 @@ void ChunkBuilder::buildLeftFace(Mesh &mesh, glm::vec3 pos, std::size_t indOffse
 		glm::u32vec3(0 + indOffset, 3 + indOffset, 2 + indOffset)
 	};
 
+	float xoff = 3 * (16 / 256.0f);
+	float w = 16 / 256.0f;
+
+	float yoff = 15 * (16 / 256.0f);
+	float h = 16 / 256.0f;
+
+	std::array<glm::vec2, 4> texture = {
+		glm::vec2(xoff, yoff),
+		glm::vec2(w + xoff, yoff),
+		glm::vec2(w + xoff, h + yoff),
+		glm::vec2(xoff, h + yoff),
+	};
+
 	for (auto &v : vertices) {
 		mesh.addPosition(v);
+		mesh.addNormal(glm::vec3(-1.0f, 0.0f, 0.0f));
 	}
 	for (auto &t : triangles) {
 		mesh.addTriangle(t);
+	}
+	for (auto &t : texture) {
+		mesh.addUv(t);
 	}
 }
 
