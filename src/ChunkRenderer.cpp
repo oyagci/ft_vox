@@ -56,7 +56,7 @@ void ChunkRenderer::update()
 					Mesh mesh = _builder->build(glm::vec2(c->getPos()), faces);
 
 					std::unique_lock<std::mutex> lcm(_cm);
-					_chunkMeshes.push(ChunkMesh(mesh));
+					_chunkMeshes.push(ChunkMesh(std::move(mesh)));
 				});
 			}
 		}
@@ -68,11 +68,11 @@ void ChunkRenderer::buildChunks()
 {
 	std::unique_lock lm(_cm);
 	if (!_chunkMeshes.empty()) {
-		ChunkMesh cm = _chunkMeshes.front();
+		ChunkMesh cm = std::move(_chunkMeshes.front());
 		if (!cm.isBuilt) {
 			cm.build();
 		}
-		_meshes.push_back(cm);
+		_meshes.push_back(std::move(cm));
 		_chunkMeshes.pop();
 	}
 }
