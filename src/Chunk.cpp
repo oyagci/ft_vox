@@ -18,6 +18,11 @@ Chunk::Chunk(glm::i32vec2 pos) : _shouldBeRebuilt(true)
 		for (std::size_t y = CHUNK_SIZE - 1; y + 1 > 0; y--) {
 			for (std::size_t z = 0; z < CHUNK_SIZE; z++) {
 
+				if (y == 0) {
+					getBlock(x, y, z) = 4;
+					continue ;
+				}
+
 				glm::vec3 pos = glm::vec3(_worldPos.x, -32, _worldPos.y) + glm::vec3(x, y, z);
 				float result = 0.0f;
 
@@ -57,7 +62,17 @@ Chunk::Chunk(glm::i32vec2 pos) : _shouldBeRebuilt(true)
 				result = -pos.y + (pH / 2 + hH) * (CHUNK_SIZE / 2) * mm + path * 10 - cave * abs(mm);
 
 				if (getBlock(x, y + 1, z) > 0) {
-					getBlock(x, y, z) = (y == 0 || result > 0.0f ? 2 : 0);
+					if (getBlock(x, y + 2, z) > 0) {
+						if (getBlock(x, y + 3, z) > 0) {
+							getBlock(x, y, z) = (y == 0 || result > 0.0f ? 2 : 0);
+						}
+						else {
+							getBlock(x, y, z) = (y == 0 || result > 0.0f ? 3 : 0);
+						}
+					}
+					else {
+						getBlock(x, y, z) = (y == 0 || result > 0.0f ? 3 : 0);
+					}
 				}
 				else {
 					getBlock(x, y, z) = (y == 0 || result > 0.0f ? 1 : 0);

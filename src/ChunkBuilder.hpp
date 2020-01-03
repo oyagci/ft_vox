@@ -12,7 +12,9 @@ public:
 		AIR,
 		DIRT,
 		GRASS,
-		STONE
+		GRASS_SIDE,
+		STONE,
+		BEDROCK,
 	};
 	enum FaceDirection {
 		FD_TOP,
@@ -27,6 +29,10 @@ public:
 		FaceDirection dir;
 		BlockType type;
 	};
+
+	static constexpr unsigned int	TEXTURE_BLOCK_SIZE = 16;
+	static constexpr unsigned int	TEXTURE_TOTAL_SIZE = 256;
+	static constexpr float			TEXTURE_TILE_SIZE = static_cast<float>(TEXTURE_BLOCK_SIZE) / TEXTURE_TOTAL_SIZE;
 
 public:
 	ChunkBuilder();
@@ -50,6 +56,8 @@ private:
 	void buildBackFace(Face const &face, Mesh &mesh, glm::vec3 pos, std::size_t indOffset);
 	void buildRightFace(Face const &face, Mesh &mesh, glm::vec3 pos, std::size_t indOffset);
 	void buildLeftFace(Face const &face, Mesh &mesh, glm::vec3 pos, std::size_t indOffset);
+
+	glm::vec2 getTexturePosition(BlockType type);
 
 	std::shared_ptr<Chunk> _chunk;
 };

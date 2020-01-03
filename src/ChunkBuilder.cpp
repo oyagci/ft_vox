@@ -36,11 +36,23 @@ auto ChunkBuilder::genFaceToRender(glm::vec3 pos, FaceDirection f, Chunk::Block 
 {
 	Face face = { pos, f, AIR };
 
-	if (block == 1) {
+	if (block == 1 && (f == FD_TOP)) {
 		face.type = GRASS;
+	}
+	else if (block == 1 && (f == FD_LEFT || f == FD_RIGHT || f == FD_FRONT || f == FD_BACK)) {
+		face.type = GRASS_SIDE;
+	}
+	else if (block == 1 && (f == FD_BOT)) {
+		face.type = DIRT;
 	}
 	else if (block == 2) {
 		face.type = STONE;
+	}
+	else if (block == 3) {
+		face.type = DIRT;
+	}
+	else if (block == 4) {
+		face.type = BEDROCK;
 	}
 
 	return face;
@@ -112,6 +124,26 @@ auto ChunkBuilder::genChunkFaces() -> std::vector<Face>
 	return faces;
 }
 
+glm::vec2 ChunkBuilder::getTexturePosition(BlockType type)
+{
+	if (type == GRASS) {
+		return glm::vec2(TEXTURE_TILE_SIZE * 8, TEXTURE_TILE_SIZE * 4);
+	}
+	else if (type == GRASS_SIDE) {
+		return glm::vec2(TEXTURE_TILE_SIZE * 3, TEXTURE_TILE_SIZE * 15);
+	}
+	else if (type == STONE) {
+		return glm::vec2(TEXTURE_TILE_SIZE * 1, TEXTURE_TILE_SIZE * 15);
+	}
+	else if (type == DIRT) {
+		return glm::vec2(TEXTURE_TILE_SIZE * 2, TEXTURE_TILE_SIZE * 15);
+	}
+	else if (type == BEDROCK) {
+		return glm::vec2(TEXTURE_TILE_SIZE * 1, TEXTURE_TILE_SIZE * 14);
+	}
+	return glm::vec2(0, 15 * TEXTURE_TILE_SIZE);
+}
+
 void ChunkBuilder::buildTopFace(Face const &face, Mesh &mesh, glm::vec3 pos, std::size_t indOffset)
 {
 	std::array<glm::vec3, 4> vertices = {
@@ -123,27 +155,13 @@ void ChunkBuilder::buildTopFace(Face const &face, Mesh &mesh, glm::vec3 pos, std
 		glm::u32vec3(1 + indOffset, 2 + indOffset, 3 + indOffset)
 	};
 
-	unsigned int xindex = 0;
-	unsigned int yindex = 0;
-
-	if (face.type == GRASS) {
-		xindex = 8;
-		yindex = 4;
-	}
-	else if (face.type == STONE) {
-		xindex = 1;
-		yindex = 15;
-	}
-
-	float side = 16.0f / 256.0f;
-	float xoff = xindex * side;
-	float yoff = yindex * side;
+	glm::vec2 tex = getTexturePosition(face.type);
 
 	std::array<glm::vec2, 4> texture = {
-		glm::vec2(side + xoff, yoff),
-		glm::vec2(       xoff, yoff),
-		glm::vec2(side + xoff, side + yoff),
-		glm::vec2(       xoff, side + yoff),
+		glm::vec2(TEXTURE_TILE_SIZE + tex.x, tex.y),
+		glm::vec2(                    tex.x, tex.y),
+		glm::vec2(TEXTURE_TILE_SIZE + tex.x, tex.y + TEXTURE_TILE_SIZE),
+		glm::vec2(                    tex.x, tex.y + TEXTURE_TILE_SIZE),
 	};
 
 	for (auto &v : vertices) {
@@ -169,27 +187,13 @@ void ChunkBuilder::buildBotFace(Face const &face, Mesh &mesh, glm::vec3 pos, std
 		glm::u32vec3(1 + indOffset, 3 + indOffset, 2 + indOffset)
 	};
 
-	unsigned int xindex = 0;
-	unsigned int yindex = 0;
-
-	if (face.type == GRASS) {
-		xindex = 2;
-		yindex = 15;
-	}
-	else if (face.type == STONE) {
-		xindex = 1;
-		yindex = 15;
-	}
-
-	float side = 16.0f / 256.0f;
-	float xoff = xindex * side;
-	float yoff = yindex * side;
+	glm::vec2 tex = getTexturePosition(face.type);
 
 	std::array<glm::vec2, 4> texture = {
-		glm::vec2(side + xoff, yoff),
-		glm::vec2(xoff, yoff),
-		glm::vec2(side + xoff, side + yoff),
-		glm::vec2(xoff, side + yoff),
+		glm::vec2(TEXTURE_TILE_SIZE + tex.x, tex.y),
+		glm::vec2(tex.x, tex.y),
+		glm::vec2(TEXTURE_TILE_SIZE + tex.x, TEXTURE_TILE_SIZE + tex.y),
+		glm::vec2(tex.x, TEXTURE_TILE_SIZE + tex.y),
 	};
 
 	for (auto &v : vertices) {
@@ -215,27 +219,13 @@ void ChunkBuilder::buildFrontFace(Face const &face, Mesh &mesh, glm::vec3 pos, s
 		glm::u32vec3(0 + indOffset, 2 + indOffset, 3 + indOffset)
 	};
 
-	unsigned int xindex = 0;
-	unsigned int yindex = 0;
-
-	if (face.type == GRASS) {
-		xindex = 3;
-		yindex = 15;
-	}
-	else if (face.type == STONE) {
-		xindex = 1;
-		yindex = 15;
-	}
-
-	float side = 16.0f / 256.0f;
-	float xoff = xindex * side;
-	float yoff = yindex * side;
+	glm::vec2 tex = getTexturePosition(face.type);
 
 	std::array<glm::vec2, 4> texture = {
-		glm::vec2(xoff, yoff),
-		glm::vec2(side + xoff, yoff),
-		glm::vec2(side + xoff, side + yoff),
-		glm::vec2(xoff, side + yoff),
+		glm::vec2(tex.x, tex.y),
+		glm::vec2(TEXTURE_TILE_SIZE + tex.x, tex.y),
+		glm::vec2(TEXTURE_TILE_SIZE + tex.x, TEXTURE_TILE_SIZE + tex.y),
+		glm::vec2(tex.x, TEXTURE_TILE_SIZE + tex.y),
 	};
 
 	for (auto &v : vertices) {
@@ -261,27 +251,13 @@ void ChunkBuilder::buildBackFace(Face const &face, Mesh &mesh, glm::vec3 pos, st
 		glm::u32vec3(0 + indOffset, 3 + indOffset, 2 + indOffset)
 	};
 
-	unsigned int xindex = 0;
-	unsigned int yindex = 0;
-
-	if (face.type == GRASS) {
-		xindex = 3;
-		yindex = 15;
-	}
-	else if (face.type == STONE) {
-		xindex = 1;
-		yindex = 15;
-	}
-
-	float side = 16.0f / 256.0f;
-	float xoff = xindex * side;
-	float yoff = yindex * side;
+	glm::vec2 tex = getTexturePosition(face.type);
 
 	std::array<glm::vec2, 4> texture = {
-		glm::vec2(xoff, yoff),
-		glm::vec2(side + xoff, yoff),
-		glm::vec2(side + xoff, side + yoff),
-		glm::vec2(xoff, side + yoff),
+		glm::vec2(tex.x, tex.y),
+		glm::vec2(TEXTURE_TILE_SIZE + tex.x, tex.y),
+		glm::vec2(TEXTURE_TILE_SIZE + tex.x, TEXTURE_TILE_SIZE + tex.y),
+		glm::vec2(tex.x, TEXTURE_TILE_SIZE + tex.y),
 	};
 
 	for (auto &v : vertices) {
@@ -307,27 +283,13 @@ void ChunkBuilder::buildRightFace(Face const &face, Mesh &mesh, glm::vec3 pos, s
 		glm::u32vec3(0 + indOffset, 2 + indOffset, 3 + indOffset)
 	};
 
-	unsigned int xindex = 0;
-	unsigned int yindex = 0;
-
-	if (face.type == GRASS) {
-		xindex = 3;
-		yindex = 15;
-	}
-	else if (face.type == STONE) {
-		xindex = 1;
-		yindex = 15;
-	}
-
-	float side = 16.0f / 256.0f;
-	float xoff = xindex * side;
-	float yoff = yindex * side;
+	glm::vec2 tex = getTexturePosition(face.type);
 
 	std::array<glm::vec2, 4> texture = {
-		glm::vec2(xoff, yoff),
-		glm::vec2(side + xoff, yoff),
-		glm::vec2(side + xoff, side + yoff),
-		glm::vec2(xoff, side + yoff),
+		glm::vec2(tex.x, tex.y),
+		glm::vec2(TEXTURE_TILE_SIZE + tex.x, tex.y),
+		glm::vec2(TEXTURE_TILE_SIZE + tex.x, TEXTURE_TILE_SIZE + tex.y),
+		glm::vec2(tex.x, TEXTURE_TILE_SIZE + tex.y),
 	};
 
 	for (auto &v : vertices) {
@@ -353,27 +315,13 @@ void ChunkBuilder::buildLeftFace(Face const &face, Mesh &mesh, glm::vec3 pos, st
 		glm::u32vec3(0 + indOffset, 3 + indOffset, 2 + indOffset)
 	};
 
-	unsigned int xindex = 0;
-	unsigned int yindex = 0;
-
-	if (face.type == GRASS) {
-		xindex = 3;
-		yindex = 15;
-	}
-	else if (face.type == STONE) {
-		xindex = 1;
-		yindex = 15;
-	}
-
-	float side = 16.0f / 256.0f;
-	float xoff = xindex * side;
-	float yoff = yindex * side;
+	glm::vec2 tex = getTexturePosition(face.type);
 
 	std::array<glm::vec2, 4> texture = {
-		glm::vec2(xoff, yoff),
-		glm::vec2(side + xoff, yoff),
-		glm::vec2(side + xoff, side + yoff),
-		glm::vec2(xoff, side + yoff),
+		glm::vec2(tex.x, tex.y),
+		glm::vec2(TEXTURE_TILE_SIZE + tex.x, tex.y),
+		glm::vec2(TEXTURE_TILE_SIZE + tex.x, TEXTURE_TILE_SIZE + tex.y),
+		glm::vec2(tex.x, TEXTURE_TILE_SIZE + tex.y),
 	};
 
 	for (auto &v : vertices) {

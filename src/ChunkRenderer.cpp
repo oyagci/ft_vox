@@ -7,7 +7,7 @@ ChunkRenderer::ChunkRenderer() : _pool(1)
 
 	int width, height, nchan;
 	stbi_set_flip_vertically_on_load(1);
-	unsigned char *data = stbi_load("img/terrain.jpg", &width, &height, &nchan, 0);
+	unsigned char *data = stbi_load("img/terrain.png", &width, &height, &nchan, 0);
 
 	GLuint texture;
 	glGenTextures(1, &texture);
