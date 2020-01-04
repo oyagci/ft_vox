@@ -9,10 +9,10 @@
 #include "threadpool/threadpool.hpp"
 #include <list>
 
-class WorldBuilder
+class WorldGenerator
 {
 public:
-	WorldBuilder();
+	WorldGenerator();
 
 	void update();
 	void setCameraPosition(glm::vec3 pos);

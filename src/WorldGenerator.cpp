@@ -1,7 +1,7 @@
-#include "WorldBuilder.hpp"
+#include "WorldGenerator.hpp"
 #include "Chunk.hpp"
 
-WorldBuilder::WorldBuilder() : _pool(1)
+WorldGenerator::WorldGenerator() : _pool(1)
 {
 	_factory = std::make_unique<ChunkFactory>();
 
@@ -31,7 +31,7 @@ WorldBuilder::WorldBuilder() : _pool(1)
 	}
 }
 
-void WorldBuilder::update()
+void WorldGenerator::update()
 {
 	if (!_chunksToGenerate.empty() && !_pool.isFull()) {
 		_pool.enqueue_work([&] {
@@ -46,7 +46,7 @@ void WorldBuilder::update()
 	}
 }
 
-std::vector<glm::vec3> WorldBuilder::getChunksFront()
+std::vector<glm::vec3> WorldGenerator::getChunksFront()
 {
 	glm::i32vec3 dir = { 0, 0, -1 };
 	std::vector<glm::vec3> chunks;
@@ -66,7 +66,7 @@ std::vector<glm::vec3> WorldBuilder::getChunksFront()
 	return chunks;
 }
 
-std::vector<glm::vec3> WorldBuilder::getChunksAround()
+std::vector<glm::vec3> WorldGenerator::getChunksAround()
 {
 	std::vector<glm::vec3> chunks;
 	glm::i32vec3 gridPos = _camPos / Chunk::CHUNK_SIZE;
@@ -91,7 +91,7 @@ std::vector<glm::vec3> WorldBuilder::getChunksAround()
 	return chunks;
 }
 
-std::vector<glm::vec3> WorldBuilder::getChunksTriangleNorth()
+std::vector<glm::vec3> WorldGenerator::getChunksTriangleNorth()
 {
 	std::vector<glm::vec3> chunks;
 
@@ -107,7 +107,7 @@ std::vector<glm::vec3> WorldBuilder::getChunksTriangleNorth()
 	return chunks;
 }
 
-std::vector<glm::vec3> WorldBuilder::getChunksTriangleSouth()
+std::vector<glm::vec3> WorldGenerator::getChunksTriangleSouth()
 {
 	std::vector<glm::vec3> chunks;
 
@@ -123,7 +123,7 @@ std::vector<glm::vec3> WorldBuilder::getChunksTriangleSouth()
 	return chunks;
 }
 
-std::vector<glm::vec3> WorldBuilder::getChunksTriangleEast()
+std::vector<glm::vec3> WorldGenerator::getChunksTriangleEast()
 {
 	std::vector<glm::vec3> chunks;
 
@@ -139,7 +139,7 @@ std::vector<glm::vec3> WorldBuilder::getChunksTriangleEast()
 	return chunks;
 }
 
-std::vector<glm::vec3> WorldBuilder::getChunksTriangleWest()
+std::vector<glm::vec3> WorldGenerator::getChunksTriangleWest()
 {
 	std::vector<glm::vec3> chunks;
 
@@ -155,12 +155,12 @@ std::vector<glm::vec3> WorldBuilder::getChunksTriangleWest()
 	return chunks;
 }
 
-void WorldBuilder::setCameraPosition(glm::vec3 pos)
+void WorldGenerator::setCameraPosition(glm::vec3 pos)
 {
 	_camPos = std::move(pos);
 }
 
-std::list<std::shared_ptr<Chunk>> WorldBuilder::takeChunks()
+std::list<std::shared_ptr<Chunk>> WorldGenerator::takeChunks()
 {
 	std::list<std::shared_ptr<Chunk>> tmp;
 

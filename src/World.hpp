@@ -1,7 +1,7 @@
 #pragma once
 #include <memory>
 #include "WorldRenderer.hpp"
-#include "WorldBuilder.hpp"
+#include "WorldGenerator.hpp"
 #include "IRenderer.hpp"
 #include <list>
 
@@ -15,7 +15,7 @@ public:
 
 private:
 	std::unique_ptr<WorldRenderer> _renderer;
-	std::unique_ptr<WorldBuilder> _builder;
+	std::unique_ptr<WorldGenerator> _builder;
 
 	std::list<std::shared_ptr<Chunk>> _chunks;
 };
