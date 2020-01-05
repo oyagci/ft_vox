@@ -88,17 +88,9 @@ void ChunkRenderer::buildChunks()
 {
 	std::unique_lock lm(_cm);
 	if (!_chunkMeshes.empty()) {
-<<<<<<< HEAD
 		ChunkMesh cm = std::move(_chunkMeshes.front());
-		if (!cm.isBuilt) {
-			cm.build();
-		}
-		_meshes.push_back(std::move(cm));
-=======
-		ChunkMesh cm = _chunkMeshes.front();
 		cm.build();
-		_meshes.push_back(cm);
->>>>>>> Refactor class ChunkMesh
+		_meshes.push_back(std::move(cm));
 		_chunkMeshes.pop();
 	}
 }
