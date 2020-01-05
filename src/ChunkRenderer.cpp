@@ -36,10 +36,13 @@ void ChunkRenderer::addChunk(std::shared_ptr<Chunk> chunk)
 bool ChunkRenderer::isInView(Camera &camera, ChunkMesh &mesh)
 {
 	glm::vec3 pos = mesh.getPosition();
+	pos.x += Chunk::CHUNK_SIZE / 2;
+	pos.z += Chunk::CHUNK_SIZE / 2;
+
 	auto vp = camera.getViewProjectionMatrix();
 	glm::vec4 clipPos = vp * glm::vec4(pos, 1.0f);
 
-	float radius = Chunk::CHUNK_SIZE;
+	float radius = glm::length(glm::vec2(Chunk::CHUNK_SIZE / 2, Chunk::CHUNK_SIZE / 2));
 
 	if ((-clipPos.w <= pos.x + radius && pos.x - radius <= clipPos.w) ||
 		(-clipPos.w <= pos.y + radius && pos.y - radius <= clipPos.w) ||
