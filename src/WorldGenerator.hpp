@@ -26,11 +26,20 @@ private:
 	std::vector<glm::vec3> getChunksTriangleEast();
 	std::vector<glm::vec3> getChunksTriangleWest();
 
+	using Priority = unsigned int;
+	struct ChunkPriority {
+		Priority priority;
+		glm::vec3 position;
+		ChunkPriority(Priority pri, glm::vec3 pos) : priority(pri), position(pos) {}
+	};
+	void addChunkToGenerate(glm::vec3 pos, Priority priority);
+	glm::vec3 popPriorityChunk();
+
 private:
 	const int RENDER_DISTANCE = 6;
 
 	std::unique_ptr<ChunkFactory> _factory;
-	std::queue<glm::vec3> _chunksToGenerate;
+	std::queue<ChunkPriority> _chunksToGenerate;
 
 	glm::vec3 _camPos;
 

@@ -1,5 +1,6 @@
 #include "WorldGenerator.hpp"
 #include "Chunk.hpp"
+#include <glm/vec3.hpp>
 
 WorldGenerator::WorldGenerator() : _pool(1)
 {
@@ -7,36 +8,43 @@ WorldGenerator::WorldGenerator() : _pool(1)
 
 	std::vector<glm::vec3> chunks = getChunksAround();
 	for (auto &c : chunks) {
-		_chunksToGenerate.push(std::move(c));
+		addChunkToGenerate(std::move(c), 0);
 	}
 
 	chunks = getChunksTriangleNorth();
 	for (auto &c : chunks) {
-		_chunksToGenerate.push(std::move(c));
+		addChunkToGenerate(std::move(c), 0);
 	}
 
 	chunks = getChunksTriangleSouth();
 	for (auto &c : chunks) {
-		_chunksToGenerate.push(std::move(c));
+		addChunkToGenerate(std::move(c), 0);
 	}
 
 	chunks = getChunksTriangleEast();
 	for (auto &c : chunks) {
-		_chunksToGenerate.push(std::move(c));
+		addChunkToGenerate(std::move(c), 0);
 	}
 
 	chunks = getChunksTriangleWest();
 	for (auto &c : chunks) {
-		_chunksToGenerate.push(std::move(c));
+		addChunkToGenerate(std::move(c), 0);
 	}
+}
+
+glm::vec3 WorldGenerator::popPriorityChunk()
+{
+	glm::vec3 pos = _chunksToGenerate.front().position;
+	_chunksToGenerate.pop();
+	return pos;
 }
 
 void WorldGenerator::update()
 {
 	if (!_chunksToGenerate.empty() && !_pool.isFull()) {
-		_pool.enqueue_work([&] {
-			glm::vec3 chunkPos = glm::vec3(_chunksToGenerate.front());
-			_chunksToGenerate.pop();
+		_pool.enqueue_work([=] {
+
+			glm::vec3 chunkPos  = popPriorityChunk();
 
 			std::shared_ptr<Chunk> chunk = _factory->getChunk(std::move(chunkPos));
 
@@ -171,4 +179,9 @@ std::list<std::shared_ptr<Chunk>> WorldGenerator::takeChunks()
 	}
 
 	return tmp;
+}
+
+void WorldGenerator::addChunkToGenerate(glm::vec3 pos, Priority priority)
+{
+	_chunksToGenerate.push(ChunkPriority(priority, std::move(pos)));
 }
