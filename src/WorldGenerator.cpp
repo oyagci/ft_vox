@@ -13,22 +13,22 @@ WorldGenerator::WorldGenerator() : _pool(1)
 
 	chunks = getChunksTriangleNorth();
 	for (auto &c : chunks) {
-		addChunkToGenerate(std::move(c), 0);
+		addChunkToGenerate(std::move(c), 1);
 	}
 
 	chunks = getChunksTriangleSouth();
 	for (auto &c : chunks) {
-		addChunkToGenerate(std::move(c), 0);
+		addChunkToGenerate(std::move(c), 4);
 	}
 
 	chunks = getChunksTriangleEast();
 	for (auto &c : chunks) {
-		addChunkToGenerate(std::move(c), 0);
+		addChunkToGenerate(std::move(c), 2);
 	}
 
 	chunks = getChunksTriangleWest();
 	for (auto &c : chunks) {
-		addChunkToGenerate(std::move(c), 0);
+		addChunkToGenerate(std::move(c), 3);
 	}
 }
 
