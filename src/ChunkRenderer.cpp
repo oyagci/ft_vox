@@ -39,6 +39,10 @@ bool ChunkRenderer::isInView(Camera &camera, ChunkMesh &mesh)
 	pos.x += Chunk::CHUNK_SIZE / 2;
 	pos.z += Chunk::CHUNK_SIZE / 2;
 
+	if (glm::length(camera.getPosition() - pos) > 300.0f) {
+		return false;
+	}
+
 	auto vp = camera.getViewProjectionMatrix();
 	glm::vec4 clipPos = vp * glm::vec4(pos, 1.0f);
 

@@ -11,11 +11,13 @@ public:
 	World(Camera &cam, glm::vec3 &camPos);
 
 	void render() override;
-	void update();
+	void update(glm::vec3 camPos);
 
 private:
 	std::unique_ptr<WorldRenderer> _renderer;
 	std::unique_ptr<WorldGenerator> _builder;
 
 	std::list<std::shared_ptr<Chunk>> _chunks;
+
+	glm::vec3 &_camera;
 };

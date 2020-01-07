@@ -5,7 +5,19 @@
 WorldGenerator::WorldGenerator() : _pool(1)
 {
 	_factory = std::make_unique<ChunkFactory>();
+	genChunksAroundPlayer();
+}
 
+glm::vec3 WorldGenerator::popPriorityChunk()
+{
+	glm::vec3 pos = _chunksToGenerate.top().position;
+	_chunksToGenerate.pop();
+
+	return pos;
+}
+
+void WorldGenerator::genChunksAroundPlayer()
+{
 	std::vector<glm::vec3> chunks = getChunksAround();
 	for (auto &c : chunks) {
 		addChunkToGenerate(std::move(c), 0);
@@ -32,25 +44,33 @@ WorldGenerator::WorldGenerator() : _pool(1)
 	}
 }
 
-glm::vec3 WorldGenerator::popPriorityChunk()
+void WorldGenerator::updatePriority()
 {
-	glm::vec3 pos = _chunksToGenerate.top().position;
-	_chunksToGenerate.pop();
+	std::vector<ChunkPriority> chunks;
 
-	return pos;
+	chunks.reserve(_chunksToGenerate.size());
+	for (std::size_t i = 0; i < _chunksToGenerate.size(); i++) {
+		auto e = _chunksToGenerate.top();
+		chunks.push_back(e);
+		_chunksToGenerate.pop();
+	}
+
+	for (auto &c : chunks) {
+		c.priority = glm::length(_camPos - c.position);
+		_chunksToGenerate.push(c);
+	}
 }
 
-void WorldGenerator::update()
+void WorldGenerator::update(glm::vec3 camPos)
 {
+	genChunksAroundPlayer();
+	updatePriority();
 	if (!_chunksToGenerate.empty() && !_pool.isFull()) {
+		glm::vec3 chunkPos  = popPriorityChunk();
 		_pool.enqueue_work([=] {
-
-			glm::vec3 chunkPos  = popPriorityChunk();
-
-			std::shared_ptr<Chunk> chunk = _factory->getChunk(std::move(chunkPos));
-
-			std::unique_lock<std::mutex> l(_cl);
-			_chunks.push(chunk);
+				std::shared_ptr<Chunk> chunk = _factory->getChunk(std::move(chunkPos));
+				std::unique_lock<std::mutex> l(_cl);
+				_chunks.push(chunk);
 		});
 	}
 }
@@ -184,5 +204,8 @@ std::list<std::shared_ptr<Chunk>> WorldGenerator::takeChunks()
 
 void WorldGenerator::addChunkToGenerate(glm::vec3 pos, Priority priority)
 {
-	_chunksToGenerate.push(ChunkPriority(priority, std::move(pos)));
+	if (std::find(_generatedChunks.begin(), _generatedChunks.end(), pos) == _generatedChunks.end()) {
+		_generatedChunks.push_back(glm::vec3(pos));
+		_chunksToGenerate.push(ChunkPriority(priority, std::move(pos)));
+	}
 }

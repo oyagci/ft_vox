@@ -15,11 +15,12 @@ class WorldGenerator
 public:
 	WorldGenerator();
 
-	void update();
+	void update(glm::vec3 camPos);
 	void setCameraPosition(glm::vec3 pos);
 	std::list<std::shared_ptr<Chunk>> takeChunks();
 
 private:
+	void genChunksAroundPlayer();
 	std::vector<glm::vec3> getChunksFront();
 	std::vector<glm::vec3> getChunksAround();
 	std::vector<glm::vec3> getChunksTriangleNorth();
@@ -41,6 +42,7 @@ private:
 	};
 	void addChunkToGenerate(glm::vec3 pos, Priority priority);
 	glm::vec3 popPriorityChunk();
+	void updatePriority();
 
 private:
 	const int RENDER_DISTANCE = 6;
@@ -52,6 +54,8 @@ private:
 
 	std::mutex _cl;
 	std::queue<std::shared_ptr<Chunk>> _chunks;
+	std::vector<glm::vec3> _generatedChunks;
 
 	thread_pool _pool;
 };
+

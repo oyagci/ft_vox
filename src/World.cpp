@@ -1,6 +1,6 @@
 #include "World.hpp"
 
-World::World(Camera &cam, glm::vec3 &camPos)
+World::World(Camera &cam, glm::vec3 &camPos) : _camera(camPos)
 {
 	_renderer = std::make_unique<WorldRenderer>(cam, camPos);
 	_builder = std::make_unique<WorldGenerator>();
@@ -11,9 +11,10 @@ void World::render()
 	_renderer->render();
 }
 
-void World::update()
+void World::update(glm::vec3 camPos)
 {
-	_builder->update();
+	_builder->setCameraPosition(camPos);
+	_builder->update(camPos);
 	auto chunks = _builder->takeChunks();
 	if (!chunks.empty()) {
 		// New chunks have been created
