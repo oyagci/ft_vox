@@ -8,6 +8,7 @@
 #include "ChunkFactory.hpp"
 #include "threadpool/threadpool.hpp"
 #include <list>
+#include <queue>
 
 class WorldGenerator
 {
@@ -31,6 +32,12 @@ private:
 		Priority priority;
 		glm::vec3 position;
 		ChunkPriority(Priority pri, glm::vec3 pos) : priority(pri), position(pos) {}
+		friend bool operator<(const ChunkPriority &lhs, const ChunkPriority &rhs) {
+			return lhs.priority < rhs.priority;
+		}
+		friend bool operator>(const ChunkPriority &lhs, const ChunkPriority &rhs) {
+			return lhs.priority > rhs.priority;
+		}
 	};
 	void addChunkToGenerate(glm::vec3 pos, Priority priority);
 	glm::vec3 popPriorityChunk();
@@ -39,7 +46,7 @@ private:
 	const int RENDER_DISTANCE = 6;
 
 	std::unique_ptr<ChunkFactory> _factory;
-	std::list<ChunkPriority> _chunksToGenerate;
+	std::priority_queue<ChunkPriority, std::vector<ChunkPriority>,std::greater<ChunkPriority>> _chunksToGenerate;
 
 	glm::vec3 _camPos;
 

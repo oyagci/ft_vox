@@ -34,10 +34,8 @@ WorldGenerator::WorldGenerator() : _pool(1)
 
 glm::vec3 WorldGenerator::popPriorityChunk()
 {
-	glm::vec3 pos = _chunksToGenerate.front().position;
-	_chunksToGenerate.pop_front();
-
-
+	glm::vec3 pos = _chunksToGenerate.top().position;
+	_chunksToGenerate.pop();
 
 	return pos;
 }
@@ -186,5 +184,5 @@ std::list<std::shared_ptr<Chunk>> WorldGenerator::takeChunks()
 
 void WorldGenerator::addChunkToGenerate(glm::vec3 pos, Priority priority)
 {
-	_chunksToGenerate.push_front(ChunkPriority(priority, std::move(pos)));
+	_chunksToGenerate.push(ChunkPriority(priority, std::move(pos)));
 }
