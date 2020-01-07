@@ -39,7 +39,7 @@ private:
 	const int RENDER_DISTANCE = 6;
 
 	std::unique_ptr<ChunkFactory> _factory;
-	std::queue<ChunkPriority> _chunksToGenerate;
+	std::list<ChunkPriority> _chunksToGenerate;
 
 	glm::vec3 _camPos;
 
