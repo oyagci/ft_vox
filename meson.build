@@ -19,7 +19,7 @@ srcs = [
 	'src/WorldRenderer.cpp',
 	'src/World.cpp',
 	'src/ChunkBuilder.cpp',
-	'src/WorldBuilder.cpp',
+	'src/WorldGenerator.cpp',
 	'src/stb_image.cpp',
 ]
 
