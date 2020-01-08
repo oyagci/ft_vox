@@ -9,13 +9,14 @@
 #include "threadpool/threadpool.hpp"
 #include <list>
 #include <queue>
+#include "TextRenderer.hpp"
 
 class WorldGenerator
 {
 public:
 	WorldGenerator();
 
-	void update(glm::vec3 camPos);
+	void update();
 	void setCameraPosition(glm::vec3 pos);
 	std::list<std::shared_ptr<Chunk>> takeChunks();
 

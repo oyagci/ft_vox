@@ -14,7 +14,7 @@ void World::render()
 void World::update(glm::vec3 camPos)
 {
 	_builder->setCameraPosition(camPos);
-	_builder->update(camPos);
+	_builder->update();
 	auto chunks = _builder->takeChunks();
 	if (!chunks.empty()) {
 		// New chunks have been created

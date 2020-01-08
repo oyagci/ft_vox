@@ -57,11 +57,14 @@ void WorldGenerator::updatePriority()
 
 	for (auto &c : chunks) {
 		c.priority = glm::length(_camPos - c.position);
-		_chunksToGenerate.push(c);
+
+		if (c.priority < 2000.0f) {
+			_chunksToGenerate.push(c);
+		}
 	}
 }
 
-void WorldGenerator::update(glm::vec3 camPos)
+void WorldGenerator::update()
 {
 	genChunksAroundPlayer();
 	updatePriority();
@@ -124,7 +127,7 @@ std::vector<glm::vec3> WorldGenerator::getChunksTriangleNorth()
 {
 	std::vector<glm::vec3> chunks;
 
-	for (int xoff = 0; xoff < RENDER_DISTANCE; xoff++) {
+	for (int xoff = 2; xoff < RENDER_DISTANCE; xoff++) {
 		glm::i32vec3 gridPos = _camPos / Chunk::CHUNK_SIZE;
 
 		gridPos.z += xoff;
@@ -140,7 +143,7 @@ std::vector<glm::vec3> WorldGenerator::getChunksTriangleSouth()
 {
 	std::vector<glm::vec3> chunks;
 
-	for (int xoff = 0; xoff < RENDER_DISTANCE; xoff++) {
+	for (int xoff = 2; xoff < RENDER_DISTANCE; xoff++) {
 		glm::i32vec3 gridPos = _camPos / Chunk::CHUNK_SIZE;
 
 		gridPos.z -= xoff;
@@ -156,7 +159,7 @@ std::vector<glm::vec3> WorldGenerator::getChunksTriangleEast()
 {
 	std::vector<glm::vec3> chunks;
 
-	for (int xoff = 0; xoff < RENDER_DISTANCE; xoff++) {
+	for (int xoff = 2; xoff < RENDER_DISTANCE; xoff++) {
 		glm::i32vec3 gridPos = _camPos / Chunk::CHUNK_SIZE;
 
 		gridPos.x += xoff;
@@ -172,7 +175,7 @@ std::vector<glm::vec3> WorldGenerator::getChunksTriangleWest()
 {
 	std::vector<glm::vec3> chunks;
 
-	for (int xoff = 0; xoff < RENDER_DISTANCE; xoff++) {
+	for (int xoff = 2; xoff < RENDER_DISTANCE; xoff++) {
 		glm::i32vec3 gridPos = _camPos / Chunk::CHUNK_SIZE;
 
 		gridPos.x -= xoff;
