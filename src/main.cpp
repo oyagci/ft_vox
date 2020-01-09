@@ -9,6 +9,9 @@
 #include "FPSCounter.hpp"
 #include "World.hpp"
 #include "Settings.hpp"
+#include "imgui/imgui.h"
+#include "imgui/imgui_impl_glfw.h"
+#include "imgui/imgui_impl_opengl3.h"
 
 using namespace lazy;
 using namespace graphics;
@@ -25,6 +28,7 @@ int main()
 	display.enableCap(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	display.setFullscreen(true);
+	display.setFocused(true);
 
 	TextRenderer tr;
 
@@ -38,8 +42,20 @@ int main()
 
 	FPSCounter fpsCounter;
 
+	IMGUI_CHECKVERSION();
+	std::cout << "ImGui version: " << IMGUI_VERSION << std::endl;
+	ImGui::CreateContext();
+	//ImGuiIO &io = ImGui::GetIO();
+
+	ImGui::StyleColorsDark();
+	ImGui_ImplGlfw_InitForOpenGL(display.getWindow(), true);
+	ImGui_ImplOpenGL3_Init("#version 450");
+
+	float ui = true;
+
 	while (!display.isClosed())
 	{
+
 		Time::instance().update();
 		display.update();
 		display.updateInputs();
@@ -50,22 +66,32 @@ int main()
 		fpsCounter.update(deltaTime);
 
 		float ms = 30.0f;
-		if (input::getKeyboard().getKey(GLFW_KEY_LEFT_SHIFT)) {
-			ms = 500.0f;
+		if (!ui) {
+			if (input::getKeyboard().getKey(GLFW_KEY_LEFT_SHIFT)) {
+				ms = 500.0f;
+			}
+			if (input::getKeyboard().getKey(GLFW_KEY_ESCAPE)) {
+				glfwSetWindowShouldClose(display.getWindow(), GLFW_TRUE);
+			}
+			if (input::getKeyboard().getKeyDown(GLFW_KEY_F1)) {
+				ui = true;
+				display.setFocused(false);
+			}
+			camera.input(ms * deltaTime, 0.001f, {
+				GLFW_KEY_W,
+				GLFW_KEY_S,
+				GLFW_KEY_A,
+				GLFW_KEY_D,
+				GLFW_KEY_LEFT_CONTROL,
+				GLFW_KEY_SPACE
+			});
 		}
-		if (input::getKeyboard().getKey(GLFW_KEY_ESCAPE)) {
-			glfwSetWindowShouldClose(display.getWindow(), GLFW_TRUE);
+		else {
+			if (input::getKeyboard().getKeyDown(GLFW_KEY_F1)) {
+				ui = false;
+				display.setFocused(true);
+			}
 		}
-
-		camera.input(ms * deltaTime, 0.001f, {
-			GLFW_KEY_W,
-			GLFW_KEY_S,
-			GLFW_KEY_A,
-			GLFW_KEY_D,
-			GLFW_KEY_LEFT_CONTROL,
-			GLFW_KEY_SPACE
-		});
-
 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glClearColor(0x87 / 255.0f, 0xCE / 255.0f, 0xEB / 255.0f, 1.0f);
@@ -74,7 +100,20 @@ int main()
 		wr.render();
 
 		tr.drawText(std::to_string(fpsCounter.getFPS()) + " FPS", glm::vec2(10, 10), .3f, glm::vec3(1.0f));
+
+		if (ui) {
+			ImGui_ImplOpenGL3_NewFrame();
+			ImGui_ImplGlfw_NewFrame();
+			ImGui::NewFrame();
+			ImGui::ShowDemoWindow();
+			ImGui::Render();
+			ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+		}
 	}
+
+	ImGui_ImplOpenGL3_Shutdown();
+    ImGui_ImplGlfw_Shutdown();
+    ImGui::DestroyContext();
 
 	return EXIT_SUCCESS;
 }

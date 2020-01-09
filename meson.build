@@ -23,6 +23,12 @@ srcs = [
 	'src/stb_image.cpp',
 	'src/ChunkMesh.cpp',
 	'src/Settings.cpp',
+	'src/imgui/imgui.cpp',
+	'src/imgui/imgui_demo.cpp',
+	'src/imgui/imgui_draw.cpp',
+	'src/imgui/imgui_widgets.cpp',
+	'src/imgui/imgui_impl_opengl3.cpp',
+	'src/imgui/imgui_impl_glfw.cpp',
 ]
 
 cmake = import('cmake')
