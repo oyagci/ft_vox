@@ -1,16 +1,17 @@
 #pragma once
 
-#include <map>
+#include <unordered_map>
 #include <any>
 #include <optional>
 
 class Settings
 {
 private:
-	Settings();
-
-	void loadDefaults();
-
+	enum SettingType {
+		INT,
+		FLOAT,
+		STRING
+	};
 public:
 	static Settings &instance() {
 		static Settings s;
@@ -24,9 +25,15 @@ public:
 
 public:
 	bool load(std::string const &filename);
-	const std::string &get(std::string const &name) const;
-	void set(std::string const &name, std::string const &value);
+	const std::any &get(std::string const &name) const;
+	void set(std::string const &name, std::any const &value);
 
 private:
-	std::map<std::string, std::string> _values;
+	Settings();
+
+	void loadDefaults();
+	SettingType getType(std::string const &name);
+
+private:
+	std::unordered_map<std::string, std::any> _values;
 };

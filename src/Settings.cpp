@@ -4,6 +4,7 @@
 #include <iostream>
 #include <chrono>
 #include <string>
+#include <map>
 
 Settings::Settings()
 {
@@ -40,18 +41,43 @@ bool Settings::load(std::string const &filename)
 	std::string key;
 	std::string value;
 	while (std::getline(std::getline(file, key, '=') >> std::ws, value)) {
-		_values[key] = value;
+		switch (getType(key)) {
+		case INT:
+			_values[key] = std::atoi(value.c_str());
+			break ;
+		case FLOAT:
+			_values[key] = std::atof(value.c_str());
+			break ;
+		case STRING:
+			_values[key] = value;
+			break ;
+		default:
+			_values[key] = value;
+			break ;
+		}
 	}
 
 	return true;
 }
 
-const std::string &Settings::get(std::string const &name) const
+const std::any &Settings::get(std::string const &name) const
 {
 	return _values.at(name);
 }
 
-void Settings::set(std::string const &name, std::string const &value)
+void Settings::set(std::string const &name, std::any const &value)
 {
 	_values[name] = value;
+}
+
+auto Settings::getType(std::string const &name) -> SettingType
+{
+	std::map<std::string, SettingType> vars = {
+		{ "renderDistance", INT }
+	};
+
+	if (vars.find(name) != vars.end()) {
+		return vars[name];
+	}
+	return STRING;
 }
