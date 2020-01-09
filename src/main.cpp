@@ -8,6 +8,7 @@
 #include "TextRenderer.hpp"
 #include "FPSCounter.hpp"
 #include "World.hpp"
+#include "Settings.hpp"
 
 using namespace lazy;
 using namespace graphics;
@@ -16,6 +17,8 @@ using namespace utils;
 
 int main()
 {
+	Settings::instance().load("config.ini");
+
 	Display display("LazyGL", 1280, 720);
 	display.enableCap(GL_DEPTH_TEST);
 	display.enableCap(GL_CULL_FACE);

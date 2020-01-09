@@ -22,6 +22,7 @@ srcs = [
 	'src/WorldGenerator.cpp',
 	'src/stb_image.cpp',
 	'src/ChunkMesh.cpp',
+	'src/Settings.cpp',
 ]
 
 cmake = import('cmake')
