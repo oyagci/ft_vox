@@ -1,5 +1,6 @@
 #include "ChunkRenderer.hpp"
 #include "stb_image.h"
+#include "Settings.hpp"
 
 ChunkRenderer::ChunkRenderer() : _pool(1)
 {
@@ -35,11 +36,12 @@ void ChunkRenderer::addChunk(std::shared_ptr<Chunk> chunk)
 
 bool ChunkRenderer::isInView(Camera &camera, ChunkMesh &mesh)
 {
+	int rd = std::any_cast<int>(Settings::instance().get("renderDistance"));
 	glm::vec3 pos = mesh.getPosition();
 	pos.x += Chunk::CHUNK_SIZE / 2;
 	pos.z += Chunk::CHUNK_SIZE / 2;
 
-	if (glm::length(camera.getPosition() - pos) > 300.0f) {
+	if (glm::length(camera.getPosition() - pos) > 64.0f * (rd / 2.0f)) {
 		return false;
 	}
 
@@ -58,15 +60,18 @@ bool ChunkRenderer::isInView(Camera &camera, ChunkMesh &mesh)
 void ChunkRenderer::render(Camera &camera)
 {
 	int n = 0;
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, _texture);
 	for (auto &m : _meshes) {
 		if (isInView(camera, m)) {
-			glActiveTexture(GL_TEXTURE0);
-			glBindTexture(GL_TEXTURE_2D, _texture);
 			m.draw();
 			n++;
 		}
 	}
-	tr.drawText(std::to_string(n) + " Visible Chunks" , glm::vec2(10.0f, 30.0f), .3f, glm::vec3(1.0f, 1.0f, 1.0f));
+	tr.drawText(std::to_string(n) +
+		" Visible Chunks (" +
+		std::to_string(_meshes.size()) + " total)",
+		glm::vec2(10.0f, 30.0f), .3f, glm::vec3(1.0f, 1.0f, 1.0f));
 }
 
 void ChunkRenderer::update()
