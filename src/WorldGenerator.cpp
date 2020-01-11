@@ -6,7 +6,6 @@
 WorldGenerator::WorldGenerator() : _pool(1)
 {
 	_factory = std::make_unique<ChunkFactory>();
-	genChunksAroundPlayer();
 }
 
 glm::vec3 WorldGenerator::popPriorityChunk()
