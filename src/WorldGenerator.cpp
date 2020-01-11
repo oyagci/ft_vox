@@ -215,6 +215,11 @@ std::list<std::shared_ptr<Chunk>> WorldGenerator::takeChunks()
 
 void WorldGenerator::addChunkToGenerate(glm::vec3 pos, Priority priority)
 {
+	// Ignore Y axis because we only need to generate chunks on the X/Z axis.
+	// If we dont do this chunks will be generated at the same X/Z coordinates for each Y unit
+	// resulting in multiple times the same chunk being generated and wasting precious resources
+	pos.y = 0;
+
 	if (std::find(_generatedChunks.begin(), _generatedChunks.end(), pos) == _generatedChunks.end()) {
 		_generatedChunks.push_back(glm::vec3(pos));
 		_chunksToGenerate.push(ChunkPriority(priority, std::move(pos)));
