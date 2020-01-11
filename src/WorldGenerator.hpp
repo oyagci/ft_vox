@@ -23,11 +23,6 @@ public:
 private:
 	void genChunksAroundPlayer();
 	std::vector<glm::vec3> getChunksFront();
-	std::vector<glm::vec3> getChunksAround();
-	std::vector<glm::vec3> getChunksTriangleNorth();
-	std::vector<glm::vec3> getChunksTriangleSouth();
-	std::vector<glm::vec3> getChunksTriangleEast();
-	std::vector<glm::vec3> getChunksTriangleWest();
 
 	using Priority = unsigned int;
 	struct ChunkPriority {
