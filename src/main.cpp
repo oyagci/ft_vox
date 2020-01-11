@@ -9,9 +9,7 @@
 #include "FPSCounter.hpp"
 #include "World.hpp"
 #include "Settings.hpp"
-#include "imgui/imgui.h"
-#include "imgui/imgui_impl_glfw.h"
-#include "imgui/imgui_impl_opengl3.h"
+#include "DebugUI.hpp"
 
 using namespace lazy;
 using namespace graphics;
@@ -42,20 +40,10 @@ int main()
 
 	FPSCounter fpsCounter;
 
-	IMGUI_CHECKVERSION();
-	std::cout << "ImGui version: " << IMGUI_VERSION << std::endl;
-	ImGui::CreateContext();
-	//ImGuiIO &io = ImGui::GetIO();
-
-	ImGui::StyleColorsDark();
-	ImGui_ImplGlfw_InitForOpenGL(display.getWindow(), true);
-	ImGui_ImplOpenGL3_Init("#version 450");
-
-	float ui = true;
+	DebugUI debug(display.getWindow());
 
 	while (!display.isClosed())
 	{
-
 		Time::instance().update();
 		display.update();
 		display.updateInputs();
@@ -66,7 +54,7 @@ int main()
 		fpsCounter.update(deltaTime);
 
 		float ms = 30.0f;
-		if (!ui) {
+		if (!debug.isActive()) {
 			if (input::getKeyboard().getKey(GLFW_KEY_LEFT_SHIFT)) {
 				ms = 500.0f;
 			}
@@ -74,7 +62,7 @@ int main()
 				glfwSetWindowShouldClose(display.getWindow(), GLFW_TRUE);
 			}
 			if (input::getKeyboard().getKeyDown(GLFW_KEY_F1)) {
-				ui = true;
+				debug.setActive(true);
 				display.setFocused(false);
 			}
 			camera.input(ms * deltaTime, 0.001f, {
@@ -88,7 +76,7 @@ int main()
 		}
 		else {
 			if (input::getKeyboard().getKeyDown(GLFW_KEY_F1)) {
-				ui = false;
+				debug.setActive(false);
 				display.setFocused(true);
 			}
 		}
@@ -98,22 +86,13 @@ int main()
 
 		wr.update(camera.getPosition());
 		wr.render();
+		debug.update();
+		debug.render();
 
 		tr.drawText(std::to_string(fpsCounter.getFPS()) + " FPS", glm::vec2(10, 10), .3f, glm::vec3(1.0f));
+		tr.drawText("F1: Show/Hide debug window", glm::vec2(1050, 10), .3f, glm::vec3(1.0f));
 
-		if (ui) {
-			ImGui_ImplOpenGL3_NewFrame();
-			ImGui_ImplGlfw_NewFrame();
-			ImGui::NewFrame();
-			ImGui::ShowDemoWindow();
-			ImGui::Render();
-			ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-		}
 	}
-
-	ImGui_ImplOpenGL3_Shutdown();
-    ImGui_ImplGlfw_Shutdown();
-    ImGui::DestroyContext();
 
 	return EXIT_SUCCESS;
 }

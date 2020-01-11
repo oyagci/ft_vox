@@ -29,6 +29,7 @@ srcs = [
 	'src/imgui/imgui_widgets.cpp',
 	'src/imgui/imgui_impl_opengl3.cpp',
 	'src/imgui/imgui_impl_glfw.cpp',
+	'src/DebugUI.cpp',
 ]
 
 cmake = import('cmake')
