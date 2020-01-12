@@ -2,7 +2,8 @@
 #include "stb_image.h"
 #include "Settings.hpp"
 
-ChunkRenderer::ChunkRenderer() : _pool(1)
+ChunkRenderer::ChunkRenderer(WorldRenderer *worldRenderer) : _pool(1),
+	_worldRenderer(worldRenderer)
 {
 	_builder = std::make_unique<ChunkBuilder>();
 

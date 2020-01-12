@@ -3,7 +3,7 @@
 WorldRenderer::WorldRenderer(Camera &camera, glm::vec3 &camPos) : _camPos(camPos),
 	_camera(camera)
 {
-	_renderer = std::make_unique<ChunkRenderer>();
+	_renderer = std::make_unique<ChunkRenderer>(this);
 
 	_shader = std::make_unique<Shader>();
 	_shader->addVertexShader("shaders/basic.vs.glsl")

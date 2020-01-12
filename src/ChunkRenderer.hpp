@@ -11,10 +11,12 @@
 #include "ChunkMesh.hpp"
 #include "TextRenderer.hpp"
 
+class WorldRenderer;
+
 class ChunkRenderer
 {
 public:
-	ChunkRenderer();
+	ChunkRenderer(WorldRenderer *worldRenderer);
 	~ChunkRenderer();
 
 	void render(Camera &camera);
@@ -43,4 +45,6 @@ private:
 
 	GLuint _texture;
 	TextRenderer tr;
+
+	WorldRenderer *_worldRenderer;
 };
