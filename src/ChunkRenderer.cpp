@@ -5,8 +5,6 @@
 ChunkRenderer::ChunkRenderer(WorldRenderer *worldRenderer) : _pool(1),
 	_worldRenderer(worldRenderer)
 {
-	_builder = std::make_unique<ChunkBuilder>();
-
 	int width, height, nchan;
 	stbi_set_flip_vertically_on_load(1);
 	unsigned char *data = stbi_load("img/terrain.png", &width, &height, &nchan, 0);
@@ -84,7 +82,7 @@ void ChunkRenderer::update()
 			if (!_pool.isFull()) {
 				c->setShouldBeRebuilt(false);
 				_pool.enqueue_work([=] {
-					ChunkBuilder builder;
+					ChunkBuilder builder(_worldRenderer);
 					builder.setChunk(c);
 
 					std::vector<ChunkBuilder::Face> faces = builder.genChunkFaces();

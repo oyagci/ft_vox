@@ -1,6 +1,8 @@
 #include "ChunkBuilder.hpp"
+#include "WorldRenderer.hpp"
 
-ChunkBuilder::ChunkBuilder()
+ChunkBuilder::ChunkBuilder(WorldRenderer *worldRenderer) :
+	_worldRenderer(worldRenderer)
 {
 }
 
@@ -13,12 +15,56 @@ int ChunkBuilder::getVisibleFaces(int x, int y, int z)
 {
 	int result = 0;
 
-	bool top    = (_chunk->getBlock(x, y + 1, z) == 0);
-	bool bottom = (_chunk->getBlock(x, y - 1, z) == 0);
-	bool left   = (_chunk->getBlock(x - 1, y, z) == 0);
-	bool right  = (_chunk->getBlock(x + 1, y, z) == 0);
-	bool front  = (_chunk->getBlock(x, y, z + 1) == 0);
-	bool back   = (_chunk->getBlock(x, y, z - 1) == 0);
+	glm::ivec3 worldPos(_chunk->getPos().x + x, y, _chunk->getPos().y + z);
+
+	bool top;
+	bool bottom;
+	bool left;
+	bool right;
+	bool front;
+	bool back;
+
+	if (y + 1 >= Chunk::CHUNK_SIZE) {
+		top    = (_worldRenderer->getBlock(worldPos.x,     worldPos.y + 1, worldPos.z    ) == 0);
+	}
+	else {
+		top    = (_chunk->getBlock(x,     y + 1, z    ) == 0);
+	}
+
+	if (y - 1 <= 0) {
+		bottom = (_worldRenderer->getBlock(worldPos.x,     worldPos.y - 1, worldPos.z    ) == 0);
+	}
+	else {
+		bottom = (_chunk->getBlock(x,     y - 1, z    ) == 0);
+	}
+
+	if (x - 1 <= 0) {
+		left   = (_worldRenderer->getBlock(worldPos.x - 1, worldPos.y,     worldPos.z    ) == 0);
+	}
+	else {
+		left   = (_chunk->getBlock(x - 1, y,     z    ) == 0);
+	}
+
+	if (x + 1 >= Chunk::CHUNK_SIZE) {
+		right  = (_worldRenderer->getBlock(worldPos.x + 1, worldPos.y,     worldPos.z    ) == 0);
+	}
+	else {
+		right  = (_chunk->getBlock(x + 1, y,     z    ) == 0);
+	}
+
+	if (z + 1 > Chunk::CHUNK_SIZE) {
+		front  = (_worldRenderer->getBlock(worldPos.x,     worldPos.y,     worldPos.z + 1) == 0);
+	}
+	else {
+		front  = (_chunk->getBlock(x,     y,     z + 1) == 0);
+	}
+
+	if (z - 1 <= 0) {
+		back   = (_worldRenderer->getBlock(worldPos.x,     worldPos.y,     worldPos.z - 1) == 0);
+	}
+	else {
+		back   = (_chunk->getBlock(x,     y,     z - 1) == 0);
+	}
 
 	result |= top    ? 0 : 1 << 0;
 	result |= bottom ? 0 : 1 << 1;
@@ -66,29 +112,7 @@ auto ChunkBuilder::genChunkFaces() -> std::vector<Face>
 
 				Chunk::Block b = _chunk->getBlock(x, y, z);
 
-				if (b) {
-					if (y == 0) {
-						faces.push_back(genFaceToRender(std::move(glm::u32vec3(x, y, z)), FD_BOT, b));
-					}
-					else if (y == Chunk::CHUNK_SIZE - 1) {
-						faces.push_back(genFaceToRender(std::move(glm::u32vec3(x, y, z)), FD_TOP, b));
-					}
-
-					if (x == 0) {
-						faces.push_back(genFaceToRender(std::move(glm::u32vec3(x, y, z)), FD_LEFT, b));
-					}
-					else if (x == Chunk::CHUNK_SIZE - 1) {
-						faces.push_back(genFaceToRender(std::move(glm::u32vec3(x, y, z)), FD_RIGHT, b));
-					}
-
-					if (z == Chunk::CHUNK_SIZE - 1) {
-						faces.push_back(genFaceToRender(std::move(glm::u32vec3(x, y, z)), FD_FRONT, b));
-					}
-					else if (z == 0) {
-						faces.push_back(genFaceToRender(std::move(glm::u32vec3(x, y, z)), FD_BACK, b));
-					}
-				}
-				else {
+				if (!b) {
 					int visibleFaces = getVisibleFaces(x, y, z);
 
 					if (visibleFaces & (1 << 0)) { // Top

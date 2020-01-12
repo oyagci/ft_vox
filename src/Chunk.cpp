@@ -1,6 +1,7 @@
 #include "Chunk.hpp"
 #include <cstdint>
 #include "SimplexNoise.hpp"
+#include <mutex>
 
 SimplexNoise s = SimplexNoise(0.1f, 1.0f, 2.0f, 0.25f);
 
@@ -19,7 +20,7 @@ Chunk::Chunk(glm::i32vec2 pos) : _shouldBeRebuilt(true)
 			for (std::size_t z = 0; z < CHUNK_SIZE; z++) {
 
 				if (y == 0) {
-					getBlock(x, y, z) = 4;
+					setBlock(x, y, z, 4);
 					continue ;
 				}
 
@@ -64,31 +65,39 @@ Chunk::Chunk(glm::i32vec2 pos) : _shouldBeRebuilt(true)
 				if (getBlock(x, y + 1, z) > 0) {
 					if (getBlock(x, y + 2, z) > 0) {
 						if (getBlock(x, y + 3, z) > 0) {
-							getBlock(x, y, z) = (y == 0 || result > 0.0f ? 2 : 0);
+							setBlock(x, y, z, (y == 0 || result > 0.0f ? 2 : 0));
 						}
 						else {
-							getBlock(x, y, z) = (y == 0 || result > 0.0f ? 3 : 0);
+							setBlock(x, y, z, (y == 0 || result > 0.0f ? 3 : 0));
 						}
 					}
 					else {
-						getBlock(x, y, z) = (y == 0 || result > 0.0f ? 3 : 0);
+						setBlock(x, y, z, (y == 0 || result > 0.0f ? 3 : 0));
 					}
 				}
 				else {
-					getBlock(x, y, z) = (y == 0 || result > 0.0f ? 1 : 0);
+					setBlock(x, y, z, (y == 0 || result > 0.0f ? 1 : 0));
 				}
 			}
 		}
 	}
 }
 
-Chunk::Block &Chunk::getBlock(std::size_t x, std::size_t y, std::size_t z)
+auto Chunk::getBlock(std::size_t x, std::size_t y, std::size_t z) const -> Block
 {
-	if (x < 0 || y < 0 || z < 0 || x >= CHUNK_SIZE || y >= CHUNK_SIZE || z >= CHUNK_SIZE) {
+	if (x >= CHUNK_SIZE || y >= CHUNK_SIZE || z >= CHUNK_SIZE) {
 		return (_void);
 	}
 
 	return (*_blocks)[x * CHUNK_SIZE * CHUNK_SIZE + y * CHUNK_SIZE + z];
+}
+
+void Chunk::setBlock(size_t x, size_t y, size_t z, Block val)
+{
+	if (x >= CHUNK_SIZE || y >= CHUNK_SIZE || z >= CHUNK_SIZE) {
+		return ;
+	}
+	(*_blocks)[x * CHUNK_SIZE * CHUNK_SIZE + y * CHUNK_SIZE + z] = val;
 }
 
 const glm::vec2 &Chunk::getPos() const

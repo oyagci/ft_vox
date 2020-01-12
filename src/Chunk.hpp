@@ -17,7 +17,8 @@ public:
 public:
 	Chunk(glm::i32vec2 pos);
 
-	Block &getBlock(std::size_t x, std::size_t y, std::size_t z);
+	Block getBlock(std::size_t x, std::size_t y, std::size_t z) const;
+	void setBlock(std::size_t x, std::size_t y, std::size_t z, Block val);
 	const glm::vec2 &getPos() const;
 
 	bool shouldBeRebuilt() { return _shouldBeRebuilt; }

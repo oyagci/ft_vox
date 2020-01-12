@@ -11,6 +11,7 @@
 #include "threadpool/blocking_queue.hpp"
 #include <queue>
 #include <list>
+#include <mutex>
 
 using namespace lazy::graphics;
 
@@ -25,6 +26,7 @@ public:
 	void update();
 	void setPos(glm::vec3 pos);
 	void registerChunks(std::list<std::shared_ptr<Chunk>> chunks);
+	Chunk::Block getBlock(int x, int y, int z);
 
 private:
 	const int RENDER_DISTANCE = 6;
@@ -32,6 +34,8 @@ private:
 	glm::vec3 &_camPos;
 	std::unique_ptr<Shader> _shader;
 	std::unique_ptr<ChunkRenderer> _renderer;
+
+	std::mutex _chunksLock;
 	std::vector<std::shared_ptr<Chunk>> _chunks;
 	Camera &_camera;
 };

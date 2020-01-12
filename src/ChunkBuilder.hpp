@@ -6,6 +6,8 @@
 #include "ChunkMesh.hpp"
 #include <cassert>
 
+class WorldRenderer;
+
 class ChunkBuilder
 {
 public:
@@ -36,7 +38,7 @@ public:
 	static constexpr float			TEXTURE_TILE_SIZE = static_cast<float>(TEXTURE_BLOCK_SIZE) / TEXTURE_TOTAL_SIZE;
 
 public:
-	ChunkBuilder();
+	ChunkBuilder(WorldRenderer *wr);
 
 	const auto &getChunk() const { return _chunk; }
 
@@ -60,4 +62,5 @@ private:
 	glm::vec2 getTexturePosition(BlockType type);
 
 	std::shared_ptr<Chunk> _chunk;
+	WorldRenderer *_worldRenderer;
 };

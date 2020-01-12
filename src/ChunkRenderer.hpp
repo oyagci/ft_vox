@@ -28,8 +28,6 @@ private:
 	bool isInView(Camera &camera, ChunkMesh &mesh);
 
 private:
-	std::unique_ptr<ChunkBuilder> _builder;
-
 	std::vector<ChunkMesh> _meshes;
 	std::vector<std::shared_ptr<Chunk>> _chunks;
 
