@@ -20,7 +20,7 @@ void WorldGenerator::genChunksAroundPlayer()
 {
 	int rd = std::any_cast<int>(Settings::instance().get("renderDistance"));
 
-	for (int xoff = -rd; xoff < rd; xoff++) {
+	for (int xoff = -(rd / 2); xoff < (rd / 2); xoff++) {
 		glm::i32vec3 gridPos = _camPos / Chunk::CHUNK_SIZE;
 
 		gridPos.z += xoff;
