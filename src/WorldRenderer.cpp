@@ -43,7 +43,7 @@ void WorldRenderer::registerChunks(std::list<std::shared_ptr<Chunk>> chunks)
 {
 	std::unique_lock<std::mutex> l(_chunksLock);
 	_chunks.insert(_chunks.end(), chunks.begin(), chunks.end());
-	for (auto &c : _chunks) { _renderer->addChunk(std::shared_ptr<Chunk>(c)); }
+	for (auto &c : chunks) { _renderer->addChunk(std::shared_ptr<Chunk>(c)); }
 }
 
 std::ostream &operator<<(std::ostream &os, glm::vec3 v) {
@@ -61,8 +61,10 @@ std::ostream &operator<<(std::ostream &os, glm::vec2 v) {
 	return os;
 }
 
-Chunk::Block WorldRenderer::getBlock(int x, int y, int z)
+std::optional<Chunk::Block> WorldRenderer::getBlock(int x, int y, int z)
 {
+	std::optional<Chunk::Block> b;
+
 	std::unique_lock<std::mutex> l(_chunksLock);
 	for (auto const &c : _chunks) {
 		glm::vec2 const &pos = c->getPos();
@@ -71,8 +73,22 @@ Chunk::Block WorldRenderer::getBlock(int x, int y, int z)
 			pos.y <= z && z < pos.y + Chunk::CHUNK_SIZE) {
 
 			glm::uvec3 offset(x % Chunk::CHUNK_SIZE, y, z % Chunk::CHUNK_SIZE);
-			return c->getBlock(offset.x, offset.y, offset.z);
+			b = c->getBlock(offset.x, offset.y, offset.z);
+			break ; 
 		}
 	}
-	return 0;
+	return b;
+}
+
+std::optional<std::shared_ptr<Chunk>> WorldRenderer::getChunk(glm::ivec2 pos)
+{
+	std::optional<std::shared_ptr<Chunk>> chunk;
+	std::unique_lock<std::mutex> l(_chunksLock);
+	for (auto &c : _chunks) {
+		if (pos.x == c->getPos().x && pos.y == c->getPos().y) {
+			chunk = c;
+		}
+	}
+
+	return chunk;
 }

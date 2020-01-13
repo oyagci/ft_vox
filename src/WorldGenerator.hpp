@@ -11,10 +11,12 @@
 #include <queue>
 #include "TextRenderer.hpp"
 
+class WorldRenderer;
+
 class WorldGenerator
 {
 public:
-	WorldGenerator();
+	WorldGenerator(WorldRenderer *wr);
 
 	void update();
 	void setCameraPosition(glm::vec3 pos);

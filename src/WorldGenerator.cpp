@@ -2,10 +2,11 @@
 #include "Chunk.hpp"
 #include <glm/vec3.hpp>
 #include "Settings.hpp"
+#include "WorldRenderer.hpp"
 
-WorldGenerator::WorldGenerator() : _pool(1)
+WorldGenerator::WorldGenerator(WorldRenderer *wr) : _pool(1)
 {
-	_factory = std::make_unique<ChunkFactory>();
+	_factory = std::make_unique<ChunkFactory>(wr);
 }
 
 glm::vec3 WorldGenerator::popPriorityChunk()

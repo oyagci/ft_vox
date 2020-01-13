@@ -26,7 +26,8 @@ public:
 	void update();
 	void setPos(glm::vec3 pos);
 	void registerChunks(std::list<std::shared_ptr<Chunk>> chunks);
-	Chunk::Block getBlock(int x, int y, int z);
+	std::optional<Chunk::Block> getBlock(int x, int y, int z);
+	std::optional<std::shared_ptr<Chunk>> getChunk(glm::ivec2 pos);
 
 private:
 	const int RENDER_DISTANCE = 6;

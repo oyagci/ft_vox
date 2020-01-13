@@ -18,10 +18,8 @@ srcs = [
 	'src/FPSCounter.cpp',
 	'src/WorldRenderer.cpp',
 	'src/World.cpp',
-	'src/ChunkBuilder.cpp',
 	'src/WorldGenerator.cpp',
 	'src/stb_image.cpp',
-	'src/ChunkMesh.cpp',
 	'src/Settings.cpp',
 ]
 

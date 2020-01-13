@@ -33,10 +33,10 @@ void ChunkRenderer::addChunk(std::shared_ptr<Chunk> chunk)
 	_chunks.push_back(chunk);
 }
 
-bool ChunkRenderer::isInView(Camera &camera, ChunkMesh &mesh)
+bool ChunkRenderer::isInView(Camera &camera, Chunk &chunk)
 {
 	int rd = std::any_cast<int>(Settings::instance().get("renderDistance"));
-	glm::vec3 pos = mesh.getPosition();
+	glm::vec3 pos = chunk.getPosition();
 	pos.x += Chunk::CHUNK_SIZE / 2;
 	pos.z += Chunk::CHUNK_SIZE / 2;
 
@@ -63,15 +63,15 @@ void ChunkRenderer::render(Camera &camera)
 	int n = 0;
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, _texture);
-	for (auto &m : _meshes) {
-		if (isInView(camera, m)) {
-			m.draw();
+	for (auto &m : _chunks) {
+		if (isInView(camera, *m)) {
+			m->draw();
 			n++;
 		}
 	}
 	tr.drawText(std::to_string(n) +
 		" Visible Chunks (" +
-		std::to_string(_meshes.size()) + " total)",
+		std::to_string(_chunks.size()) + " total)",
 		glm::vec2(10.0f, 30.0f), .3f, glm::vec3(1.0f, 1.0f, 1.0f));
 }
 
@@ -82,14 +82,9 @@ void ChunkRenderer::update()
 			if (!_pool.isFull()) {
 				c->setShouldBeRebuilt(false);
 				_pool.enqueue_work([=] {
-					ChunkBuilder builder(_worldRenderer);
-					builder.setChunk(c);
-
-					std::vector<ChunkBuilder::Face> faces = builder.genChunkFaces();
-					ChunkMesh mesh = builder.build(glm::vec2(c->getPos()), faces);
-
+					c->build();
 					std::unique_lock<std::mutex> lcm(_cm);
-					_chunkMeshes.push(ChunkMesh(std::move(mesh)));
+					_chunkMeshes.push(c);
 				});
 			}
 		}
@@ -101,9 +96,7 @@ void ChunkRenderer::buildChunks()
 {
 	std::unique_lock lm(_cm);
 	if (!_chunkMeshes.empty()) {
-		ChunkMesh cm = std::move(_chunkMeshes.front());
-		cm.build();
-		_meshes.push_back(std::move(cm));
+		_chunkMeshes.front()->build();
 		_chunkMeshes.pop();
 	}
 }
