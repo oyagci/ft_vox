@@ -36,27 +36,17 @@ void ChunkRenderer::addChunk(std::shared_ptr<Chunk> chunk)
 bool ChunkRenderer::isInView(Camera &camera, Chunk &chunk)
 {
 	int rd = std::any_cast<int>(Settings::instance().get("renderDistance"));
-	glm::vec3 pos = chunk.getPosition();
+	glm::vec2 pos = chunk.getPosition();
 	pos.x += Chunk::CHUNK_SIZE / 2;
-	pos.z += Chunk::CHUNK_SIZE / 2;
+	pos.y += Chunk::CHUNK_SIZE / 2;
 
 	glm::vec2 camPos2D(camera.getPosition().x, camera.getPosition().z);
-	glm::vec2 meshPos2D(pos.x, pos.z);
+	glm::vec2 meshPos2D(pos.x, pos.y);
 	if (glm::length(camPos2D - meshPos2D) > 64.0f * (rd / 2.0f)) {
 		return false;
 	}
-
-	auto vp = camera.getViewProjectionMatrix();
-	glm::vec4 clipPos = vp * glm::vec4(pos, 1.0f);
-
-	float radius = glm::length(glm::vec2(Chunk::CHUNK_SIZE / 2, Chunk::CHUNK_SIZE / 2));
-
-	if ((-clipPos.w <= pos.x + radius && pos.x - radius <= clipPos.w) ||
-		(-clipPos.w <= pos.y + radius && pos.y - radius <= clipPos.w) ||
-		(-clipPos.w <= pos.z + radius && pos.z - radius <= clipPos.w)) {
-		return true;
-	}
-	return false;
+	// TODO: Do frustum culling
+	return true;
 }
 void ChunkRenderer::render(Camera &camera)
 {

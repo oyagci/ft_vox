@@ -14,7 +14,7 @@ float simplexNoise(size_t octaves, glm::vec3 pos)
 Chunk::Chunk(glm::i32vec2 pos, WorldRenderer *wr) : _shouldBeRebuilt(true), _worldRenderer(wr)
 {
 	_blocks = std::make_unique<std::array<Block, CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE>>();
-	_worldPos = std::move(pos);
+	_position = std::move(pos);
 
 	for (std::size_t x = 0; x < CHUNK_SIZE; x++) {
 		for (std::size_t y = CHUNK_SIZE - 1; y + 1 > 0; y--) {
@@ -25,7 +25,7 @@ Chunk::Chunk(glm::i32vec2 pos, WorldRenderer *wr) : _shouldBeRebuilt(true), _wor
 					continue ;
 				}
 
-				glm::vec3 pos = glm::vec3(_worldPos.x, -32, _worldPos.y) + glm::vec3(x, y, z);
+				glm::vec3 pos = glm::vec3(_position.x, -32, _position.y) + glm::vec3(x, y, z);
 				float result = 0.0f;
 
 				float hH = simplexNoise(1, pos / 10);
@@ -101,14 +101,9 @@ void Chunk::setBlock(size_t x, size_t y, size_t z, Block val)
 	(*_blocks)[x * CHUNK_SIZE * CHUNK_SIZE + y * CHUNK_SIZE + z] = val;
 }
 
-const glm::vec2 &Chunk::getPos() const
-{
-	return _worldPos;
-}
-
 void Chunk::markMissingNeighbors()
 {
-	glm::ivec2 gridPos(getPos() / CHUNK_SIZE);
+	glm::ivec2 gridPos(getPosition() / CHUNK_SIZE);
 
 	auto c = _worldRenderer->getChunk(glm::ivec2(gridPos.x - 1, gridPos.y));
 	if (!c.has_value()) {
@@ -136,7 +131,7 @@ void Chunk::build()
 	markMissingNeighbors();
 	_isBuilt = _missingNeighbors == 0;
 	_faces = genChunkFaces();
-	_mesh = buildChunkFaces(_worldPos, _faces);
+	_mesh = buildChunkFaces(_position, _faces);
 	_mesh.build();
 }
 
@@ -149,7 +144,7 @@ int Chunk::getVisibleFaces(int x, int y, int z)
 {
 	int result = 0;
 
-	glm::ivec3 worldPos(getPos().x + x, y, getPos().y + z);
+	glm::ivec3 worldPos(getPosition().x + x, y, getPosition().y + z);
 
 	bool top;
 	bool bottom;
@@ -503,7 +498,7 @@ Mesh Chunk::buildChunkFaces(glm::vec2 chunkPos, std::vector<Face> faces)
 	std::size_t nVert = 0;
 	glm::vec3 worldPos = glm::vec3(chunkPos.x, 0, chunkPos.y);
 
-	setPosition(glm::vec3(chunkPos.x, 0, chunkPos.y));
+	setPosition(chunkPos);
 
 	for (auto &f : faces) {
 		switch (f.dir) {

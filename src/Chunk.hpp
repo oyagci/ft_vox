@@ -55,7 +55,6 @@ public:
 
 	Block getBlock(std::size_t x, std::size_t y, std::size_t z) const;
 	void setBlock(std::size_t x, std::size_t y, std::size_t z, Block val);
-	const glm::vec2 &getPos() const;
 
 	bool shouldBeRebuilt() { return _shouldBeRebuilt; }
 	void setShouldBeRebuilt(bool val) { _shouldBeRebuilt = val; }
@@ -64,8 +63,8 @@ public:
 	void build();
 	std::vector<Face> genChunkFaces();
 
-	glm::vec3 const &getPosition() const { return _position; }
-	void setPosition(glm::vec3 position) { _position = position; }
+	glm::vec2 const &getPosition() const { return _position; }
+	void setPosition(glm::vec2 position) { _position = position; }
 
 private:
 	int getVisibleFaces(int x, int y, int z);
@@ -85,12 +84,11 @@ private:
 private:
 	std::unique_ptr<std::array<Block, CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE>> _blocks;
 	Block _void = 0;
-	glm::vec2 _worldPos;
 	bool _shouldBeRebuilt;
 	WorldRenderer *_worldRenderer;
 	unsigned int _missingNeighbors;
 	bool _isBuilt;
 	Mesh _mesh;
-	glm::vec3 _position;
+	glm::vec2 _position;
 	std::vector<Face> _faces;
 };

@@ -67,7 +67,7 @@ std::optional<Chunk::Block> WorldRenderer::getBlock(int x, int y, int z)
 
 	std::unique_lock<std::mutex> l(_chunksLock);
 	for (auto const &c : _chunks) {
-		glm::vec2 const &pos = c->getPos();
+		glm::vec2 const &pos = c->getPosition();
 
 		if (pos.x <= x && x < pos.x + Chunk::CHUNK_SIZE &&
 			pos.y <= z && z < pos.y + Chunk::CHUNK_SIZE) {
@@ -85,7 +85,7 @@ std::optional<std::shared_ptr<Chunk>> WorldRenderer::getChunk(glm::ivec2 pos)
 	std::optional<std::shared_ptr<Chunk>> chunk;
 	std::unique_lock<std::mutex> l(_chunksLock);
 	for (auto &c : _chunks) {
-		if (pos.x == c->getPos().x && pos.y == c->getPos().y) {
+		if (pos.x == c->getPosition().x && pos.y == c->getPosition().y) {
 			chunk = c;
 		}
 	}
