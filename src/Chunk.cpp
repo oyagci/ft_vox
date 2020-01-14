@@ -246,7 +246,29 @@ auto Chunk::genChunkFaces() -> std::vector<Face>
 
 				Chunk::Block b = getBlock(x, y, z);
 
-				if (!b) {
+				if (b) {
+					if (y == 0) {
+						faces.push_back(genFaceToRender(std::move(glm::u32vec3(x, y, z)), FD_BOT, b));
+					}
+					else if (y == Chunk::CHUNK_SIZE - 1) {
+						faces.push_back(genFaceToRender(std::move(glm::u32vec3(x, y, z)), FD_TOP, b));
+					}
+
+					if (x == 0) {
+						faces.push_back(genFaceToRender(std::move(glm::u32vec3(x, y, z)), FD_LEFT, b));
+					}
+					else if (x == Chunk::CHUNK_SIZE - 1) {
+						faces.push_back(genFaceToRender(std::move(glm::u32vec3(x, y, z)), FD_RIGHT, b));
+					}
+
+					if (z == Chunk::CHUNK_SIZE - 1) {
+						faces.push_back(genFaceToRender(std::move(glm::u32vec3(x, y, z)), FD_FRONT, b));
+					}
+					else if (z == 0) {
+						faces.push_back(genFaceToRender(std::move(glm::u32vec3(x, y, z)), FD_BACK, b));
+					}
+				}
+				else {
 					int visibleFaces = getVisibleFaces(x, y, z);
 
 					if (visibleFaces & (1 << 0)) { // Top
