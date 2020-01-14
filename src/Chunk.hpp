@@ -86,8 +86,6 @@ private:
 	Block _void = 0;
 	bool _shouldBeRebuilt;
 	WorldRenderer *_worldRenderer;
-	unsigned int _missingNeighbors;
-	bool _isBuilt;
 	Mesh _mesh;
 	glm::vec2 _position;
 	std::vector<Face> _faces;

@@ -128,11 +128,11 @@ void Chunk::markMissingNeighbors()
 
 void Chunk::build()
 {
-	markMissingNeighbors();
-	_isBuilt = _missingNeighbors == 0;
 	_faces = genChunkFaces();
-	_mesh = buildChunkFaces(_position, _faces);
-	_mesh.build();
+	Mesh tmp = buildChunkFaces(_position, _faces);
+	tmp.build();
+	_mesh = std::move(tmp);
+	markMissingNeighbors();
 }
 
 void Chunk::draw()
