@@ -73,7 +73,10 @@ std::optional<Chunk::Block> WorldRenderer::getBlock(int x, int y, int z)
 			pos.y <= z && z < pos.y + Chunk::CHUNK_SIZE) {
 
 			glm::uvec3 offset(x % Chunk::CHUNK_SIZE, y, z % Chunk::CHUNK_SIZE);
-			b = c->getBlock(offset.x, offset.y, offset.z);
+			Chunk::Block block = c->getBlock(offset.x, offset.y, offset.z);
+			if (block != 0) {
+				b = block;
+			}
 			break ; 
 		}
 	}
@@ -85,7 +88,8 @@ std::optional<std::shared_ptr<Chunk>> WorldRenderer::getChunk(glm::ivec2 pos)
 	std::optional<std::shared_ptr<Chunk>> chunk;
 	std::unique_lock<std::mutex> l(_chunksLock);
 	for (auto &c : _chunks) {
-		if (pos.x == c->getPosition().x && pos.y == c->getPosition().y) {
+		glm::ivec2 gridPos(c->getPosition() / Chunk::CHUNK_SIZE);
+		if (gridPos == pos) {
 			chunk = c;
 		}
 	}

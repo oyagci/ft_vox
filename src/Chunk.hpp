@@ -79,7 +79,6 @@ private:
 	void buildLeftFace(Face const &face, Mesh &mesh, glm::vec3 pos, std::size_t indOffset);
 
 	glm::vec2 getTexturePosition(BlockType type);
-	void markMissingNeighbors();
 
 private:
 	std::unique_ptr<std::array<Block, CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE>> _blocks;

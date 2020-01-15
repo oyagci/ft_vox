@@ -101,38 +101,12 @@ void Chunk::setBlock(size_t x, size_t y, size_t z, Block val)
 	(*_blocks)[x * CHUNK_SIZE * CHUNK_SIZE + y * CHUNK_SIZE + z] = val;
 }
 
-void Chunk::markMissingNeighbors()
-{
-	glm::ivec2 gridPos(getPosition() / CHUNK_SIZE);
-
-	auto c = _worldRenderer->getChunk(glm::ivec2(gridPos.x - 1, gridPos.y));
-	if (!c.has_value()) {
-		_missingNeighbors |= LEFT;
-	}
-
-	c = _worldRenderer->getChunk(glm::ivec2(gridPos.x + 1, gridPos.y));
-	if (!c.has_value()) {
-		_missingNeighbors |= RIGHT;
-	}
-
-	c = _worldRenderer->getChunk(glm::ivec2(gridPos.x, gridPos.y - 1));
-	if (!c.has_value()) {
-		_missingNeighbors |= FRONT;
-	}
-
-	c = _worldRenderer->getChunk(glm::ivec2(gridPos.x - 1, gridPos.y + 1));
-	if (!c.has_value()) {
-		_missingNeighbors |= BACK;
-	}
-}
-
 void Chunk::build()
 {
 	_faces = genChunkFaces();
 	Mesh tmp = buildChunkFaces(_position, _faces);
 	tmp.build();
 	_mesh = std::move(tmp);
-	markMissingNeighbors();
 }
 
 void Chunk::draw()
@@ -144,8 +118,6 @@ int Chunk::getVisibleFaces(int x, int y, int z)
 {
 	int result = 0;
 
-	glm::ivec3 worldPos(getPosition().x + x, y, getPosition().y + z);
-
 	bool top;
 	bool bottom;
 	bool left;
@@ -153,52 +125,17 @@ int Chunk::getVisibleFaces(int x, int y, int z)
 	bool front;
 	bool back;
 
-	auto blockIsEmpty = [this] (int x, int y, int z) -> bool {
+	auto blockIsPresent = [this] (int x, int y, int z) -> bool {
 		auto b = _worldRenderer->getBlock(x, y, z);
-		return !b.has_value() || b.value() == 0;
+		return b.has_value() && b.value() != 0;
 	};
 
-	if (y + 1 >= Chunk::CHUNK_SIZE) {
-		top = blockIsEmpty(worldPos.x, worldPos.y + 1, worldPos.z);
-	}
-	else {
-		top = (getBlock(x, y + 1, z) == 0);
-	}
-
-	if (y - 1 <= 0) {
-		bottom = blockIsEmpty(worldPos.x, worldPos.y - 1, worldPos.z);
-	}
-	else {
-		bottom = (getBlock(x, y - 1, z) == 0);
-	}
-
-	if (x - 1 <= 0) {
-		left = blockIsEmpty(worldPos.x - 1, worldPos.y, worldPos.z);
-	}
-	else {
-		left = (getBlock(x - 1, y, z) == 0);
-	}
-
-	if (x + 1 >= CHUNK_SIZE) {
-		right = blockIsEmpty(worldPos.x + 1, worldPos.y, worldPos.z);
-	}
-	else {
-		right = (getBlock(x + 1, y, z) == 0);
-	}
-
-	if (z + 1 > CHUNK_SIZE) {
-		front = blockIsEmpty(worldPos.x, worldPos.y, worldPos.z + 1);
-	}
-	else {
-		front = (getBlock(x, y, z + 1) == 0);
-	}
-
-	if (z - 1 <= 0) {
-		back = blockIsEmpty(worldPos.x, worldPos.y, worldPos.z - 1);
-	}
-	else {
-		back = (getBlock(x, y, z - 1) == 0);
-	}
+	top = !blockIsPresent(x, y + 1, z);
+	bottom = !blockIsPresent(x, y - 1, z);
+	left = !blockIsPresent(x - 1, y, z);
+	right = !blockIsPresent(x + 1, y, z);
+	front = !blockIsPresent(x, y, z + 1);
+	back = !blockIsPresent(x, y, z - 1);
 
 	result |= top    ? 0 : 1 << 0;
 	result |= bottom ? 0 : 1 << 1;
@@ -244,56 +181,35 @@ auto Chunk::genChunkFaces() -> std::vector<Face>
 		for (std::size_t y = 0; y < Chunk::CHUNK_SIZE; y++) {
 			for (std::size_t z = 0; z < Chunk::CHUNK_SIZE; z++) {
 
+				glm::ivec3 worldPos(getPosition().x + x, y, getPosition().y + z);
 				Chunk::Block b = getBlock(x, y, z);
 
-				if (b) {
-					if (y == 0) {
-						faces.push_back(genFaceToRender(std::move(glm::u32vec3(x, y, z)), FD_BOT, b));
-					}
-					else if (y == Chunk::CHUNK_SIZE - 1) {
-						faces.push_back(genFaceToRender(std::move(glm::u32vec3(x, y, z)), FD_TOP, b));
-					}
-
-					if (x == 0) {
-						faces.push_back(genFaceToRender(std::move(glm::u32vec3(x, y, z)), FD_LEFT, b));
-					}
-					else if (x == Chunk::CHUNK_SIZE - 1) {
-						faces.push_back(genFaceToRender(std::move(glm::u32vec3(x, y, z)), FD_RIGHT, b));
-					}
-
-					if (z == Chunk::CHUNK_SIZE - 1) {
-						faces.push_back(genFaceToRender(std::move(glm::u32vec3(x, y, z)), FD_FRONT, b));
-					}
-					else if (z == 0) {
-						faces.push_back(genFaceToRender(std::move(glm::u32vec3(x, y, z)), FD_BACK, b));
-					}
-				}
-				else {
-					int visibleFaces = getVisibleFaces(x, y, z);
+				if (!b) {
+					int visibleFaces = getVisibleFaces(worldPos.x, worldPos.y, worldPos.z);
 
 					if (visibleFaces & (1 << 0)) { // Top
-						faces.push_back(genFaceToRender(std::move(glm::u32vec3(x, y + 1, z)), FD_BOT,
-							getBlock(x, y + 1, z)));
+						faces.push_back(genFaceToRender(std::move(glm::ivec3(x, y + 1, z)), FD_BOT,
+							_worldRenderer->getBlock(worldPos.x, worldPos.y + 1, worldPos.z).value_or(0)));
 					}
 					if (visibleFaces & (1 << 1)) { // Bottom
-						faces.push_back(genFaceToRender(std::move(glm::u32vec3(x, y - 1, z)), FD_TOP,
-							getBlock(x, y - 1, z)));
+						faces.push_back(genFaceToRender(std::move(glm::ivec3(x, y - 1, z)), FD_TOP,
+							_worldRenderer->getBlock(worldPos.x, worldPos.y - 1, worldPos.z).value_or(0)));
 					}
 					if (visibleFaces & (1 << 2)) { // Left
-						faces.push_back(genFaceToRender(std::move(glm::u32vec3(x - 1, y, z)), FD_RIGHT,
-							getBlock(x - 1, y, z)));
+						faces.push_back(genFaceToRender(std::move(glm::ivec3(x - 1, y, z)), FD_RIGHT,
+							_worldRenderer->getBlock(worldPos.x - 1, worldPos.y, worldPos.z).value_or(0)));
 					}
 					if (visibleFaces & (1 << 3)) { // Right
-						faces.push_back(genFaceToRender(std::move(glm::u32vec3(x + 1, y, z)), FD_LEFT,
-							getBlock(x + 1, y, z)));
+						faces.push_back(genFaceToRender(std::move(glm::ivec3(x + 1, y, z)), FD_LEFT,
+							_worldRenderer->getBlock(worldPos.x + 1, worldPos.y, worldPos.z).value_or(0)));
 					}
 					if (visibleFaces & (1 << 4)) { // Front
-						faces.push_back(genFaceToRender(std::move(glm::u32vec3(x, y, z + 1)), FD_BACK,
-							getBlock(x, y, z + 1)));
+						faces.push_back(genFaceToRender(std::move(glm::ivec3(x, y, z + 1)), FD_BACK,
+							_worldRenderer->getBlock(worldPos.x, worldPos.y, worldPos.z + 1).value_or(0)));
 					}
 					if (visibleFaces & (1 << 5)) { // Back
-						faces.push_back(genFaceToRender(std::move(glm::u32vec3(x, y, z - 1)), FD_FRONT,
-							getBlock(x, y, z - 1)));
+						faces.push_back(genFaceToRender(std::move(glm::ivec3(x, y, z - 1)), FD_FRONT,
+							_worldRenderer->getBlock(worldPos.x, worldPos.y, worldPos.z - 1).value_or(0)));
 					}
 				}
 			}
@@ -519,8 +435,6 @@ Mesh Chunk::buildChunkFaces(glm::vec2 chunkPos, std::vector<Face> faces)
 	Mesh mesh;
 	std::size_t nVert = 0;
 	glm::vec3 worldPos = glm::vec3(chunkPos.x, 0, chunkPos.y);
-
-	setPosition(chunkPos);
 
 	for (auto &f : faces) {
 		switch (f.dir) {
