@@ -41,8 +41,7 @@ bool ChunkRenderer::isInView(Camera &camera, Chunk &chunk)
 	pos.y += Chunk::CHUNK_SIZE / 2;
 
 	glm::vec2 camPos2D(camera.getPosition().x, camera.getPosition().z);
-	glm::vec2 meshPos2D(pos.x, pos.y);
-	if (glm::length(camPos2D - meshPos2D) > 64.0f * (rd / 2.0f)) {
+	if (glm::length(camPos2D - pos) > 64.0f * (rd / 2.0f)) {
 		return false;
 	}
 	// TODO: Do frustum culling
