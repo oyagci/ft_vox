@@ -25,7 +25,7 @@ void WorldGenerator::genChunksAroundPlayer()
 		glm::i32vec3 gridPos = _camPos / Chunk::CHUNK_SIZE;
 
 		gridPos.z += xoff;
-		for (int yoff = -rd; yoff < rd; yoff++) {
+		for (int yoff = -(rd / 2); yoff < (rd / 2); yoff++) {
 			glm::vec3 chunkPos = glm::vec3(gridPos.x + yoff, gridPos.y, gridPos.z) * 64.0f;
 			addChunkToGenerate(chunkPos, 1);
 		}
