@@ -51,7 +51,7 @@ public:
 
 
 public:
-	Chunk(glm::i32vec2 pos, WorldRenderer *wr);
+	Chunk(glm::ivec2 pos, WorldRenderer *wr);
 
 	Block getBlock(std::size_t x, std::size_t y, std::size_t z) const;
 	void setBlock(std::size_t x, std::size_t y, std::size_t z, Block val);
