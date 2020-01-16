@@ -185,9 +185,9 @@ auto Chunk::genChunkFaces() -> std::vector<Face>
 {
 	std::vector<Face> faces;
 
-	for (std::size_t x = 0; x < Chunk::CHUNK_SIZE; x++) {
-		for (std::size_t y = 0; y < Chunk::CHUNK_SIZE; y++) {
-			for (std::size_t z = 0; z < Chunk::CHUNK_SIZE; z++) {
+	for (int x = 0; x < Chunk::CHUNK_SIZE; x++) {
+		for (int y = 0; y < Chunk::CHUNK_SIZE; y++) {
+			for (int z = 0; z < Chunk::CHUNK_SIZE; z++) {
 
 				glm::ivec3 worldPos(getPosition().x + x, y, getPosition().y + z);
 				Chunk::Block b = getBlock(x, y, z);
@@ -195,22 +195,63 @@ auto Chunk::genChunkFaces() -> std::vector<Face>
 				if (!b) {
 					continue;
 				}
-				if (!_worldRenderer->getBlock(worldPos.x, worldPos.y + 1, worldPos.z).has_value()) {
+
+				if (y + 1 >= Chunk::CHUNK_SIZE) {
+					if (!_worldRenderer->getBlock(worldPos.x, worldPos.y + 1, worldPos.z).has_value()) {
+						faces.push_back(genFaceToRender(std::move(glm::ivec3(x, y, z)), FD_TOP, b));
+					}
+				}
+				else if (!getBlock(x, y + 1, z)) {
 					faces.push_back(genFaceToRender(std::move(glm::ivec3(x, y, z)), FD_TOP, b));
 				}
-				if (!_worldRenderer->getBlock(worldPos.x, worldPos.y - 1, worldPos.z).has_value()) {
+
+
+				if (y - 1 < 0) {
+					if (!_worldRenderer->getBlock(worldPos.x, worldPos.y - 1, worldPos.z).has_value()) {
+						faces.push_back(genFaceToRender(std::move(glm::ivec3(x, y, z)), FD_BOT, b));
+					}
+				}
+				else if (!getBlock(x, y - 1, z)) {
 					faces.push_back(genFaceToRender(std::move(glm::ivec3(x, y, z)), FD_BOT, b));
 				}
-				if (!_worldRenderer->getBlock(worldPos.x + 1, worldPos.y, worldPos.z).has_value()) {
+
+
+				if (x + 1 >= Chunk::CHUNK_SIZE) {
+					if (!_worldRenderer->getBlock(worldPos.x + 1, worldPos.y, worldPos.z).has_value()) {
+						faces.push_back(genFaceToRender(std::move(glm::ivec3(x, y, z)), FD_RIGHT, b));
+					}
+				}
+				else if (!getBlock(x + 1, y, z)) {
 					faces.push_back(genFaceToRender(std::move(glm::ivec3(x, y, z)), FD_RIGHT, b));
 				}
-				if (!_worldRenderer->getBlock(worldPos.x - 1, worldPos.y, worldPos.z).has_value()) {
+
+
+				if (x - 1 < 0) {
+					if (!_worldRenderer->getBlock(worldPos.x - 1, worldPos.y, worldPos.z).has_value()) {
+						faces.push_back(genFaceToRender(std::move(glm::ivec3(x, y, z)), FD_LEFT, b));
+					}
+				}
+				else if (!getBlock(x - 1, y, z)) {
 					faces.push_back(genFaceToRender(std::move(glm::ivec3(x, y, z)), FD_LEFT, b));
 				}
-				if (!_worldRenderer->getBlock(worldPos.x, worldPos.y, worldPos.z + 1).has_value()) {
+
+
+				if (z + 1 >= Chunk::CHUNK_SIZE) {
+					if (!_worldRenderer->getBlock(worldPos.x, worldPos.y, worldPos.z + 1).has_value()) {
+						faces.push_back(genFaceToRender(std::move(glm::ivec3(x, y, z)), FD_FRONT, b));
+					}
+				}
+				else if (!getBlock(x, y, z + 1)) {
 					faces.push_back(genFaceToRender(std::move(glm::ivec3(x, y, z)), FD_FRONT, b));
 				}
-				if (!_worldRenderer->getBlock(worldPos.x, worldPos.y, worldPos.z - 1).has_value()) {
+
+
+				if (z - 1 < 0) {
+					if (!_worldRenderer->getBlock(worldPos.x, worldPos.y, worldPos.z - 1).has_value()) {
+						faces.push_back(genFaceToRender(std::move(glm::ivec3(x, y, z)), FD_BACK, b));
+					}
+				}
+				else if (!getBlock(x, y, z - 1)) {
 					faces.push_back(genFaceToRender(std::move(glm::ivec3(x, y, z)), FD_BACK, b));
 				}
 			}
