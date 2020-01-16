@@ -185,32 +185,25 @@ auto Chunk::genChunkFaces() -> std::vector<Face>
 				Chunk::Block b = getBlock(x, y, z);
 
 				if (!b) {
-					int visibleFaces = getVisibleFaces(worldPos.x, worldPos.y, worldPos.z);
-
-					if (visibleFaces & (1 << 0)) { // Top
-						faces.push_back(genFaceToRender(std::move(glm::ivec3(x, y + 1, z)), FD_BOT,
-							_worldRenderer->getBlock(worldPos.x, worldPos.y + 1, worldPos.z).value_or(0)));
-					}
-					if (visibleFaces & (1 << 1)) { // Bottom
-						faces.push_back(genFaceToRender(std::move(glm::ivec3(x, y - 1, z)), FD_TOP,
-							_worldRenderer->getBlock(worldPos.x, worldPos.y - 1, worldPos.z).value_or(0)));
-					}
-					if (visibleFaces & (1 << 2)) { // Left
-						faces.push_back(genFaceToRender(std::move(glm::ivec3(x - 1, y, z)), FD_RIGHT,
-							_worldRenderer->getBlock(worldPos.x - 1, worldPos.y, worldPos.z).value_or(0)));
-					}
-					if (visibleFaces & (1 << 3)) { // Right
-						faces.push_back(genFaceToRender(std::move(glm::ivec3(x + 1, y, z)), FD_LEFT,
-							_worldRenderer->getBlock(worldPos.x + 1, worldPos.y, worldPos.z).value_or(0)));
-					}
-					if (visibleFaces & (1 << 4)) { // Front
-						faces.push_back(genFaceToRender(std::move(glm::ivec3(x, y, z + 1)), FD_BACK,
-							_worldRenderer->getBlock(worldPos.x, worldPos.y, worldPos.z + 1).value_or(0)));
-					}
-					if (visibleFaces & (1 << 5)) { // Back
-						faces.push_back(genFaceToRender(std::move(glm::ivec3(x, y, z - 1)), FD_FRONT,
-							_worldRenderer->getBlock(worldPos.x, worldPos.y, worldPos.z - 1).value_or(0)));
-					}
+					continue;
+				}
+				if (!_worldRenderer->getBlock(worldPos.x, worldPos.y + 1, worldPos.z).has_value()) {
+					faces.push_back(genFaceToRender(std::move(glm::ivec3(x, y, z)), FD_TOP, b));
+				}
+				if (!_worldRenderer->getBlock(worldPos.x, worldPos.y - 1, worldPos.z).has_value()) {
+					faces.push_back(genFaceToRender(std::move(glm::ivec3(x, y, z)), FD_BOT, b));
+				}
+				if (!_worldRenderer->getBlock(worldPos.x + 1, worldPos.y, worldPos.z).has_value()) {
+					faces.push_back(genFaceToRender(std::move(glm::ivec3(x, y, z)), FD_RIGHT, b));
+				}
+				if (!_worldRenderer->getBlock(worldPos.x - 1, worldPos.y, worldPos.z).has_value()) {
+					faces.push_back(genFaceToRender(std::move(glm::ivec3(x, y, z)), FD_LEFT, b));
+				}
+				if (!_worldRenderer->getBlock(worldPos.x, worldPos.y, worldPos.z + 1).has_value()) {
+					faces.push_back(genFaceToRender(std::move(glm::ivec3(x, y, z)), FD_FRONT, b));
+				}
+				if (!_worldRenderer->getBlock(worldPos.x, worldPos.y, worldPos.z - 1).has_value()) {
+					faces.push_back(genFaceToRender(std::move(glm::ivec3(x, y, z)), FD_BACK, b));
 				}
 			}
 		}
