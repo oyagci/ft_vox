@@ -101,9 +101,13 @@ void Chunk::setBlock(size_t x, size_t y, size_t z, Block val)
 	(*_blocks)[x * CHUNK_SIZE * CHUNK_SIZE + y * CHUNK_SIZE + z] = val;
 }
 
-void Chunk::build()
+void Chunk::generate()
 {
 	_faces = genChunkFaces();
+}
+
+void Chunk::build()
+{
 	Mesh tmp = buildChunkFaces(_position, _faces);
 	tmp.build();
 	_mesh = std::move(tmp);
@@ -112,6 +116,10 @@ void Chunk::build()
 void Chunk::draw()
 {
 	_mesh.draw();
+}
+
+void Chunk::update()
+{
 }
 
 int Chunk::getVisibleFaces(int x, int y, int z)

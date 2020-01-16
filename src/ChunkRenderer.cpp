@@ -67,11 +67,12 @@ void ChunkRenderer::render(Camera &camera)
 void ChunkRenderer::update()
 {
 	for (auto &c : _chunks) {
+		c->update();
 		if (c->shouldBeRebuilt()) {
 			if (!_pool.isFull()) {
 				c->setShouldBeRebuilt(false);
 				_pool.enqueue_work([=] {
-					c->build();
+					c->generate();
 					std::unique_lock<std::mutex> lcm(_cm);
 					_chunkMeshes.push(c);
 				});

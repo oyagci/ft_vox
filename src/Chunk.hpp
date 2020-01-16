@@ -59,8 +59,10 @@ public:
 	bool shouldBeRebuilt() { return _shouldBeRebuilt; }
 	void setShouldBeRebuilt(bool val) { _shouldBeRebuilt = val; }
 
-	void draw();
+	void generate();
 	void build();
+	void draw();
+	void update();
 	std::vector<Face> genChunkFaces();
 
 	glm::vec2 const &getPosition() const { return _position; }
