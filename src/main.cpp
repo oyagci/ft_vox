@@ -10,6 +10,7 @@
 #include "World.hpp"
 #include "Settings.hpp"
 #include "stb_image.h"
+#include "PlayerHUD.hpp"
 
 using namespace lazy;
 using namespace graphics;
@@ -40,6 +41,7 @@ int main()
 	World wr(camera);
 
 	FPSCounter fpsCounter;
+	PlayerHUD hud;
 
 	while (!display.isClosed())
 	{
@@ -75,6 +77,7 @@ int main()
 
 		wr.update();
 		wr.render();
+		hud.draw();
 
 		tr.drawText(std::to_string(fpsCounter.getFPS()) + " FPS", glm::vec2(10, 10), .3f, glm::vec3(1.0f));
 	}
