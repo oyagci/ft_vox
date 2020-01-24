@@ -12,17 +12,9 @@ class WorldRenderer;
 class Chunk
 {
 public:
-	typedef char Block;
+	typedef int Block;
 
-	enum Sides {
-		TOP    = 1 << 0,
-		BOTTOM = 1 << 1,
-		LEFT   = 1 << 2,
-		RIGHT  = 1 << 3,
-		FRONT  = 1 << 4,
-		BACK   = 1 << 5,
-	};
-	enum BlockType {
+	enum class BlockType {
 		AIR,
 		DIRT,
 		GRASS,
@@ -30,13 +22,13 @@ public:
 		STONE,
 		BEDROCK,
 	};
-	enum FaceDirection {
-		FD_TOP,
-		FD_BOT,
-		FD_LEFT,
-		FD_RIGHT,
-		FD_FRONT,
-		FD_BACK,
+	enum class FaceDirection {
+		TOP,
+		BOT,
+		LEFT,
+		RIGHT,
+		FRONT,
+		BACK,
 	};
 	struct Face {
 		glm::vec3 pos;

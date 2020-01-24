@@ -157,25 +157,27 @@ int Chunk::getVisibleFaces(int x, int y, int z)
 
 auto Chunk::genFaceToRender(glm::vec3 pos, FaceDirection f, Chunk::Block const &block) -> Face
 {
-	Face face = { pos, f, AIR };
+	Face face = { pos, f, BlockType::AIR };
 
-	if (block == 1 && (f == FD_TOP)) {
-		face.type = GRASS;
+	if (block == 1 && (f == FaceDirection::TOP)) {
+		face.type = BlockType::GRASS;
 	}
-	else if (block == 1 && (f == FD_LEFT || f == FD_RIGHT || f == FD_FRONT || f == FD_BACK)) {
-		face.type = GRASS_SIDE;
+	else if (block == 1 &&
+		(f == FaceDirection::LEFT || f == FaceDirection::RIGHT ||
+			 f == FaceDirection::FRONT || f == FaceDirection::BACK)) {
+		face.type = BlockType::GRASS_SIDE;
 	}
-	else if (block == 1 && (f == FD_BOT)) {
-		face.type = DIRT;
+	else if (block == 1 && (f == FaceDirection::BOT)) {
+		face.type = BlockType::DIRT;
 	}
 	else if (block == 2) {
-		face.type = STONE;
+		face.type = BlockType::STONE;
 	}
 	else if (block == 3) {
-		face.type = DIRT;
+		face.type = BlockType::DIRT;
 	}
 	else if (block == 4) {
-		face.type = BEDROCK;
+		face.type = BlockType::BEDROCK;
 	}
 
 	return face;
@@ -185,9 +187,9 @@ auto Chunk::genChunkFaces() -> std::vector<Face>
 {
 	std::vector<Face> faces;
 
-	for (int x = 0; x < Chunk::CHUNK_SIZE; x++) {
-		for (int y = 0; y < Chunk::CHUNK_SIZE; y++) {
-			for (int z = 0; z < Chunk::CHUNK_SIZE; z++) {
+	for (size_t x = 0; x < Chunk::CHUNK_SIZE; x++) {
+		for (size_t y = 0; y < Chunk::CHUNK_SIZE; y++) {
+			for (size_t z = 0; z < Chunk::CHUNK_SIZE; z++) {
 
 				glm::ivec3 worldPos(getPosition().x + x, y, getPosition().y + z);
 				Chunk::Block b = getBlock(x, y, z);
@@ -198,61 +200,56 @@ auto Chunk::genChunkFaces() -> std::vector<Face>
 
 				if (y + 1 >= Chunk::CHUNK_SIZE) {
 					if (!_worldRenderer->getBlock(worldPos.x, worldPos.y + 1, worldPos.z).has_value()) {
-						faces.push_back(genFaceToRender(std::move(glm::ivec3(x, y, z)), FD_TOP, b));
+						faces.push_back(genFaceToRender(std::move(glm::ivec3(x, y, z)), FaceDirection::TOP, b));
 					}
 				}
 				else if (!getBlock(x, y + 1, z)) {
-					faces.push_back(genFaceToRender(std::move(glm::ivec3(x, y, z)), FD_TOP, b));
+					faces.push_back(genFaceToRender(std::move(glm::ivec3(x, y, z)), FaceDirection::TOP, b));
 				}
 
-
-				if (y - 1 < 0) {
+				if (static_cast<int>(y) - 1 < 0) {
 					if (!_worldRenderer->getBlock(worldPos.x, worldPos.y - 1, worldPos.z).has_value()) {
-						faces.push_back(genFaceToRender(std::move(glm::ivec3(x, y, z)), FD_BOT, b));
+						faces.push_back(genFaceToRender(std::move(glm::ivec3(x, y, z)), FaceDirection::BOT, b));
 					}
 				}
 				else if (!getBlock(x, y - 1, z)) {
-					faces.push_back(genFaceToRender(std::move(glm::ivec3(x, y, z)), FD_BOT, b));
+					faces.push_back(genFaceToRender(std::move(glm::ivec3(x, y, z)), FaceDirection::BOT, b));
 				}
-
 
 				if (x + 1 >= Chunk::CHUNK_SIZE) {
 					if (!_worldRenderer->getBlock(worldPos.x + 1, worldPos.y, worldPos.z).has_value()) {
-						faces.push_back(genFaceToRender(std::move(glm::ivec3(x, y, z)), FD_RIGHT, b));
+						faces.push_back(genFaceToRender(std::move(glm::ivec3(x, y, z)), FaceDirection::RIGHT, b));
 					}
 				}
 				else if (!getBlock(x + 1, y, z)) {
-					faces.push_back(genFaceToRender(std::move(glm::ivec3(x, y, z)), FD_RIGHT, b));
+					faces.push_back(genFaceToRender(std::move(glm::ivec3(x, y, z)), FaceDirection::RIGHT, b));
 				}
 
-
-				if (x - 1 < 0) {
+				if (static_cast<int>(x) - 1 < 0) {
 					if (!_worldRenderer->getBlock(worldPos.x - 1, worldPos.y, worldPos.z).has_value()) {
-						faces.push_back(genFaceToRender(std::move(glm::ivec3(x, y, z)), FD_LEFT, b));
+						faces.push_back(genFaceToRender(std::move(glm::ivec3(x, y, z)), FaceDirection::LEFT, b));
 					}
 				}
 				else if (!getBlock(x - 1, y, z)) {
-					faces.push_back(genFaceToRender(std::move(glm::ivec3(x, y, z)), FD_LEFT, b));
+					faces.push_back(genFaceToRender(std::move(glm::ivec3(x, y, z)), FaceDirection::LEFT, b));
 				}
-
 
 				if (z + 1 >= Chunk::CHUNK_SIZE) {
 					if (!_worldRenderer->getBlock(worldPos.x, worldPos.y, worldPos.z + 1).has_value()) {
-						faces.push_back(genFaceToRender(std::move(glm::ivec3(x, y, z)), FD_FRONT, b));
+						faces.push_back(genFaceToRender(std::move(glm::ivec3(x, y, z)), FaceDirection::FRONT, b));
 					}
 				}
 				else if (!getBlock(x, y, z + 1)) {
-					faces.push_back(genFaceToRender(std::move(glm::ivec3(x, y, z)), FD_FRONT, b));
+					faces.push_back(genFaceToRender(std::move(glm::ivec3(x, y, z)), FaceDirection::FRONT, b));
 				}
 
-
-				if (z - 1 < 0) {
+				if (static_cast<int>(z) - 1 < 0) {
 					if (!_worldRenderer->getBlock(worldPos.x, worldPos.y, worldPos.z - 1).has_value()) {
-						faces.push_back(genFaceToRender(std::move(glm::ivec3(x, y, z)), FD_BACK, b));
+						faces.push_back(genFaceToRender(std::move(glm::ivec3(x, y, z)), FaceDirection::BACK, b));
 					}
 				}
 				else if (!getBlock(x, y, z - 1)) {
-					faces.push_back(genFaceToRender(std::move(glm::ivec3(x, y, z)), FD_BACK, b));
+					faces.push_back(genFaceToRender(std::move(glm::ivec3(x, y, z)), FaceDirection::BACK, b));
 				}
 			}
 		}
@@ -262,19 +259,19 @@ auto Chunk::genChunkFaces() -> std::vector<Face>
 
 glm::vec2 Chunk::getTexturePosition(BlockType type)
 {
-	if (type == GRASS) {
+	if (type == BlockType::GRASS) {
 		return glm::vec2(TEXTURE_TILE_SIZE * 8, TEXTURE_TILE_SIZE * 4);
 	}
-	else if (type == GRASS_SIDE) {
+	else if (type == BlockType::GRASS_SIDE) {
 		return glm::vec2(TEXTURE_TILE_SIZE * 3, TEXTURE_TILE_SIZE * 15);
 	}
-	else if (type == STONE) {
+	else if (type == BlockType::STONE) {
 		return glm::vec2(TEXTURE_TILE_SIZE * 1, TEXTURE_TILE_SIZE * 15);
 	}
-	else if (type == DIRT) {
+	else if (type == BlockType::DIRT) {
 		return glm::vec2(TEXTURE_TILE_SIZE * 2, TEXTURE_TILE_SIZE * 15);
 	}
-	else if (type == BEDROCK) {
+	else if (type == BlockType::BEDROCK) {
 		return glm::vec2(TEXTURE_TILE_SIZE * 1, TEXTURE_TILE_SIZE * 14);
 	}
 	return glm::vec2(0, 15 * TEXTURE_TILE_SIZE);
@@ -480,27 +477,27 @@ Mesh Chunk::buildChunkFaces(glm::vec2 chunkPos, std::vector<Face> faces)
 
 	for (auto &f : faces) {
 		switch (f.dir) {
-		case FD_TOP:
+		case FaceDirection::TOP:
 			buildTopFace(f, mesh, f.pos + worldPos, nVert);
 			nVert += 4;
 			break ;
-		case FD_BOT:
+		case FaceDirection::BOT:
 			buildBotFace(f, mesh, f.pos + worldPos, nVert);
 			nVert += 4;
 			break ;
-		case FD_FRONT:
+		case FaceDirection::FRONT:
 			buildFrontFace(f, mesh, f.pos + worldPos, nVert);
 			nVert += 4;
 			break ;
-		case FD_BACK:
+		case FaceDirection::BACK:
 			buildBackFace(f, mesh, f.pos + worldPos, nVert);
 			nVert += 4;
 			break ;
-		case FD_RIGHT:
+		case FaceDirection::RIGHT:
 			buildRightFace(f, mesh, f.pos + worldPos, nVert);
 			nVert += 4;
 			break ;
-		case FD_LEFT:
+		case FaceDirection::LEFT:
 			buildLeftFace(f, mesh, f.pos + worldPos, nVert);
 			nVert += 4;
 		default:
