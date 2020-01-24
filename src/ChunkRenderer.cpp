@@ -70,7 +70,7 @@ void ChunkRenderer::update()
 {
 	for (auto &c : _chunks) {
 		c->update();
-		if (c->shouldBeRebuilt()) {
+		if (c->getUnavailableSides() == 0 && c->shouldBeRebuilt()) {
 			if (!_pool.isFull()) {
 				c->setShouldBeRebuilt(false);
 				_pool.enqueue_work([=] {

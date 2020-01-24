@@ -23,12 +23,12 @@ public:
 		BEDROCK,
 	};
 	enum class FaceDirection {
-		TOP,
-		BOT,
-		LEFT,
-		RIGHT,
-		FRONT,
-		BACK,
+		TOP   = 1 << 0,
+		BOT   = 1 << 1,
+		LEFT  = 1 << 2,
+		RIGHT = 1 << 3,
+		FRONT = 1 << 4,
+		BACK  = 1 << 5,
 	};
 	struct Face {
 		glm::vec3 pos;
@@ -59,6 +59,8 @@ public:
 
 	glm::vec2 const &getPosition() const { return _position; }
 	void setPosition(glm::vec2 position) { _position = position; }
+
+	unsigned int getUnavailableSides();
 
 private:
 	int getVisibleFaces(int x, int y, int z);

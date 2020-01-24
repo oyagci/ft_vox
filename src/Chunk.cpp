@@ -507,3 +507,30 @@ Mesh Chunk::buildChunkFaces(glm::vec2 chunkPos, std::vector<Face> faces)
 
 	return mesh;
 }
+
+unsigned int Chunk::getUnavailableSides()
+{
+	glm::ivec2 gridPos(_position / CHUNK_SIZE);
+
+	auto right = _worldRenderer->getChunk(glm::ivec2(gridPos.x + 1, gridPos.y)).has_value();
+	auto left = _worldRenderer->getChunk(glm::ivec2(gridPos.x - 1, gridPos.y)).has_value();
+	auto front = _worldRenderer->getChunk(glm::ivec2(gridPos.x,     gridPos.y + 1)).has_value();
+	auto back = _worldRenderer->getChunk(glm::ivec2(gridPos.x,     gridPos.y - 1)).has_value();
+
+	unsigned int unavailable = 0;
+
+	if (!right) {
+		unavailable |= static_cast<unsigned int>(FaceDirection::RIGHT);
+	}
+	if (!left) {
+		unavailable |= static_cast<unsigned int>(FaceDirection::LEFT);
+	}
+	if (!front) {
+		unavailable |= static_cast<unsigned int>(FaceDirection::FRONT);
+	}
+	if (!back) {
+		unavailable |= static_cast<unsigned int>(FaceDirection::BACK);
+	}
+
+	return unavailable;
+}
