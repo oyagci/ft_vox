@@ -44,8 +44,10 @@ bool ChunkRenderer::isInView(Camera &camera, Chunk &chunk)
 	if (glm::length(camPos2D - pos) > 64.0f * (rd / 2.0f)) {
 		return false;
 	}
-	// TODO: Do frustum culling
-	return true;
+
+	glm::vec3 worldPos(pos.x, 32.0f, pos.y);
+	float radius = glm::length(glm::vec3(32.0f, 32.0f, 0.0f));
+	return camera.sphereInFrustum(worldPos, radius);
 }
 void ChunkRenderer::render(Camera &camera)
 {
