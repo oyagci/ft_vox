@@ -46,21 +46,6 @@ void WorldRenderer::registerChunks(std::list<std::shared_ptr<Chunk>> chunks)
 	for (auto &c : chunks) { _renderer->addChunk(std::shared_ptr<Chunk>(c)); }
 }
 
-std::ostream &operator<<(std::ostream &os, glm::vec3 v) {
-	os << "{ " << v.x << ", " << v.y << ", " << v.z << " }";
-	return os;
-}
-
-std::ostream &operator<<(std::ostream &os, glm::uvec3 v) {
-	os << "{ " << v.x << ", " << v.y << ", " << v.z << " }";
-	return os;
-}
-
-std::ostream &operator<<(std::ostream &os, glm::vec2 v) {
-	os << "{ " << v.x << ", " << v.y << " }";
-	return os;
-}
-
 std::optional<Chunk::Block> WorldRenderer::getBlock(int x, int y, int z)
 {
 	std::optional<Chunk::Block> b;

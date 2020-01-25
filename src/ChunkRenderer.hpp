@@ -2,12 +2,24 @@
 
 #include <memory>
 #include <queue>
-#include <tuple>
+#include <map>
 #include <glm/vec3.hpp>
 #include "Chunk.hpp"
 #include "IRenderer.hpp"
 #include "threadpool/threadpool.hpp"
 #include "TextRenderer.hpp"
+
+namespace std {
+	template <>
+	struct hash<glm::vec2>
+	{
+		std::size_t operator()(const glm::vec2 &v) const
+		{
+			return (hash<float>()(v.x)
+					^ ((hash<float>()(v.y) << 1) >> 1));
+		}
+	};
+}
 
 class WorldRenderer;
 
@@ -43,4 +55,6 @@ private:
 	TextRenderer tr;
 
 	WorldRenderer *_worldRenderer;
+
+	std::unordered_map<glm::vec2, std::shared_ptr<Chunk>> _chunkMap;
 };

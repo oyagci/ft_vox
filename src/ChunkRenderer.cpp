@@ -31,6 +31,7 @@ ChunkRenderer::~ChunkRenderer()
 void ChunkRenderer::addChunk(std::shared_ptr<Chunk> chunk)
 {
 	_chunks.push_back(chunk);
+	_chunkMap[chunk->getPosition()] = chunk;
 }
 
 bool ChunkRenderer::isInView(Camera &camera, Chunk &chunk)
@@ -54,29 +55,29 @@ void ChunkRenderer::render(Camera &camera)
 	int n = 0;
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, _texture);
-	for (auto &m : _chunks) {
-		if (isInView(camera, *m)) {
-			m->draw();
+	for (auto &m : _chunkMap) {
+		if (isInView(camera, *m.second)) {
+			m.second->draw();
 			n++;
 		}
 	}
 	tr.drawText(std::to_string(n) +
 		" Visible Chunks (" +
-		std::to_string(_chunks.size()) + " total)",
+		std::to_string(_chunkMap.size()) + " total)",
 		glm::vec2(10.0f, 30.0f), .3f, glm::vec3(1.0f, 1.0f, 1.0f));
 }
 
 void ChunkRenderer::update()
 {
-	for (auto &c : _chunks) {
-		c->update();
-		if (c->getUnavailableSides() == 0 && c->shouldBeRebuilt()) {
+	for (auto &c : _chunkMap) {
+		c.second->update();
+		if (c.second->getUnavailableSides() == 0 && c.second->shouldBeRebuilt()) {
 			if (!_pool.isFull()) {
-				c->setShouldBeRebuilt(false);
+				c.second->setShouldBeRebuilt(false);
 				_pool.enqueue_work([=] {
-					c->generate();
+					c.second->generate();
 					std::unique_lock<std::mutex> lcm(_cm);
-					_chunkMeshes.push(c);
+					_chunkMeshes.push(c.second);
 				});
 			}
 		}
