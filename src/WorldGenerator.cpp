@@ -66,26 +66,6 @@ void WorldGenerator::update()
 	}
 }
 
-std::vector<glm::vec3> WorldGenerator::getChunksFront()
-{
-	glm::i32vec3 dir = { 0, 0, -1 };
-	std::vector<glm::vec3> chunks;
-
-	for (int j = -3; j < 3; j++) {
-		for (int i = 14; i >= 0; i--) {
-			glm::i32vec3 gridPos = _camPos / Chunk::CHUNK_SIZE;
-
-			gridPos += (dir * i);
-			gridPos *= Chunk::CHUNK_SIZE;
-			gridPos += j * 64;
-
-			chunks.push_back(glm::vec3(gridPos));
-		}
-	}
-
-	return chunks;
-}
-
 void WorldGenerator::setCameraPosition(glm::vec3 pos)
 {
 	_camPos = std::move(pos);

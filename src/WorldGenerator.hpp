@@ -24,7 +24,6 @@ public:
 
 private:
 	void genChunksAroundPlayer();
-	std::vector<glm::vec3> getChunksFront();
 
 	using Priority = unsigned int;
 	struct ChunkPriority {
