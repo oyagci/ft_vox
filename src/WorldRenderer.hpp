@@ -28,10 +28,9 @@ public:
 	void registerChunks(std::list<std::shared_ptr<Chunk>> chunks);
 	std::optional<Chunk::Block> getBlock(int x, int y, int z);
 	std::optional<std::shared_ptr<Chunk>> getChunk(glm::ivec2 pos);
+	void removeChunksTooFar(std::vector<glm::vec2> chunksTooFar);
 
 private:
-	const int RENDER_DISTANCE = 6;
-
 	glm::vec3 &_camPos;
 	std::unique_ptr<Shader> _shader;
 	std::unique_ptr<ChunkRenderer> _renderer;

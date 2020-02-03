@@ -1,4 +1,5 @@
 #include "World.hpp"
+#include "Settings.hpp"
 
 World::World(Camera &cam, glm::vec3 &camPos) : _camera(camPos)
 {
@@ -13,6 +14,10 @@ void World::render()
 
 void World::update(glm::vec3 camPos)
 {
+	auto chunksTooFar = getChunksTooFar(camPos);
+
+	_renderer->removeChunksTooFar(chunksTooFar);
+
 	_builder->setCameraPosition(camPos);
 	_builder->update();
 	auto chunks = _builder->takeChunks();
@@ -26,4 +31,44 @@ void World::update(glm::vec3 camPos)
 	}
 
 	_renderer->update();
+
+	removeChunksTooFar(chunksTooFar);
+}
+
+std::vector<glm::vec2> World::getChunksTooFar(glm::vec3 camPos)
+{
+	glm::vec2 camPos2D(camPos.x, camPos.z);
+	int renderDistance = std::any_cast<int>(Settings::instance().get("renderDistance"));
+	std::vector<glm::vec2> positions;
+
+	for (auto &c : _chunks) {
+		float dist = glm::length(c->getPosition() - camPos2D);
+
+		if (dist / 64 > renderDistance) {
+			positions.push_back(c->getPosition());
+		}
+	}
+
+	return positions;
+}
+
+void World::removeChunksTooFar(std::vector<glm::vec2> chunksTooFar)
+{
+	std::list<std::shared_ptr<Chunk>> chunks;
+	int n = 0;
+
+	for (auto &c : _chunks) {
+		bool remove = false;
+		for (auto const &pos : chunksTooFar) {
+			if (c->getPosition() == pos) {
+				remove = true;
+				n++;
+			}
+		}
+		if (!remove) {
+			chunks.push_back(c);
+		}
+	}
+
+	_chunks = chunks;
 }

@@ -30,7 +30,6 @@ ChunkRenderer::~ChunkRenderer()
 
 void ChunkRenderer::addChunk(std::shared_ptr<Chunk> chunk)
 {
-	_chunks.push_back(chunk);
 	_chunkMap[chunk->getPosition()] = chunk;
 }
 
@@ -91,5 +90,12 @@ void ChunkRenderer::buildChunks()
 	if (!_chunkMeshes.empty()) {
 		_chunkMeshes.front()->build();
 		_chunkMeshes.pop();
+	}
+}
+
+void ChunkRenderer::removeChunksTooFar(std::vector<glm::vec2> chunksTooFar)
+{
+	for (auto const &pos : chunksTooFar) {
+		_chunkMap.erase(pos);
 	}
 }

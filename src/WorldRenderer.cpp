@@ -81,3 +81,26 @@ std::optional<std::shared_ptr<Chunk>> WorldRenderer::getChunk(glm::ivec2 pos)
 
 	return chunk;
 }
+
+void WorldRenderer::removeChunksTooFar(std::vector<glm::vec2> chunksTooFar)
+{
+	std::vector<std::shared_ptr<Chunk>> chunks;
+	int n = 0;
+
+	_renderer->removeChunksTooFar(chunksTooFar);
+
+	for (auto &c : _chunks) {
+		bool remove = false;
+		for (auto const &pos : chunksTooFar) {
+			if (c->getPosition() == pos) {
+				remove = true;
+				n++;
+			}
+		}
+		if (!remove) {
+			chunks.push_back(c);
+		}
+	}
+
+	_chunks = chunks;
+}

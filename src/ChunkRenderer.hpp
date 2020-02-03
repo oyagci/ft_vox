@@ -32,15 +32,13 @@ public:
 	void render(Camera &camera);
 	void addChunk(std::shared_ptr<Chunk> chunk);
 	void update();
+	void removeChunksTooFar(std::vector<glm::vec2> chunksTooFar);
 
 private:
 	void buildChunks();
 	bool isInView(Camera &camera, Chunk &chunk);
 
 private:
-	std::vector<Mesh> _meshes;
-	std::vector<std::shared_ptr<Chunk>> _chunks;
-
 	using Faces = std::vector<Chunk::Face>;
 
 	std::mutex _cf;

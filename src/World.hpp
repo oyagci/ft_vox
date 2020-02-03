@@ -4,6 +4,7 @@
 #include "WorldGenerator.hpp"
 #include "IRenderer.hpp"
 #include <list>
+#include <vector>
 
 class World : public IRenderer
 {
@@ -12,6 +13,10 @@ public:
 
 	void render() override;
 	void update(glm::vec3 camPos);
+
+private:
+	std::vector<glm::vec2> getChunksTooFar(glm::vec3 camPos);
+	void removeChunksTooFar(std::vector<glm::vec2> chunksTooFar);
 
 private:
 	std::unique_ptr<WorldRenderer> _renderer;
