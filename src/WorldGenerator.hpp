@@ -38,15 +38,14 @@ private:
 			return lhs.priority > rhs.priority;
 		}
 	};
-	void addChunkToGenerate(glm::vec3 pos, Priority priority);
-	glm::vec3 popPriorityChunk();
-	void updatePriority();
+	void addChunkToGenerate(glm::vec3 pos);
 
 private:
 	const int RENDER_DISTANCE = 6;
 
 	std::unique_ptr<ChunkFactory> _factory;
-	std::priority_queue<ChunkPriority, std::vector<ChunkPriority>,std::greater<ChunkPriority>> _chunksToGenerate;
+	std::list<glm::vec3> _chunksToGenerate;
+	std::priority_queue<ChunkPriority, std::vector<ChunkPriority>, std::greater<ChunkPriority>> _priority;
 
 	glm::vec3 _camPos;
 
@@ -55,5 +54,7 @@ private:
 	std::vector<glm::vec3> _generatedChunks;
 
 	thread_pool _pool;
+
+	glm::vec3 lastGridPos;
 };
 

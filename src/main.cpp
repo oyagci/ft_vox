@@ -34,7 +34,7 @@ int main()
 	Camera camera(display, std::move(t));
 	camera.setProjection(glm::radians(80.0f), 0.1f, 1000.0f);
 
-	World wr(camera, camPos);
+	World wr(camera);
 
 	FPSCounter fpsCounter;
 

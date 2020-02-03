@@ -3,18 +3,11 @@
 #include <glm/vec3.hpp>
 #include "Settings.hpp"
 #include "WorldRenderer.hpp"
+#include <list>
 
 WorldGenerator::WorldGenerator(WorldRenderer *wr) : _pool(1)
 {
 	_factory = std::make_unique<ChunkFactory>(wr);
-}
-
-glm::vec3 WorldGenerator::popPriorityChunk()
-{
-	glm::vec3 pos = _chunksToGenerate.top().position;
-	_chunksToGenerate.pop();
-
-	return pos;
 }
 
 void WorldGenerator::genChunksAroundPlayer()
@@ -27,48 +20,42 @@ void WorldGenerator::genChunksAroundPlayer()
 		gridPos.z += xoff;
 		for (int yoff = -(rd / 2); yoff < (rd / 2); yoff++) {
 			glm::vec3 chunkPos = glm::vec3(gridPos.x + yoff, gridPos.y, gridPos.z) * Chunk::CHUNK_SIZE;
-			addChunkToGenerate(chunkPos, 1);
+			addChunkToGenerate(chunkPos);
 		}
 	}
 }
 
-void WorldGenerator::updatePriority()
-{
-	std::vector<ChunkPriority> chunks;
-
-	chunks.reserve(_chunksToGenerate.size());
-	for (std::size_t i = 0; i < _chunksToGenerate.size(); i++) {
-		auto e = _chunksToGenerate.top();
-		chunks.push_back(e);
-		_chunksToGenerate.pop();
-	}
-
-	for (auto &c : chunks) {
-		c.priority = glm::length(_camPos - c.position);
-
-		if (c.priority < 2000.0f) {
-			_chunksToGenerate.push(c);
-		}
-	}
-}
 
 void WorldGenerator::update(Camera const &camera)
 {
-	genChunksAroundPlayer();
-	updatePriority();
-	if (!_chunksToGenerate.empty() && !_pool.isFull()) {
-		glm::vec3 chunkPos  = popPriorityChunk();
-		_pool.enqueue_work([=] {
-				std::shared_ptr<Chunk> chunk = _factory->getChunk(std::move(chunkPos));
-				std::unique_lock<std::mutex> l(_cl);
-				_chunks.push(chunk);
-		});
-	}
-}
+	_camPos = camera.getPosition();
 
-void WorldGenerator::setCameraPosition(glm::vec3 pos)
-{
-	_camPos = std::move(pos);
+	glm::vec3 gridPos = camera.getPosition() / Chunk::CHUNK_SIZE;
+	if (lastGridPos != gridPos) {
+		genChunksAroundPlayer();
+	}
+	lastGridPos = gridPos;
+
+	std::priority_queue<ChunkPriority, std::vector<ChunkPriority>, std::greater<ChunkPriority>> priority;
+	for (auto const &c : _chunksToGenerate) {
+		if (camera.sphereInFrustum(glm::vec3(c.x, 32.0f, c.z),
+				glm::length(glm::vec3(64.0f, 64.0f, 0.0f)))) {
+			priority.push(ChunkPriority(glm::length(camera.getPosition() - c), c));
+		}
+	}
+
+	if (!_chunksToGenerate.empty() && !_pool.isFull()) {
+		if (priority.size() > 0) {
+			glm::vec3 chunkPos = priority.top().position;
+			priority.pop();
+			_chunksToGenerate.remove(chunkPos);
+			_pool.enqueue_work([=] {
+					std::shared_ptr<Chunk> chunk = _factory->getChunk(chunkPos);
+					std::unique_lock<std::mutex> l(_cl);
+					_chunks.push(chunk);
+			});
+		}
+	}
 }
 
 std::list<std::shared_ptr<Chunk>> WorldGenerator::takeChunks()
@@ -84,7 +71,7 @@ std::list<std::shared_ptr<Chunk>> WorldGenerator::takeChunks()
 	return tmp;
 }
 
-void WorldGenerator::addChunkToGenerate(glm::vec3 pos, Priority priority)
+void WorldGenerator::addChunkToGenerate(glm::vec3 pos)
 {
 	// Ignore Y axis because we only need to generate chunks on the X/Z axis.
 	// If we dont do this chunks will be generated at the same X/Z coordinates for each Y unit
@@ -93,7 +80,7 @@ void WorldGenerator::addChunkToGenerate(glm::vec3 pos, Priority priority)
 
 	if (std::find(_generatedChunks.begin(), _generatedChunks.end(), pos) == _generatedChunks.end()) {
 		_generatedChunks.push_back(glm::vec3(pos));
-		_chunksToGenerate.push(ChunkPriority(priority, std::move(pos)));
+		_chunksToGenerate.push_back(std::move(pos));
 	}
 }
 

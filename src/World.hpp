@@ -12,7 +12,7 @@ using lazy::graphics::Camera;
 class World : public IRenderer
 {
 public:
-	World(Camera &cam, glm::vec3 &camPos);
+	World(Camera &cam);
 
 	void render() override;
 	void update();

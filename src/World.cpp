@@ -1,7 +1,7 @@
 #include "World.hpp"
 #include "Settings.hpp"
 
-World::World(Camera &camera, glm::vec3 &camPos) : _camera(camera)
+World::World(Camera &camera) : _camera(camera)
 {
 	_renderer = std::make_unique<WorldRenderer>(camera);
 	_generator = std::make_unique<WorldGenerator>(_renderer.get());
@@ -18,7 +18,6 @@ void World::update()
 
 	_renderer->removeChunksTooFar(chunksTooFar);
 
-	_generator->setCameraPosition(_camera.getPosition());
 	_generator->update(_camera);
 	_generator->removeChunksTooFar(chunksTooFar);
 	auto chunks = _generator->takeChunks();
