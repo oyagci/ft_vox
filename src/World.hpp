@@ -20,7 +20,7 @@ private:
 
 private:
 	std::unique_ptr<WorldRenderer> _renderer;
-	std::unique_ptr<WorldGenerator> _builder;
+	std::unique_ptr<WorldGenerator> _generator;
 
 	std::list<std::shared_ptr<Chunk>> _chunks;
 

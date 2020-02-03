@@ -4,7 +4,7 @@
 World::World(Camera &cam, glm::vec3 &camPos) : _camera(camPos)
 {
 	_renderer = std::make_unique<WorldRenderer>(cam, camPos);
-	_builder = std::make_unique<WorldGenerator>(_renderer.get());
+	_generator = std::make_unique<WorldGenerator>(_renderer.get());
 }
 
 void World::render()
@@ -18,9 +18,9 @@ void World::update(glm::vec3 camPos)
 
 	_renderer->removeChunksTooFar(chunksTooFar);
 
-	_builder->setCameraPosition(camPos);
-	_builder->update();
-	auto chunks = _builder->takeChunks();
+	_generator->setCameraPosition(camPos);
+	_generator->update();
+	auto chunks = _generator->takeChunks();
 	if (!chunks.empty()) {
 		// New chunks have been created
 		// Add them to list of chunks
