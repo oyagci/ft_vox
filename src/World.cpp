@@ -20,6 +20,7 @@ void World::update(glm::vec3 camPos)
 
 	_generator->setCameraPosition(camPos);
 	_generator->update();
+	_generator->removeChunksTooFar(chunksTooFar);
 	auto chunks = _generator->takeChunks();
 	if (!chunks.empty()) {
 		// New chunks have been created

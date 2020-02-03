@@ -21,6 +21,7 @@ public:
 	void update();
 	void setCameraPosition(glm::vec3 pos);
 	std::list<std::shared_ptr<Chunk>> takeChunks();
+	void removeChunksTooFar(std::vector<glm::vec2> chunksTooFar);
 
 private:
 	void genChunksAroundPlayer();

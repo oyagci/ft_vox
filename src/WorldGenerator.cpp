@@ -96,3 +96,24 @@ void WorldGenerator::addChunkToGenerate(glm::vec3 pos, Priority priority)
 		_chunksToGenerate.push(ChunkPriority(priority, std::move(pos)));
 	}
 }
+
+void WorldGenerator::removeChunksTooFar(std::vector<glm::vec2> chunksTooFar)
+{
+	std::vector<glm::vec3> chunks;
+	int n = 0;
+
+	for (auto &c : _generatedChunks) {
+		bool remove = false;
+		for (auto const &pos : chunksTooFar) {
+			if (pos.x == c.x && pos.y == c.z) {
+				remove = true;
+				n++;
+			}
+		}
+		if (!remove) {
+			chunks.push_back(c);
+		}
+	}
+
+	_generatedChunks = chunks;
+}
