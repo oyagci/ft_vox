@@ -17,7 +17,7 @@ Settings::~Settings()
 
 void Settings::loadDefaults()
 {
-	_values["renderDistance"] = "14";
+	_values["renderDistance"] = 14;
 	{
 		auto now = std::chrono::system_clock::now();
 		auto now_ms = std::chrono::time_point_cast<std::chrono::milliseconds>(now);
