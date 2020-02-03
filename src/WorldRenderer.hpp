@@ -18,7 +18,7 @@ using namespace lazy::graphics;
 class WorldRenderer : public IRenderer
 {
 public:
-	WorldRenderer(Camera &camera, glm::vec3 &camPos);
+	WorldRenderer(Camera &camera);
 	~WorldRenderer();
 
 	void generateChunks();
@@ -31,7 +31,6 @@ public:
 	void removeChunksTooFar(std::vector<glm::vec2> chunksTooFar);
 
 private:
-	glm::vec3 &_camPos;
 	std::unique_ptr<Shader> _shader;
 	std::unique_ptr<ChunkRenderer> _renderer;
 

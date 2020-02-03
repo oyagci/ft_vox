@@ -18,7 +18,7 @@ class WorldGenerator
 public:
 	WorldGenerator(WorldRenderer *wr);
 
-	void update();
+	void update(Camera const &camera);
 	void setCameraPosition(glm::vec3 pos);
 	std::list<std::shared_ptr<Chunk>> takeChunks();
 	void removeChunksTooFar(std::vector<glm::vec2> chunksTooFar);

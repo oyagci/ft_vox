@@ -1,8 +1,7 @@
 #include "WorldRenderer.hpp"
 #include <iostream>
 
-WorldRenderer::WorldRenderer(Camera &camera, glm::vec3 &camPos) : _camPos(camPos),
-	_camera(camera)
+WorldRenderer::WorldRenderer(Camera &camera) : _camera(camera)
 {
 	_renderer = std::make_unique<ChunkRenderer>(this);
 
@@ -32,11 +31,6 @@ void WorldRenderer::render()
 	_renderer->render(_camera);
 
 	_shader->unbind();
-}
-
-void WorldRenderer::setPos(glm::vec3 pos)
-{
-	_camPos = std::move(pos);
 }
 
 void WorldRenderer::registerChunks(std::list<std::shared_ptr<Chunk>> chunks)

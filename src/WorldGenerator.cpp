@@ -52,7 +52,7 @@ void WorldGenerator::updatePriority()
 	}
 }
 
-void WorldGenerator::update()
+void WorldGenerator::update(Camera const &camera)
 {
 	genChunksAroundPlayer();
 	updatePriority();
