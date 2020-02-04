@@ -8,6 +8,7 @@
 #include "IRenderer.hpp"
 #include "threadpool/threadpool.hpp"
 #include "TextRenderer.hpp"
+#include "Texture.hpp"
 
 namespace std {
 	template <>
@@ -49,10 +50,11 @@ private:
 	std::mutex _cm;
 	std::queue<std::shared_ptr<Chunk>> _chunkMeshes;
 
-	GLuint _texture;
+	Texture _texture;
 	TextRenderer tr;
 
 	WorldRenderer *_worldRenderer;
 
 	std::unordered_map<glm::vec2, std::shared_ptr<Chunk>> _chunkMap;
+
 };
