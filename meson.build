@@ -21,6 +21,7 @@ srcs = [
 	'src/WorldGenerator.cpp',
 	'src/stb_image.cpp',
 	'src/Settings.cpp',
+	'src/Texture.cpp',
 ]
 
 cmake = import('cmake')
