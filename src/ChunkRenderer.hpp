@@ -22,12 +22,12 @@ namespace std {
 	};
 }
 
-class WorldRenderer;
+class World;
 
 class ChunkRenderer
 {
 public:
-	ChunkRenderer(WorldRenderer *worldRenderer);
+	ChunkRenderer(World *world);
 	~ChunkRenderer();
 
 	void render(Camera &camera);
@@ -52,7 +52,7 @@ private:
 
 	TextRenderer tr;
 
-	WorldRenderer *_worldRenderer;
+	World *_world;
 
 	std::unordered_map<glm::vec2, std::shared_ptr<Chunk>> _chunkMap;
 

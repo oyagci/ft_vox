@@ -7,7 +7,7 @@
 
 using namespace lazy::graphics;
 
-class WorldRenderer;
+class World;
 
 class Chunk
 {
@@ -43,7 +43,7 @@ public:
 
 
 public:
-	Chunk(glm::ivec2 pos, WorldRenderer *wr);
+	Chunk(glm::ivec2 pos, World *world);
 
 	Block getBlock(std::size_t x, std::size_t y, std::size_t z) const;
 	void setBlock(std::size_t x, std::size_t y, std::size_t z, Block val);
@@ -80,7 +80,7 @@ private:
 	std::unique_ptr<std::array<Block, CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE>> _blocks;
 	Block _void = 0;
 	bool _shouldBeRebuilt;
-	WorldRenderer *_worldRenderer;
+	World *_world;
 	Mesh _mesh;
 	glm::vec2 _position;
 	std::vector<Face> _faces;

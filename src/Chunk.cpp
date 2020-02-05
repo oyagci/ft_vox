@@ -2,7 +2,7 @@
 #include <cstdint>
 #include "SimplexNoise.hpp"
 #include <mutex>
-#include "WorldRenderer.hpp"
+#include "World.hpp"
 
 SimplexNoise s = SimplexNoise(0.1f, 1.0f, 2.0f, 0.25f);
 
@@ -11,7 +11,7 @@ float simplexNoise(size_t octaves, glm::vec3 pos)
 	return s.fractal(octaves, pos.x, pos.y, pos.z);
 }
 
-Chunk::Chunk(glm::ivec2 pos, WorldRenderer *wr) : _shouldBeRebuilt(true), _worldRenderer(wr)
+Chunk::Chunk(glm::ivec2 pos, World *world) : _shouldBeRebuilt(true), _world(world)
 {
 	_blocks = std::make_unique<std::array<Block, CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE>>();
 	_position = std::move(pos);
@@ -134,7 +134,7 @@ int Chunk::getVisibleFaces(int x, int y, int z)
 	bool back;
 
 	auto blockIsPresent = [this] (int x, int y, int z) -> bool {
-		auto b = _worldRenderer->getBlock(x, y, z);
+		auto b = _world->getBlock(x, y, z);
 		return b.has_value() && b.value() != 0;
 	};
 
@@ -199,7 +199,7 @@ auto Chunk::genChunkFaces() -> std::vector<Face>
 				}
 
 				if (y + 1 >= Chunk::CHUNK_SIZE) {
-					if (!_worldRenderer->getBlock(worldPos.x, worldPos.y + 1, worldPos.z).has_value()) {
+					if (!_world->getBlock(worldPos.x, worldPos.y + 1, worldPos.z).has_value()) {
 						faces.push_back(genFaceToRender(std::move(glm::ivec3(x, y, z)), FaceDirection::TOP, b));
 					}
 				}
@@ -208,7 +208,7 @@ auto Chunk::genChunkFaces() -> std::vector<Face>
 				}
 
 				if (static_cast<int>(y) - 1 < 0) {
-					if (!_worldRenderer->getBlock(worldPos.x, worldPos.y - 1, worldPos.z).has_value()) {
+					if (!_world->getBlock(worldPos.x, worldPos.y - 1, worldPos.z).has_value()) {
 						faces.push_back(genFaceToRender(std::move(glm::ivec3(x, y, z)), FaceDirection::BOT, b));
 					}
 				}
@@ -217,7 +217,7 @@ auto Chunk::genChunkFaces() -> std::vector<Face>
 				}
 
 				if (x + 1 >= Chunk::CHUNK_SIZE) {
-					if (!_worldRenderer->getBlock(worldPos.x + 1, worldPos.y, worldPos.z).has_value()) {
+					if (!_world->getBlock(worldPos.x + 1, worldPos.y, worldPos.z).has_value()) {
 						faces.push_back(genFaceToRender(std::move(glm::ivec3(x, y, z)), FaceDirection::RIGHT, b));
 					}
 				}
@@ -226,7 +226,7 @@ auto Chunk::genChunkFaces() -> std::vector<Face>
 				}
 
 				if (static_cast<int>(x) - 1 < 0) {
-					if (!_worldRenderer->getBlock(worldPos.x - 1, worldPos.y, worldPos.z).has_value()) {
+					if (!_world->getBlock(worldPos.x - 1, worldPos.y, worldPos.z).has_value()) {
 						faces.push_back(genFaceToRender(std::move(glm::ivec3(x, y, z)), FaceDirection::LEFT, b));
 					}
 				}
@@ -235,7 +235,7 @@ auto Chunk::genChunkFaces() -> std::vector<Face>
 				}
 
 				if (z + 1 >= Chunk::CHUNK_SIZE) {
-					if (!_worldRenderer->getBlock(worldPos.x, worldPos.y, worldPos.z + 1).has_value()) {
+					if (!_world->getBlock(worldPos.x, worldPos.y, worldPos.z + 1).has_value()) {
 						faces.push_back(genFaceToRender(std::move(glm::ivec3(x, y, z)), FaceDirection::FRONT, b));
 					}
 				}
@@ -244,7 +244,7 @@ auto Chunk::genChunkFaces() -> std::vector<Face>
 				}
 
 				if (static_cast<int>(z) - 1 < 0) {
-					if (!_worldRenderer->getBlock(worldPos.x, worldPos.y, worldPos.z - 1).has_value()) {
+					if (!_world->getBlock(worldPos.x, worldPos.y, worldPos.z - 1).has_value()) {
 						faces.push_back(genFaceToRender(std::move(glm::ivec3(x, y, z)), FaceDirection::BACK, b));
 					}
 				}
@@ -512,10 +512,10 @@ unsigned int Chunk::getUnavailableSides()
 {
 	glm::ivec2 gridPos(_position / CHUNK_SIZE);
 
-	auto right = _worldRenderer->getChunk(glm::ivec2(gridPos.x + 1, gridPos.y)).has_value();
-	auto left = _worldRenderer->getChunk(glm::ivec2(gridPos.x - 1, gridPos.y)).has_value();
-	auto front = _worldRenderer->getChunk(glm::ivec2(gridPos.x,     gridPos.y + 1)).has_value();
-	auto back = _worldRenderer->getChunk(glm::ivec2(gridPos.x,     gridPos.y - 1)).has_value();
+	auto right = _world->getChunk(glm::ivec2(gridPos.x + 1, gridPos.y)).has_value();
+	auto left = _world->getChunk(glm::ivec2(gridPos.x - 1, gridPos.y)).has_value();
+	auto front = _world->getChunk(glm::ivec2(gridPos.x,     gridPos.y + 1)).has_value();
+	auto back = _world->getChunk(glm::ivec2(gridPos.x,     gridPos.y - 1)).has_value();
 
 	unsigned int unavailable = 0;
 

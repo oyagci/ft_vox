@@ -16,7 +16,6 @@ srcs = [
 	'src/ChunkFactory.cpp',
 	'src/TextRenderer.cpp',
 	'src/FPSCounter.cpp',
-	'src/WorldRenderer.cpp',
 	'src/World.cpp',
 	'src/WorldGenerator.cpp',
 	'src/stb_image.cpp',

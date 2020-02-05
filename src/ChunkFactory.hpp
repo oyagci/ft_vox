@@ -2,15 +2,13 @@
 
 #include "Chunk.hpp"
 
-class WorldRenderer;
+class World;
 
 class ChunkFactory
 {
 public:
-	ChunkFactory(WorldRenderer *wr);
-
+	ChunkFactory(World *world);
 	std::unique_ptr<Chunk> getChunk(glm::vec3 pos);
-
 private:
-	WorldRenderer *_worldRenderer;
+	World *_world;
 };

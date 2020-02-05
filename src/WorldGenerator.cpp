@@ -2,12 +2,12 @@
 #include "Chunk.hpp"
 #include <glm/vec3.hpp>
 #include "Settings.hpp"
-#include "WorldRenderer.hpp"
+#include "World.hpp"
 #include <list>
 
-WorldGenerator::WorldGenerator(WorldRenderer *wr) : _pool(1)
+WorldGenerator::WorldGenerator(World *world) : _pool(1)
 {
-	_factory = std::make_unique<ChunkFactory>(wr);
+	_factory = std::make_unique<ChunkFactory>(world);
 }
 
 void WorldGenerator::genChunksAroundPlayer()
@@ -30,7 +30,7 @@ void WorldGenerator::update(Camera const &camera)
 {
 	_camPos = camera.getPosition();
 
-	glm::vec3 gridPos = camera.getPosition() / Chunk::CHUNK_SIZE;
+	glm::ivec3 gridPos = camera.getPosition() / Chunk::CHUNK_SIZE;
 	if (lastGridPos != gridPos) {
 		genChunksAroundPlayer();
 	}

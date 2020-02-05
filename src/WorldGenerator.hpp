@@ -11,12 +11,12 @@
 #include <queue>
 #include "TextRenderer.hpp"
 
-class WorldRenderer;
+class World;
 
 class WorldGenerator
 {
 public:
-	WorldGenerator(WorldRenderer *wr);
+	WorldGenerator(World *world);
 
 	void update(Camera const &camera);
 	void setCameraPosition(glm::vec3 pos);
@@ -55,6 +55,6 @@ private:
 
 	thread_pool _pool;
 
-	glm::vec3 lastGridPos;
+	glm::ivec3 lastGridPos;
 };
 

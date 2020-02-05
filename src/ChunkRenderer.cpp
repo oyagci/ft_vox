@@ -2,8 +2,9 @@
 #include "stb_image.h"
 #include "Settings.hpp"
 #include "TextureManager.hpp"
+#include "World.hpp"
 
-ChunkRenderer::ChunkRenderer(WorldRenderer *worldRenderer) : _worldRenderer(worldRenderer)
+ChunkRenderer::ChunkRenderer(World *world) : _world(world)
 {
 }
 
