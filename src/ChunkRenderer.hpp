@@ -50,7 +50,6 @@ private:
 	std::mutex _cm;
 	std::queue<std::shared_ptr<Chunk>> _chunkMeshes;
 
-	Texture _texture;
 	TextRenderer tr;
 
 	WorldRenderer *_worldRenderer;

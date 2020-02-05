@@ -9,6 +9,7 @@
 #include "FPSCounter.hpp"
 #include "World.hpp"
 #include "Settings.hpp"
+#include "stb_image.h"
 
 using namespace lazy;
 using namespace graphics;
@@ -25,6 +26,8 @@ int main()
 	display.enableCap(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	display.setFullscreen(true);
+
+	stbi_set_flip_vertically_on_load(1);
 
 	TextRenderer tr;
 

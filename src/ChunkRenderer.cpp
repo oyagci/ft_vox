@@ -1,17 +1,10 @@
 #include "ChunkRenderer.hpp"
 #include "stb_image.h"
 #include "Settings.hpp"
+#include "TextureManager.hpp"
 
-ChunkRenderer::ChunkRenderer(WorldRenderer *worldRenderer) : _pool(1),
-	_texture("Blocks"), _worldRenderer(worldRenderer)
+ChunkRenderer::ChunkRenderer(WorldRenderer *worldRenderer) : _worldRenderer(worldRenderer)
 {
-	stbi_set_flip_vertically_on_load(1);
-	_texture.bind(GL_TEXTURE0);
-	_texture.setParameter(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	_texture.setParameter(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	_texture.setParameter(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	_texture.setParameter(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	_texture.load("img/terrain.png");
 }
 
 ChunkRenderer::~ChunkRenderer()
@@ -42,7 +35,7 @@ bool ChunkRenderer::isInView(Camera &camera, Chunk &chunk)
 void ChunkRenderer::render(Camera &camera)
 {
 	int n = 0;
-	_texture.bind(GL_TEXTURE0);
+	TextureManager::instance().bind("Blocks", GL_TEXTURE0);
 	for (auto &m : _chunkMap) {
 		if (isInView(camera, *m.second)) {
 			m.second->draw();

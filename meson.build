@@ -22,6 +22,7 @@ srcs = [
 	'src/stb_image.cpp',
 	'src/Settings.cpp',
 	'src/Texture.cpp',
+	'src/TextureManager.cpp'
 ]
 
 cmake = import('cmake')

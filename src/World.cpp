@@ -1,8 +1,16 @@
 #include "World.hpp"
 #include "Settings.hpp"
+#include "TextureManager.hpp"
 
 World::World(Camera &camera) : _camera(camera)
 {
+	TextureManager::instance().createTexture("Blocks", "img/terrain.png", {
+		{ GL_TEXTURE_MIN_FILTER, GL_NEAREST },
+		{ GL_TEXTURE_MAG_FILTER, GL_NEAREST },
+		{ GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE },
+		{ GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE },
+	});
+
 	_renderer = std::make_unique<WorldRenderer>(camera);
 	_generator = std::make_unique<WorldGenerator>(_renderer.get());
 }
