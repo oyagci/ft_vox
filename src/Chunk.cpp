@@ -3,6 +3,9 @@
 #include "SimplexNoise.hpp"
 #include <mutex>
 #include "World.hpp"
+#include "Time.hpp"
+
+using lazy::utils::Time;
 
 SimplexNoise s = SimplexNoise(0.1f, 1.0f, 2.0f, 0.25f);
 
@@ -15,6 +18,16 @@ Chunk::Chunk(glm::ivec2 pos, World *world) : _shouldBeRebuilt(true), _world(worl
 {
 	_blocks = std::make_unique<std::array<Block, CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE>>();
 	_position = std::move(pos);
+	_verticalOffset = -VERTICAL_OFFSET;
+	_offsetTime = 0.0f;
+	_state = ChunkState::NOT_BUILT;
+
+	// Don't animate this chunk if it is too close to the player
+	glm::vec3 player = world->getPlayerPosition();
+	if (glm::length(glm::vec2(pos) - glm::vec2(player.x, player.z)) < 200.0f) {
+		_verticalOffset = 0.0f;
+		_offsetTime = 1.0f;
+	}
 
 	for (std::size_t x = 0; x < CHUNK_SIZE; x++) {
 		for (std::size_t y = CHUNK_SIZE - 1; y + 1 > 0; y--) {
@@ -108,9 +121,12 @@ void Chunk::generate()
 
 void Chunk::build()
 {
-	Mesh tmp = buildChunkFaces(_position, _faces);
-	tmp.build();
-	_mesh = std::move(tmp);
+	if (_state == ChunkState::NOT_BUILT) {
+		Mesh tmp = buildChunkFaces(_position, _faces);
+		tmp.build();
+		_mesh = std::move(tmp);
+		_state = ChunkState::BUILT;
+	}
 }
 
 void Chunk::draw()
@@ -120,6 +136,32 @@ void Chunk::draw()
 
 void Chunk::update()
 {
+	float deltaTime = Time::getDeltaTime();
+
+	auto cubicBezier = [] (float t, float p0, float p1, float p2, float p3) -> float {
+		float res = std::pow(1.0f - t, 3.0f) * p0 +
+					3.0f * std::pow(1.0f - t, 2.0f) * t * p1 +
+					3.0f * (1.0f - t) * std::pow(t , 2.0f) * p2 +
+					std::pow(t, 3.0f) * p3;
+		return res;
+	};
+
+	switch (_state) {
+	case ChunkState::NOT_BUILT:
+		break ;
+	case ChunkState::BUILT:
+		if (_offsetTime <= 1.0f) {
+			_verticalOffset = -VERTICAL_OFFSET + (cubicBezier(_offsetTime, 0.0f, 1.0f, 1.0f, 1.0f) * VERTICAL_OFFSET);
+			_offsetTime += VERTICAL_OFFSET_STEP * deltaTime;
+		}
+		else {
+			_verticalOffset = 0.0f;
+			_state = ChunkState::DONE;
+		}
+		break;
+	case ChunkState::DONE:
+		break;
+	};
 }
 
 int Chunk::getVisibleFaces(int x, int y, int z)

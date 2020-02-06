@@ -30,7 +30,7 @@ public:
 	ChunkRenderer(World *world);
 	~ChunkRenderer();
 
-	void render(Camera &camera);
+	void render(Camera &camera, Shader &shader);
 	void addChunk(std::shared_ptr<Chunk> chunk);
 	void update();
 	void removeChunksTooFar(std::vector<glm::vec2> chunksTooFar);

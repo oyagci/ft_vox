@@ -35,11 +35,20 @@ public:
 		FaceDirection dir;
 		BlockType type;
 	};
+	enum class ChunkState {
+		NOT_BUILT,
+		BUILT,
+		DONE
+	};
 
 	static constexpr unsigned int	TEXTURE_BLOCK_SIZE = 16;
 	static constexpr unsigned int	TEXTURE_TOTAL_SIZE = 256;
 	static constexpr float			TEXTURE_TILE_SIZE = static_cast<float>(TEXTURE_BLOCK_SIZE) / TEXTURE_TOTAL_SIZE;
 	static constexpr std::size_t	CHUNK_SIZE = 64;
+
+private:
+	static constexpr float			VERTICAL_OFFSET = 32.0f;
+	static constexpr float			VERTICAL_OFFSET_STEP = 0.9f;
 
 
 public:
@@ -61,6 +70,7 @@ public:
 	void setPosition(glm::vec2 position) { _position = position; }
 
 	unsigned int getUnavailableSides();
+	float getVerticalOffset() const { return _verticalOffset; }
 
 private:
 	int getVisibleFaces(int x, int y, int z);
@@ -84,4 +94,8 @@ private:
 	Mesh _mesh;
 	glm::vec2 _position;
 	std::vector<Face> _faces;
+	ChunkState _state;
+
+	float _verticalOffset;
+	float _offsetTime;
 };

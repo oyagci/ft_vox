@@ -33,12 +33,17 @@ bool ChunkRenderer::isInView(Camera &camera, Chunk &chunk)
 	float radius = glm::length(glm::vec3(Chunk::CHUNK_SIZE / 2.0f, Chunk::CHUNK_SIZE / 2.0f, 0.0f));
 	return camera.sphereInFrustum(worldPos, radius);
 }
-void ChunkRenderer::render(Camera &camera)
+void ChunkRenderer::render(Camera &camera, Shader &shader)
 {
 	int n = 0;
 	TextureManager::instance().bind("Blocks", GL_TEXTURE0);
 	for (auto &m : _chunkMap) {
 		if (isInView(camera, *m.second)) {
+			float offset = m.second->getVerticalOffset();
+			glm::mat4 model(1.0f);
+
+			model = glm::translate(model, glm::vec3(0.0f, offset, 0.0f));
+			shader.setUniform4x4f("modelMatrix", model);
 			m.second->draw();
 			n++;
 		}
