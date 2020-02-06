@@ -58,11 +58,11 @@ void ChunkRenderer::update()
 {
 	for (auto &c : _chunkMap) {
 		c.second->update();
-		if (c.second->getUnavailableSides() == 0 && c.second->shouldBeRebuilt()) {
+		if (c.second->getUnavailableSides() == 0 && c.second->shouldRegenerate()) {
 			if (!_pool.isFull()) {
-				c.second->setShouldBeRebuilt(false);
+				c.second->onStartGeneration();
 				_pool.enqueue_work([=] {
-					c.second->generate();
+					c.second->onDoGeneration();
 					std::unique_lock<std::mutex> lcm(_cm);
 					_chunkMeshes.push(c.second);
 				});
@@ -76,7 +76,7 @@ void ChunkRenderer::buildChunks()
 {
 	std::unique_lock lm(_cm);
 	if (!_chunkMeshes.empty()) {
-		_chunkMeshes.front()->build();
+		_chunkMeshes.front()->onBuild();
 		_chunkMeshes.pop();
 	}
 }

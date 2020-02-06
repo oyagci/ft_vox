@@ -35,16 +35,28 @@ public:
 		FaceDirection dir;
 		BlockType type;
 	};
-	enum class ChunkState {
-		NOT_BUILT,
-		BUILT,
-		DONE
-	};
 
 	static constexpr unsigned int	TEXTURE_BLOCK_SIZE = 16;
 	static constexpr unsigned int	TEXTURE_TOTAL_SIZE = 256;
 	static constexpr float			TEXTURE_TILE_SIZE = static_cast<float>(TEXTURE_BLOCK_SIZE) / TEXTURE_TOTAL_SIZE;
 	static constexpr std::size_t	CHUNK_SIZE = 64;
+
+private:
+	enum class ChunkState {
+		NOT_GENERATED,
+		IS_GENERATING,
+		NOT_BUILT,
+		BUILT,
+		DONE,
+	};
+	enum class ChunkAction {
+		START_GENERATE,
+		DO_GENERATE,
+		END_GENERATE,
+		START_BUILD,
+		END_BUILD,
+		SET_DONE,
+	};
 
 private:
 	static constexpr float			VERTICAL_OFFSET = 32.0f;
@@ -57,11 +69,11 @@ public:
 	Block getBlock(std::size_t x, std::size_t y, std::size_t z) const;
 	void setBlock(std::size_t x, std::size_t y, std::size_t z, Block val);
 
-	bool shouldBeRebuilt() { return _shouldBeRebuilt; }
-	void setShouldBeRebuilt(bool val) { _shouldBeRebuilt = val; }
+	bool shouldRebuild() const { return _shouldRebuild; }
+	bool shouldRegenerate() const { return _state == ChunkState::NOT_GENERATED; }
+	void setShouldRebuild(bool val) { _shouldRebuild = val; }
+	void setShouldRegenerate(bool val) { _shouldRegen = val; }
 
-	void generate();
-	void build();
 	void draw();
 	void update();
 	std::vector<Face> genChunkFaces();
@@ -72,7 +84,15 @@ public:
 	unsigned int getUnavailableSides();
 	float getVerticalOffset() const { return _verticalOffset; }
 
+	void onStartGeneration() { action(ChunkAction::START_GENERATE); }
+	void onDoGeneration() { action(ChunkAction::DO_GENERATE); }
+	void onBuild() { action(ChunkAction::START_BUILD); }
+
 private:
+	void generate();
+	void build();
+	void action(ChunkAction action);
+
 	int getVisibleFaces(int x, int y, int z);
 	Face genFaceToRender(glm::vec3 pos, FaceDirection f, Chunk::Block const &block);
 
@@ -89,7 +109,8 @@ private:
 private:
 	std::unique_ptr<std::array<Block, CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE>> _blocks;
 	Block _void = 0;
-	bool _shouldBeRebuilt;
+	bool _shouldRebuild;
+	bool _shouldRegen;
 	World *_world;
 	Mesh _mesh;
 	glm::vec2 _position;

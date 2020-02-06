@@ -14,13 +14,13 @@ float simplexNoise(size_t octaves, glm::vec3 pos)
 	return s.fractal(octaves, pos.x, pos.y, pos.z);
 }
 
-Chunk::Chunk(glm::ivec2 pos, World *world) : _shouldBeRebuilt(true), _world(world)
+Chunk::Chunk(glm::ivec2 pos, World *world) : _shouldRebuild(false), _shouldRegen(true), _world(world)
 {
 	_blocks = std::make_unique<std::array<Block, CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE>>();
 	_position = std::move(pos);
 	_verticalOffset = -VERTICAL_OFFSET;
 	_offsetTime = 0.0f;
-	_state = ChunkState::NOT_BUILT;
+	_state = ChunkState::NOT_GENERATED;
 
 	// Don't animate this chunk if it is too close to the player
 	glm::vec3 player = world->getPlayerPosition();
@@ -117,21 +117,59 @@ void Chunk::setBlock(size_t x, size_t y, size_t z, Block val)
 void Chunk::generate()
 {
 	_faces = genChunkFaces();
+	setShouldRebuild(true);
 }
 
 void Chunk::build()
 {
-	if (_state == ChunkState::NOT_BUILT) {
-		Mesh tmp = buildChunkFaces(_position, _faces);
-		tmp.build();
-		_mesh = std::move(tmp);
-		_state = ChunkState::BUILT;
-	}
+	Mesh tmp = buildChunkFaces(_position, _faces);
+	tmp.build();
+	_mesh = std::move(tmp);
+	_state = ChunkState::BUILT;
 }
 
 void Chunk::draw()
 {
 	_mesh.draw();
+}
+
+void Chunk::action(ChunkAction action)
+{
+	switch (action) {
+	case ChunkAction::START_GENERATE:
+		if (_state == ChunkState::NOT_GENERATED) {
+			_state = ChunkState::IS_GENERATING;
+		}
+		break;
+	case ChunkAction::DO_GENERATE:
+		if (_state == ChunkState::IS_GENERATING) {
+			generate();
+			Chunk::action(ChunkAction::END_GENERATE);
+		}
+		break;
+	case ChunkAction::END_GENERATE:
+		if (_state == ChunkState::IS_GENERATING) {
+			_state = ChunkState::NOT_BUILT;
+		}
+		break ;
+	case ChunkAction::START_BUILD:
+		if (_state == ChunkState::NOT_BUILT) {
+			build();
+			Chunk::action(ChunkAction::END_BUILD);
+		}
+		break;
+	case ChunkAction::END_BUILD:
+		if (_state == ChunkState::NOT_BUILT) {
+			_state = ChunkState::BUILT;
+		}
+		break;
+	case ChunkAction::SET_DONE:
+		if (_state == ChunkState::BUILT) {
+			_state = ChunkState::DONE;
+		}
+	default:
+		break ;
+	}
 }
 
 void Chunk::update()
@@ -147,8 +185,6 @@ void Chunk::update()
 	};
 
 	switch (_state) {
-	case ChunkState::NOT_BUILT:
-		break ;
 	case ChunkState::BUILT:
 		if (_offsetTime <= 1.0f) {
 			_verticalOffset = -VERTICAL_OFFSET + (cubicBezier(_offsetTime, 0.0f, 1.0f, 1.0f, 1.0f) * VERTICAL_OFFSET);
@@ -157,9 +193,10 @@ void Chunk::update()
 		else {
 			_verticalOffset = 0.0f;
 			_state = ChunkState::DONE;
+			action(ChunkAction::SET_DONE);
 		}
 		break;
-	case ChunkState::DONE:
+	default:
 		break;
 	};
 }
