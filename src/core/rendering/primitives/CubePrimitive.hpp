@@ -16,5 +16,5 @@ public:
 
     void draw();
 
-    Mesh getMesh() const { return _mesh; }
+    // Mesh getMesh() const { return _mesh; }
 };
