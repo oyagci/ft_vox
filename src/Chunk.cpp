@@ -130,7 +130,9 @@ void Chunk::build()
 
 void Chunk::draw()
 {
-	_mesh.draw();
+	if (_state == ChunkState::BUILT || _state == ChunkState::DONE) {
+		_mesh.draw();
+	}
 }
 
 void Chunk::action(ChunkAction action)
