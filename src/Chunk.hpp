@@ -51,16 +51,16 @@ private:
 	};
 	enum class ChunkAction {
 		START_GENERATE,
-		DO_GENERATE,
 		END_GENERATE,
 		START_BUILD,
 		END_BUILD,
 		SET_DONE,
+		REGENERATE,
 	};
 
 private:
 	static constexpr float			VERTICAL_OFFSET = 32.0f;
-	static constexpr float			VERTICAL_OFFSET_STEP = 0.9f;
+	static constexpr float			VERTICAL_OFFSET_STEP = 1.0f;
 
 
 public:
@@ -69,14 +69,11 @@ public:
 	Block getBlock(std::size_t x, std::size_t y, std::size_t z) const;
 	void setBlock(std::size_t x, std::size_t y, std::size_t z, Block val);
 
-	bool shouldRebuild() const { return _shouldRebuild; }
+	bool shouldRebuild() const { return _state == ChunkState::NOT_BUILT; }
 	bool shouldRegenerate() const { return _state == ChunkState::NOT_GENERATED; }
-	void setShouldRebuild(bool val) { _shouldRebuild = val; }
-	void setShouldRegenerate(bool val) { _shouldRegen = val; }
 
 	void draw();
 	void update();
-	std::vector<Face> genChunkFaces();
 
 	glm::vec2 const &getPosition() const { return _position; }
 	void setPosition(glm::vec2 position) { _position = position; }
@@ -84,8 +81,7 @@ public:
 	unsigned int getUnavailableSides();
 	float getVerticalOffset() const { return _verticalOffset; }
 
-	void onStartGeneration() { action(ChunkAction::START_GENERATE); }
-	void onDoGeneration() { action(ChunkAction::DO_GENERATE); }
+	void onGenerate() { action(ChunkAction::START_GENERATE); }
 	void onBuild() { action(ChunkAction::START_BUILD); }
 
 private:
@@ -93,6 +89,7 @@ private:
 	void build();
 	void action(ChunkAction action);
 
+	void genChunkFaces();
 	int getVisibleFaces(int x, int y, int z);
 	Face genFaceToRender(glm::vec3 pos, FaceDirection f, Chunk::Block const &block);
 
@@ -109,8 +106,6 @@ private:
 private:
 	std::unique_ptr<std::array<Block, CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE>> _blocks;
 	Block _void = 0;
-	bool _shouldRebuild;
-	bool _shouldRegen;
 	World *_world;
 	Mesh _mesh;
 	glm::vec2 _position;

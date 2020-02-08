@@ -14,7 +14,7 @@ float simplexNoise(size_t octaves, glm::vec3 pos)
 	return s.fractal(octaves, pos.x, pos.y, pos.z);
 }
 
-Chunk::Chunk(glm::ivec2 pos, World *world) : _shouldRebuild(false), _shouldRegen(true), _world(world)
+Chunk::Chunk(glm::ivec2 pos, World *world) : _world(world)
 {
 	_blocks = std::make_unique<std::array<Block, CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE>>();
 	_position = std::move(pos);
@@ -116,8 +116,7 @@ void Chunk::setBlock(size_t x, size_t y, size_t z, Block val)
 
 void Chunk::generate()
 {
-	_faces = genChunkFaces();
-	setShouldRebuild(true);
+	auto f = std::async(std::launch::async, &Chunk::genChunkFaces, this);
 }
 
 void Chunk::build()
@@ -125,7 +124,6 @@ void Chunk::build()
 	Mesh tmp = buildChunkFaces(_position, _faces);
 	tmp.build();
 	_mesh = std::move(tmp);
-	_state = ChunkState::BUILT;
 }
 
 void Chunk::draw()
@@ -141,14 +139,10 @@ void Chunk::action(ChunkAction action)
 	case ChunkAction::START_GENERATE:
 		if (_state == ChunkState::NOT_GENERATED) {
 			_state = ChunkState::IS_GENERATING;
-		}
-		break;
-	case ChunkAction::DO_GENERATE:
-		if (_state == ChunkState::IS_GENERATING) {
 			generate();
 			Chunk::action(ChunkAction::END_GENERATE);
 		}
-		break;
+		break ;
 	case ChunkAction::END_GENERATE:
 		if (_state == ChunkState::IS_GENERATING) {
 			_state = ChunkState::NOT_BUILT;
@@ -159,16 +153,20 @@ void Chunk::action(ChunkAction action)
 			build();
 			Chunk::action(ChunkAction::END_BUILD);
 		}
-		break;
+		break ;
 	case ChunkAction::END_BUILD:
 		if (_state == ChunkState::NOT_BUILT) {
 			_state = ChunkState::BUILT;
 		}
-		break;
+		break ;
 	case ChunkAction::SET_DONE:
 		if (_state == ChunkState::BUILT) {
 			_state = ChunkState::DONE;
 		}
+		break ;
+	case ChunkAction::REGENERATE:
+		_state = ChunkState::NOT_GENERATED;
+		break ;
 	default:
 		break ;
 	}
@@ -187,6 +185,14 @@ void Chunk::update()
 	};
 
 	switch (_state) {
+	case ChunkState::NOT_GENERATED:
+		if (getUnavailableSides() == 0) {
+			onGenerate();
+		}
+		break ;
+	case ChunkState::NOT_BUILT:
+		onBuild();
+		break ;
 	case ChunkState::BUILT:
 		if (_offsetTime <= 1.0f) {
 			_verticalOffset = -VERTICAL_OFFSET + (cubicBezier(_offsetTime, 0.0f, 1.0f, 1.0f, 1.0f) * VERTICAL_OFFSET);
@@ -264,7 +270,7 @@ auto Chunk::genFaceToRender(glm::vec3 pos, FaceDirection f, Chunk::Block const &
 	return face;
 }
 
-auto Chunk::genChunkFaces() -> std::vector<Face>
+void Chunk::genChunkFaces()
 {
 	std::vector<Face> faces;
 
@@ -280,18 +286,18 @@ auto Chunk::genChunkFaces() -> std::vector<Face>
 				}
 
 				if (y + 1 >= Chunk::CHUNK_SIZE) {
-					if (!_world->getBlock(worldPos.x, worldPos.y + 1, worldPos.z).has_value()) {
+//					if (!_world->getBlock(worldPos.x, worldPos.y + 1, worldPos.z).has_value()) {
 						faces.push_back(genFaceToRender(std::move(glm::ivec3(x, y, z)), FaceDirection::TOP, b));
-					}
+//					}
 				}
 				else if (!getBlock(x, y + 1, z)) {
 					faces.push_back(genFaceToRender(std::move(glm::ivec3(x, y, z)), FaceDirection::TOP, b));
 				}
 
 				if (static_cast<int>(y) - 1 < 0) {
-					if (!_world->getBlock(worldPos.x, worldPos.y - 1, worldPos.z).has_value()) {
+//					if (!_world->getBlock(worldPos.x, worldPos.y - 1, worldPos.z).has_value()) {
 						faces.push_back(genFaceToRender(std::move(glm::ivec3(x, y, z)), FaceDirection::BOT, b));
-					}
+//					}
 				}
 				else if (!getBlock(x, y - 1, z)) {
 					faces.push_back(genFaceToRender(std::move(glm::ivec3(x, y, z)), FaceDirection::BOT, b));
@@ -335,7 +341,7 @@ auto Chunk::genChunkFaces() -> std::vector<Face>
 			}
 		}
 	}
-	return faces;
+	_faces = std::move(faces);
 }
 
 glm::vec2 Chunk::getTexturePosition(BlockType type)

@@ -6,7 +6,6 @@
 #include <glm/vec3.hpp>
 #include "Chunk.hpp"
 #include "IRenderer.hpp"
-#include "threadpool/threadpool.hpp"
 #include "TextRenderer.hpp"
 #include "Texture.hpp"
 
@@ -40,16 +39,6 @@ private:
 	bool isInView(Camera &camera, Chunk &chunk);
 
 private:
-	using Faces = std::vector<Chunk::Face>;
-
-	std::mutex _cf;
-	std::queue<std::tuple<glm::vec2, Faces>> _chunkFaces;
-
-	thread_pool _pool;
-
-	std::mutex _cm;
-	std::queue<std::shared_ptr<Chunk>> _chunkMeshes;
-
 	TextRenderer tr;
 
 	World *_world;
