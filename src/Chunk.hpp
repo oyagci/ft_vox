@@ -69,9 +69,6 @@ public:
 	Block getBlock(std::size_t x, std::size_t y, std::size_t z) const;
 	void setBlock(std::size_t x, std::size_t y, std::size_t z, Block val);
 
-	bool shouldRebuild() const { return _state == ChunkState::NOT_BUILT; }
-	bool shouldRegenerate() const { return _state == ChunkState::NOT_GENERATED; }
-
 	void draw();
 	void update();
 
