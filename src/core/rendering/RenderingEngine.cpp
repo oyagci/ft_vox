@@ -12,10 +12,13 @@ RenderingEngine::RenderingEngine(const Display &display)
 	_basicShader.link();
     _pipeline.resize(display.getWidth(), display.getHeight());
 
-    addLight(new PointLight(glm::vec4(1, 0, 0, 1), 10, glm::vec3(3, -0.5, 0)));
-    addLight(new PointLight(glm::vec4(0, 0, 1, 1), 1, glm::vec3(-3, 5, 0)));
-    addLight(new PointLight(glm::vec4(0, 1, 0, 1), 1, glm::vec3(0, 5, 0)));
-    addLight(new DirectionalLight(glm::vec4(0, 1, 1, 1), 1, glm::quat(glm::vec3(1, 1, 1))));
+    // addLight(new PointLight(glm::vec4(1, 0, 0, 1), 10, glm::vec3(3, -0.5, 0)));
+    // addLight(new PointLight(glm::vec4(0, 0, 1, 1), 1, glm::vec3(-3, 5, 0)));       
+    // addLight(new PointLight(glm::vec4(0, 1, 0, 1), 1, glm::vec3(0, 5, 0)));            
+    Light *light = new DirectionalLight(glm::vec4(0, 1, 1, 1), 1, glm::quat(glm::vec3(M_PI / 4, M_PI / 4, 0)));
+    light->initShadows(2048);
+
+    addLight(light);
 }
 
 RenderingEngine::~RenderingEngine()
@@ -50,11 +53,14 @@ void RenderingEngine::update()
             GLFW_KEY_SPACE
         });
     }
+
+    _pipeline.update(_camera);
 }
 
 void RenderingEngine::renderScene(Scene &_scene)
 {
     _pipeline.renderScene(_camera, _scene);
+    _pipeline.renderShadows(*_lights[0], _camera, _scene);
 }
 
 void RenderingEngine::render()

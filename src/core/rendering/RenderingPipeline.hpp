@@ -29,6 +29,8 @@ public:
     void bind();
     void unbind();
 
+    void update(Camera &camera);
+
     void renderScene(Camera &camera, Scene &scene);
     void renderShadows(Light &light, Camera &camera, Scene &scene);
     void renderDeferred(Light &light, Camera &camera);

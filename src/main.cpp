@@ -12,7 +12,7 @@ int main()
 	Display display("LazyGL", 1280, 720);
 	display.enableCap(GL_DEPTH_TEST);
 	display.enableCap(GL_CULL_FACE);
-	display.setVSync(1);
+	// display.setVSync(1);
 
 	Scene scene;
 	RenderingEngine renderingEngine(display);

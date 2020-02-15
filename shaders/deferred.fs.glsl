@@ -11,10 +11,10 @@ uniform sampler2D albedo;
 void main()
 {
 	vec2 quad_texcoord = v_position.xy * 0.5 + 0.5;
-	vec3 position = texture(position, quad_texcoord).xyz;
+	vec4 position = texture(position, quad_texcoord);
 	vec3 normal = texture(normal, quad_texcoord).xyz;
 	vec3 albedo = texture(albedo, quad_texcoord).xyz;
 
-	float light = dot(normalize(position - vec3(0, 0, 5)), -normal);
+	float light = dot(normalize(position.xyz - vec3(0, 0, 5)), -normal);
 	frag_color = vec4(vec3(light), 1);
 }

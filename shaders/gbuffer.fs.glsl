@@ -1,10 +1,10 @@
 #version 330 core
 
-layout (location = 0) out vec3 g_position;
+layout (location = 0) out vec4 g_position;
 layout (location = 1) out vec3 g_normal;
 layout (location = 2) out vec4 g_albedo;
 
-in vec3 fragpos;
+in vec4 fragpos;
 in vec3 v_normal;
 
 void main()

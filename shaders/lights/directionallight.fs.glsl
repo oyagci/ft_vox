@@ -15,10 +15,17 @@ uniform DirectionalLight light;
 void main()
 {
 	vec2 quad_texcoord = v_position.xy * 0.5 + 0.5;
-	vec3 fragPos = texture(position, quad_texcoord).xyz;
+	vec4 fragPos = texture(position, quad_texcoord);
 	vec3 normal = texture(normal, quad_texcoord).xyz;
 	vec3 albedo = texture(albedo, quad_texcoord).xyz;
+	float depth = texture(depth, quad_texcoord).x;
 
-	vec4 finalLight = calcDirectionalLight(light, normal, fragPos);
+	vec4 finalLight = calcDirectionalLight(light, normal, fragPos.xyz);
+
+	if (light.light.hasShadow == 1)
+	{
+		finalLight *= calcBlurredShadowFactor(light.light.shadowMap, light.light.shadowProjection, fragPos, 3, 20);
+	}
+
 	frag_color = finalLight;
 }

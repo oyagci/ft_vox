@@ -15,6 +15,28 @@ DeferredRenderer::~DeferredRenderer()
 
 }
 
+void DeferredRenderer::genSSAOKernel(int size)
+{
+    std::vector<float> randomFloats(0.0, 1.0); // random floats between 0.0 - 1.0
+    for (unsigned int i = 0; i < size; ++i)
+    {
+        float random1 = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+        float random2 = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+        float random3 = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+        float random4 = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+
+        glm::vec3 sample(
+            random1 * 2.0 - 1.0, 
+            random1 * 2.0 - 1.0, 
+            random1
+        );
+        sample = glm::normalize(sample);
+        sample *= random4;
+        float scale = (float)i / float(size); 
+        _ssaoKernel.push_back(sample);
+    }
+}
+
 void DeferredRenderer::resize(int width, int height)
 {
     _width = width;
@@ -23,7 +45,7 @@ void DeferredRenderer::resize(int width, int height)
     _gbuffer.clean();
     _gbuffer.genFramebuffer();
     _gbuffer.setSize(width, height);
-    _gbuffer.genColorTexture(GL_RGB16F, GL_RGB, GL_FLOAT, GL_NEAREST, GL_CLAMP_TO_BORDER);
+    _gbuffer.genColorTexture(GL_RGBA16F, GL_RGBA, GL_FLOAT, GL_NEAREST, GL_CLAMP_TO_BORDER);
     _gbuffer.genColorTexture(GL_RGB16F, GL_RGB, GL_FLOAT, GL_NEAREST, GL_CLAMP_TO_BORDER);
     _gbuffer.genColorTexture(GL_RGB, GL_RGB, GL_UNSIGNED_BYTE, GL_LINEAR, GL_CLAMP_TO_BORDER);
     _gbuffer.genDepthTexture(GL_NEAREST, 0);
@@ -35,9 +57,33 @@ void DeferredRenderer::resize(int width, int height)
     });
 }
 
-void DeferredRenderer::update()
+void DeferredRenderer::update(Camera &camera)
 {
+    float aspect = 720.0f / 1280.0f;
+    float fov = camera.getFov();
 
+    float tanHalfHorFOV = std::tan(TO_RADIANS(fov / 2.0f));
+    float tanHalfVerFOV = std::tan(TO_RADIANS((fov * aspect) / 2.0f));
+
+    float shadowNear = camera.getNear();
+    float shadowFar = 50.0f;
+
+    float xn = shadowNear * tanHalfHorFOV;
+    float xf = shadowFar * tanHalfHorFOV;
+    float yn = shadowNear * tanHalfVerFOV;
+    float yf = shadowFar * tanHalfVerFOV;
+
+    _frustumCorners = {
+        glm::vec4(xn, yn, shadowNear, 1.0f),
+        glm::vec4(-xn, yn, shadowNear, 1.0f),
+        glm::vec4(xn, -yn, shadowNear, 1.0f),
+        glm::vec4(-xn, -yn, shadowNear, 1.0f),
+        
+        glm::vec4(xf, yf, shadowFar, 1.0f),
+        glm::vec4(-xf, yf, shadowFar, 1.0f),
+        glm::vec4(xf, -yf, shadowFar, 1.0f),
+        glm::vec4(-xf, -yf, shadowFar, 1.0f)
+    };
 }
 
 void DeferredRenderer::renderScene(Camera &camera, Scene &scene)
@@ -61,6 +107,7 @@ void DeferredRenderer::renderDebug()
     _quadShader.bind(); 
     this->bind(_quadShader);
     _quad.draw();
+    _quadShader.unbind(); 
 }
 
 void DeferredRenderer::render(Light &light, Camera &camera)

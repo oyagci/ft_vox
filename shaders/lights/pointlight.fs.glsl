@@ -14,10 +14,10 @@ uniform PointLight light;
 void main()
 {
 	vec2 quad_texcoord = v_position.xy * 0.5 + 0.5;
-	vec3 fragPos = texture(position, quad_texcoord).xyz;
+	vec4 fragPos = texture(position, quad_texcoord);
 	vec3 normal = texture(normal, quad_texcoord).xyz;
 	vec3 albedo = texture(albedo, quad_texcoord).xyz;
 
-	vec4 finalLight = calcPointLight(light, normal, fragPos);
+	vec4 finalLight = calcPointLight(light, normal, fragPos.xyz);
 	frag_color = finalLight;
 }

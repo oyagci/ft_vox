@@ -12,6 +12,12 @@ protected:
     float       _intensity;
     std::string _name;
 
+    Shader      _shadowShader;
+    Framebuffer _shadowFbo;
+    bool        _emmitShadows;
+    glm::mat4   _shadowProjection;
+    int         _resolution;
+
 public:
     Light();
     Light(const glm::vec4 &color, float intensity);
@@ -19,7 +25,12 @@ public:
     virtual ~Light();
 
     virtual void bind(Camera &camera);
-    virtual glm::mat4 getViewMatrix();
+    virtual glm::mat4 getViewMatrix(float width, float height, Camera &camera);
+
+    virtual void initShadows(int resolution) {};
 
     Shader  &getShader() { return _shader; }
+    Shader  &getShadowShader() { return _shadowShader; }
+    Framebuffer  &getShadowFBO() { return _shadowFbo; }
+    int getResolution() { return _resolution; }
 };

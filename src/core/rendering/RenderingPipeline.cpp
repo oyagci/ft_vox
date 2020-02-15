@@ -9,8 +9,7 @@ RenderingPipeline::RenderingPipeline()
 }
 
 RenderingPipeline::~RenderingPipeline()
-{
-}
+{}
 
 void RenderingPipeline::resize(int width, int height)
 {
@@ -36,6 +35,11 @@ void RenderingPipeline::unbind()
     _fbo.unbind();
 }
 
+void RenderingPipeline::update(Camera &camera)
+{
+    _deferred.update(camera);
+}
+
 void RenderingPipeline::renderScene(Camera &camera, Scene &scene)
 {
     _deferred.renderScene(camera, scene);
@@ -43,7 +47,19 @@ void RenderingPipeline::renderScene(Camera &camera, Scene &scene)
 
 void RenderingPipeline::renderShadows(Light &light, Camera &camera, Scene &scene)
 {
-    _deferred.renderScene(camera, scene);
+    light.getShadowFBO().bind();
+    glViewport(0, 0, light.getResolution(), light.getResolution());
+
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    light.getShadowShader().bind();
+    // light.getShadowShader().setUniform4x4f("projectionMatrix", camera.getProjectionMatrix());
+    // light.getShadowShader().setUniform4x4f("viewMatrix", camera.getViewMatrix());
+    // light.getShadowShader().setUniform4x4f("viewProjectionMatrix", camera.getViewProjectionMatrix());
+    light.getShadowShader().setUniform4x4f("viewProjectionMatrix", light.getViewMatrix(_width, _height, camera));
+    scene.render(light.getShadowShader());
+
+    light.getShadowFBO().unbind();
 }
 
 void RenderingPipeline::renderDeferred(Light &light, Camera &camera)
@@ -61,9 +77,7 @@ void RenderingPipeline::renderForward(std::vector<Light*> &lights, Camera &camer
     glDepthFunc(GL_EQUAL);
 
     for (Light *light : lights)
-    {
         renderDeferred(*light, camera);
-    }
 
     glDepthFunc(GL_LESS);
     glDepthMask(true);
@@ -86,9 +100,9 @@ void RenderingPipeline::render(std::vector<Light*> &lights, Camera &camera)
     unbind();
     renderScreenQuad();
 
-    _quadShader.bind();
-    glBindTexture(GL_TEXTURE_2D, _fbo.getDepthTexture());
-    _quadShader.setUniform4x4f("modelViewMatrix", glm::translate(glm::vec3(-1 + 0.3f)) * glm::scale(glm::vec3(0.3f)));
-    _quad.draw();
-    _quadShader.unbind();
+    // _quadShader.bind();
+    // glBindTexture(GL_TEXTURE_2D, _deferred.getGBuffer().getColorTexture(0)); //(*lights[0]).getShadowFBO().getDepthTexture());
+    // _quadShader.setUniform4x4f("modelViewMatrix", glm::translate(glm::vec3(-1 + 0.3f, -1 + 0.6f, -1)) * glm::scale(glm::vec3(0.3f, 0.6, 1)));
+    // _quad.draw();
+    // _quadShader.unbind();
 }

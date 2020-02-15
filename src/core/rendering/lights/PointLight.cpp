@@ -11,7 +11,7 @@ PointLight::PointLight(const glm::vec4 &color, float intensity, const glm::vec3 
 PointLight::~PointLight()
 {}
 
-glm::mat4 PointLight::getViewMatrix()
+glm::mat4 PointLight::getViewMatrix(float width, float height, Camera &camera)
 {
     return glm::mat4(1);
 }

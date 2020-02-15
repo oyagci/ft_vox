@@ -9,7 +9,7 @@ Light::Light(const glm::vec4 &color, float intensity)
 {}
 
 Light::Light(const std::string &name, const glm::vec4 &color, float intensity)
-:   _name(name), _color(color), _intensity(intensity)
+:   _name(name), _color(color), _intensity(intensity), _emmitShadows(false)
 {
     _shader.addVertexShader("shaders/lights/light.vs.glsl")
         .addFragmentShader("shaders/lights/" + name + ".fs.glsl");
@@ -22,7 +22,7 @@ Light::~Light()
 void Light::bind(Camera &camera)
 {}
 
-glm::mat4 Light::getViewMatrix()
+glm::mat4 Light::getViewMatrix(float width, float height, Camera &camera)
 {
     return glm::mat4(1);
 }
