@@ -27,6 +27,7 @@ int main()
 	display.enableCap(GL_BLEND);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glDepthFunc(GL_LEQUAL);
 	display.setFullscreen(true);
 
 	stbi_set_flip_vertically_on_load(1);

@@ -6,6 +6,7 @@
 #include <vector>
 #include <lazy.hpp>
 #include "ChunkRenderer.hpp"
+#include "Cubemap.hpp"
 
 using lazy::graphics::Camera;
 using lazy::graphics::Shader;
@@ -30,6 +31,8 @@ private:
 	std::unique_ptr<ChunkRenderer> _chunkRenderer;
 	std::unique_ptr<Shader> _shader;
 	std::unique_ptr<WorldGenerator> _generator;
+	std::unique_ptr<Cubemap> _cubemap;
+	std::unique_ptr<Shader> _cubemapShader;
 
 	std::list<std::shared_ptr<Chunk>> _chunks;
 

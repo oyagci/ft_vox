@@ -19,6 +19,12 @@ World::World(Camera &camera) : _camera(camera)
 	_shader->addVertexShader("shaders/basic.vs.glsl")
 		.addFragmentShader("shaders/basic.fs.glsl");
 	_shader->link();
+
+	_cubemap = std::make_unique<Cubemap>();
+	_cubemapShader = std::make_unique<Shader>();
+	_cubemapShader->addVertexShader("shaders/cubemap.vs.glsl")
+		.addFragmentShader("shaders/cubemap.fs.glsl")
+		.link();
 }
 
 void World::render()
@@ -28,10 +34,16 @@ void World::render()
 	_shader->setUniform4x4f("viewMatrix", _camera.getViewMatrix());
 	_shader->setUniform4x4f("viewProjectionMatrix", _camera.getViewProjectionMatrix());
 	_shader->setUniform4x4f("modelMatrix", glm::mat4(1.0f));
-
 	_chunkRenderer->render(_camera, *_shader);
-
 	_shader->unbind();
+
+	glm::mat4 cubemapView = glm::mat4(glm::mat3(_camera.getViewMatrix()));
+	_cubemapShader->bind();
+	_cubemapShader->setUniform4x4f("projectionMatrix", _camera.getProjectionMatrix());
+	_cubemapShader->setUniform4x4f("viewMatrix", cubemapView);
+	_cubemapShader->setUniform1i("cubemap", 0);
+	_cubemap->draw();
+	_cubemapShader->unbind();
 }
 
 void World::update()
