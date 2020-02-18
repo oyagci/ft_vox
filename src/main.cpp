@@ -25,6 +25,7 @@ int main()
 	display.enableCap(GL_DEPTH_TEST);
 	display.enableCap(GL_CULL_FACE);
 	display.enableCap(GL_BLEND);
+	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	display.setFullscreen(true);
 

@@ -17,8 +17,8 @@ bool Texture::load(std::string const &path)
 
 	if (data) {
 		glTexImage2D(GL_TEXTURE_2D, 0,
-			GL_RGB, _width, _height, 0,
-			GL_RGB, GL_UNSIGNED_BYTE, data);
+			GL_RGBA, _width, _height, 0,
+			GL_RGBA, GL_UNSIGNED_BYTE, data);
 		glGenerateMipmap(GL_TEXTURE_2D);
 		stbi_image_free(data);
 		return true;

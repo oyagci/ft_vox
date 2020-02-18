@@ -347,7 +347,7 @@ void Chunk::genChunkFaces()
 glm::vec2 Chunk::getTexturePosition(BlockType type)
 {
 	if (type == BlockType::GRASS) {
-		return glm::vec2(TEXTURE_TILE_SIZE * 8, TEXTURE_TILE_SIZE * 4);
+		return glm::vec2(TEXTURE_TILE_SIZE * 11, TEXTURE_TILE_SIZE * 4);
 	}
 	else if (type == BlockType::GRASS_SIDE) {
 		return glm::vec2(TEXTURE_TILE_SIZE * 3, TEXTURE_TILE_SIZE * 15);

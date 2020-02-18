@@ -4,7 +4,7 @@
 
 World::World(Camera &camera) : _camera(camera)
 {
-	TextureManager::instance().createTexture("Blocks", "img/terrain.png", {
+	TextureManager::instance().createTexture("Blocks", "img/terrain_512.png", {
 		{ GL_TEXTURE_MIN_FILTER, GL_NEAREST },
 		{ GL_TEXTURE_MAG_FILTER, GL_NEAREST },
 		{ GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE },
