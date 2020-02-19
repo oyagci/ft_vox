@@ -103,6 +103,7 @@ private:
 
 	glm::vec2 getTexturePosition(BlockType type);
 
+	void genTrees(glm::vec3 seedOff);
 	void putTree(glm::ivec3 root);
 
 private:

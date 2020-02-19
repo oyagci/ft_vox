@@ -97,6 +97,7 @@ Chunk::Chunk(unsigned int seed, glm::ivec2 pos, World *world) : _world(world)
 			}
 		}
 	}
+	genTrees(seedOffset);
 }
 
 auto Chunk::getBlock(std::size_t x, std::size_t y, std::size_t z) const -> Block
@@ -268,6 +269,18 @@ auto Chunk::genFaceToRender(glm::vec3 pos, FaceDirection f, Chunk::Block const &
 	else if (block == 4) {
 		face.type = BlockType::BEDROCK;
 	}
+	else if (block == 5) {
+		if ((f == FaceDirection::LEFT || f == FaceDirection::RIGHT ||
+			 f == FaceDirection::FRONT || f == FaceDirection::BACK)) {
+			face.type = BlockType::OAK_LOG;
+		}
+		else {
+			face.type = BlockType::OAK_LOG_TOP;
+		}
+	}
+	else if (block == 6) {
+		face.type = BlockType::LEAF;
+	}
 
 	return face;
 }
@@ -362,6 +375,15 @@ glm::vec2 Chunk::getTexturePosition(BlockType type)
 	}
 	else if (type == BlockType::BEDROCK) {
 		return glm::vec2(TEXTURE_TILE_SIZE * 1, TEXTURE_TILE_SIZE * 14);
+	}
+	else if (type == BlockType::OAK_LOG) {
+		return glm::vec2(TEXTURE_TILE_SIZE * 4, TEXTURE_TILE_SIZE * 14);
+	}
+	else if (type == BlockType::OAK_LOG_TOP) {
+		return glm::vec2(TEXTURE_TILE_SIZE * 5, TEXTURE_TILE_SIZE * 14);
+	}
+	else if (type == BlockType::LEAF) {
+		return glm::vec2(TEXTURE_TILE_SIZE * 12, TEXTURE_TILE_SIZE * 4);
 	}
 	return glm::vec2(0, 15 * TEXTURE_TILE_SIZE);
 }
@@ -622,4 +644,88 @@ unsigned int Chunk::getUnavailableSides()
 	}
 
 	return unavailable;
+}
+
+void Chunk::genTrees(glm::vec3 seedOff)
+{
+	for (std::size_t x = 0; x < CHUNK_SIZE; x++) {
+		for (std::size_t z = 0; z < CHUNK_SIZE; z++) {
+
+			glm::ivec3 pos = glm::vec3(_position.x, 0, _position.y) + glm::vec3(x, 0, z) + seedOff;
+
+			float n = (simplexNoise(4, glm::vec3(pos.x / 10.0f, 0.0f, pos.z / 10.0f)) + 1.0f) / 2.0f;
+			float n2 = (simplexNoise(10, glm::vec3(pos.x * 10.0f, 0.0f, pos.z * 10.0f)) + 1.0f) / 2.0f;
+
+			float val = n2 - (0.95f - n);
+
+			if (val > 0.7f) {
+				putTree(glm::vec3(x, 0, z));
+			}
+		}
+	}
+}
+
+void Chunk::putTree(glm::ivec3 root)
+{
+	int treeShape[6][5][5] = {
+		{
+			{ 0, 0, 0, 0, 0 },
+			{ 0, 0, 6, 0, 0 },
+			{ 0, 6, 6, 6, 0 },
+			{ 0, 0, 6, 0, 0 },
+			{ 0, 0, 0, 0, 0 },
+		},
+		{
+			{ 0, 0, 0, 0, 0 },
+			{ 0, 6, 6, 6, 0 },
+			{ 0, 6, 5, 6, 0 },
+			{ 0, 6, 6, 6, 0 },
+			{ 0, 0, 0, 0, 0 },
+		},
+		{
+			{ 6, 6, 6, 6, 6 },
+			{ 6, 6, 6, 6, 6 },
+			{ 6, 6, 5, 6, 6 },
+			{ 6, 6, 6, 6, 6 },
+			{ 6, 6, 6, 6, 6 },
+		},
+		{
+			{ 6, 6, 6, 6, 6 },
+			{ 6, 6, 6, 6, 6 },
+			{ 6, 6, 5, 6, 6 },
+			{ 6, 6, 6, 6, 6 },
+			{ 6, 6, 6, 6, 6 },
+		},
+		{
+			{ 0, 0, 0, 0, 0 },
+			{ 0, 0, 0, 0, 0 },
+			{ 0, 0, 5, 0, 0 },
+			{ 0, 0, 0, 0, 0 },
+			{ 0, 0, 0, 0, 0 },
+		},
+		{
+			{ 0, 0, 0, 0, 0 },
+			{ 0, 0, 0, 0, 0 },
+			{ 0, 0, 5, 0, 0 },
+			{ 0, 0, 0, 0, 0 },
+			{ 0, 0, 0, 0, 0 },
+		},
+	};
+	for (size_t y = Chunk::CHUNK_SIZE - 4; y > 0; y--) {
+		if (getBlock(root.x, y, root.z) == 1) {// && root.x % 6 == 0 && root.z % 6 == 0) {
+			for (int yTree = 0; yTree < 6; yTree++) {
+				for (int xTree = 0; xTree < 5; xTree++) {
+					for (int zTree = 0; zTree < 5; zTree++) {
+						if (treeShape[yTree][xTree][zTree] != 0) {
+							setBlock(
+								root.x + xTree - 2,
+								y + 1 + (5 - yTree),
+								root.z + zTree - 2,
+								treeShape[yTree][xTree][zTree]);
+						}
+					}
+				}
+			}
+		}
+	}
 }
