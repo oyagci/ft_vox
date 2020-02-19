@@ -7,7 +7,8 @@
 
 WorldGenerator::WorldGenerator(World *world) : _pool(1)
 {
-	_factory = std::make_unique<ChunkFactory>(world);
+	_seed = std::any_cast<unsigned int>(Settings::instance().get("seed"));
+	_factory = std::make_unique<ChunkFactory>(world, _seed);
 }
 
 void WorldGenerator::genChunksAroundPlayer()

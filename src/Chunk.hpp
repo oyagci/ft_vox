@@ -67,7 +67,7 @@ private:
 
 
 public:
-	Chunk(glm::ivec2 pos, World *world);
+	Chunk(unsigned int seed, glm::ivec2 pos, World *world);
 
 	Block getBlock(std::size_t x, std::size_t y, std::size_t z) const;
 	void setBlock(std::size_t x, std::size_t y, std::size_t z, Block val);

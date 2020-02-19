@@ -25,7 +25,7 @@ void Settings::loadDefaults()
 		auto value = std::chrono::duration_cast<std::chrono::milliseconds>(epoch);
 		long duration = value.count();
 
-		_values["seed"] = std::to_string(duration);
+		_values["seed"] = static_cast<unsigned int>(duration);
 	}
 }
 

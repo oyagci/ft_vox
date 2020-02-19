@@ -56,5 +56,6 @@ private:
 	thread_pool _pool;
 
 	glm::ivec3 lastGridPos;
+	unsigned int _seed;
 };
 

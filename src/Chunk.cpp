@@ -14,7 +14,7 @@ float simplexNoise(size_t octaves, glm::vec3 pos)
 	return s.fractal(octaves, pos.x, pos.y, pos.z);
 }
 
-Chunk::Chunk(glm::ivec2 pos, World *world) : _world(world)
+Chunk::Chunk(unsigned int seed, glm::ivec2 pos, World *world) : _world(world)
 {
 	_blocks = std::make_unique<std::array<Block, CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE>>();
 	_position = std::move(pos);
@@ -29,6 +29,8 @@ Chunk::Chunk(glm::ivec2 pos, World *world) : _world(world)
 		_offsetTime = 1.0f;
 	}
 
+	glm::vec3 seedOffset(seed % 1000000, 0, seed % 1000000);
+
 	for (std::size_t x = 0; x < CHUNK_SIZE; x++) {
 		for (std::size_t y = CHUNK_SIZE - 1; y + 1 > 0; y--) {
 			for (std::size_t z = 0; z < CHUNK_SIZE; z++) {
@@ -38,37 +40,37 @@ Chunk::Chunk(glm::ivec2 pos, World *world) : _world(world)
 					continue ;
 				}
 
-				glm::vec3 pos = glm::vec3(_position.x, -32, _position.y) + glm::vec3(x, y, z);
+				glm::vec3 pos = glm::vec3(_position.x, -32, _position.y) + glm::vec3(x, y, z) + seedOffset;
 				float result = 0.0f;
 
-				float hH = simplexNoise(1, pos / 10);
-				for (int i = 2; i < 6; i++) {
-					hH += simplexNoise(1, pos / (i * 5)) * i / 16;
+				float hH = simplexNoise(1, pos / 10.0f);
+				for (int i = 2; i < 3; i++) {
+					hH += simplexNoise(1, pos / ((float)i * 5.0f)) * (float)i / 10.0f;
 				}
 
-				float pH = simplexNoise(1, pos / 10);
+				float pH = simplexNoise(1, pos / 10.0f);
 				for (int i = 2; i < 6; i++) {
-					pH -= simplexNoise(1, pos / i) * i / 16;
+					pH -= simplexNoise(1, pos / (float)i) * (float)i / 16.0f;
 				}
 
-				glm::vec3 mP = glm::vec3(pos.x + 3000.0f, 0, pos.z -400) / 50;
+				glm::vec3 mP = glm::vec3(pos.x + 3000.0f, 0, pos.z - 400) / 50.0f;
 				float mm = simplexNoise(1, mP);
 
-				glm::vec3 dP = glm::vec3(pos.x - 3.4f, 827, z + 51.3f);
+				glm::vec3 dP = glm::vec3((float)pos.x - 3.4f, 827.0f, pos.z + 51.3f);
 				float path = simplexNoise(1, dP);
 
 				for (int i = 2; i < 6; i++) {
-					path *= simplexNoise(1, dP / i) * i / 6;
+					path *= simplexNoise(1, dP / (float)i) * (float)i / 6.0f;
 				}
 
-				glm::vec3 cP = glm::vec3(pos.x / 2 - 523.432, pos.y - 2.827, z / 2 + 5516.0f);
-				float cave = simplexNoise(1, cP / 5);
+				glm::vec3 cP = glm::vec3((float)pos.x / 2.0f - 523.432, (float)pos.y - 2.827, (float)pos.z / 2.0f + 5516.0f);
+				float cave = simplexNoise(1, cP / 5.0f);
 				for (int i = 0; i < 6; i++) {
-					cave += simplexNoise(1, cP / (i * 2)) * i / 6;
+					cave += simplexNoise(1, cP / ((float)i * 2.0f)) * (float)i / 6.0f;
 				}
 
-				if (abs(floor(cave * 50)) - 30 > 0) {
-					cave = abs(cave * 10);
+				if (abs(floor(cave * 50.0f)) - 30.0f > 0.0f) {
+					cave = abs(cave * 10.0f);
 				}
 				else {
 					cave = 0;
