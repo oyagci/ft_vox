@@ -25,6 +25,7 @@ srcs = [
 	'src/TextureManager.cpp',
 	'src/PlayerHUD.cpp',
 	'src/Cubemap.cpp',
+	'src/Game.cpp',
 ]
 
 cmake = import('cmake')
