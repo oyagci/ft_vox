@@ -651,7 +651,7 @@ void Chunk::genTrees(glm::vec3 seedOff)
 	for (std::size_t x = 0; x < CHUNK_SIZE; x++) {
 		for (std::size_t z = 0; z < CHUNK_SIZE; z++) {
 
-			glm::ivec3 pos = glm::vec3(_position.x, 0, _position.y) + glm::vec3(x, 0, z) + seedOff;
+			glm::ivec3 pos = glm::vec3(_position.x + 100, 0, _position.y + 100) + glm::vec3(x, 0, z) + seedOff;
 
 			float n = (simplexNoise(4, glm::vec3(pos.x / 10.0f, 0.0f, pos.z / 10.0f)) + 1.0f) / 2.0f;
 			float n2 = (simplexNoise(10, glm::vec3(pos.x * 10.0f, 0.0f, pos.z * 10.0f)) + 1.0f) / 2.0f;
@@ -712,7 +712,7 @@ void Chunk::putTree(glm::ivec3 root)
 		},
 	};
 	for (size_t y = Chunk::CHUNK_SIZE - 4; y > 0; y--) {
-		if (getBlock(root.x, y, root.z) == 1) {// && root.x % 6 == 0 && root.z % 6 == 0) {
+		if (getBlock(root.x, y, root.z) == 1) {
 			for (int yTree = 0; yTree < 6; yTree++) {
 				for (int xTree = 0; xTree < 5; xTree++) {
 					for (int zTree = 0; zTree < 5; zTree++) {
