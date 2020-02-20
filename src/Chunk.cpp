@@ -249,16 +249,17 @@ auto Chunk::genFaceToRender(glm::vec3 pos, FaceDirection f, Chunk::Block const &
 {
 	Face face = { pos, f, BlockType::AIR };
 
-	if (block == 1 && (f == FaceDirection::TOP)) {
-		face.type = BlockType::GRASS;
-	}
-	else if (block == 1 &&
-		(f == FaceDirection::LEFT || f == FaceDirection::RIGHT ||
-			 f == FaceDirection::FRONT || f == FaceDirection::BACK)) {
-		face.type = BlockType::GRASS_SIDE;
-	}
-	else if (block == 1 && (f == FaceDirection::BOT)) {
-		face.type = BlockType::DIRT;
+	if (block == 1) {
+		if (f == FaceDirection::TOP) {
+			face.type = BlockType::GRASS;
+		}
+		else if (f == FaceDirection::LEFT || f == FaceDirection::RIGHT ||
+				f == FaceDirection::FRONT || f == FaceDirection::BACK) {
+			face.type = BlockType::GRASS_SIDE;
+		}
+		else if (f == FaceDirection::BOT) {
+			face.type = BlockType::DIRT;
+		}
 	}
 	else if (block == 2) {
 		face.type = BlockType::STONE;
