@@ -30,7 +30,9 @@ bool ChunkRenderer::isInView(Camera &camera, Chunk &chunk)
 	}
 
 	glm::vec3 worldPos(pos.x, Chunk::CHUNK_SIZE / 2.0f, pos.y);
-	float radius = glm::length(glm::vec3(Chunk::CHUNK_SIZE / 2.0f, Chunk::CHUNK_SIZE / 2.0f, 0.0f));
+	float radius = glm::length(glm::vec3(Chunk::CHUNK_SIZE / 2.0f,
+										 Chunk::CHUNK_SIZE / 2.0f,
+										 Chunk::CHUNK_SIZE / 2.0f));
 	return camera.sphereInFrustum(worldPos, radius);
 }
 void ChunkRenderer::render(Camera &camera, Shader &shader)
