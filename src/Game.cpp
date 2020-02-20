@@ -5,7 +5,7 @@
 
 Game::Game()
 {
-	_state.game = PLAYING;
+	_state.game = MAIN_MENU;
 
 	_display = std::make_unique<Display>("ft_vox", 1280, 720);
 	_display->enableCap(GL_DEPTH_TEST);
@@ -21,10 +21,14 @@ Game::Game()
 	_hud = std::make_unique<PlayerHUD>();
 	_fpsCounter = std::make_unique<FPSCounter>();
 	_textRenderer = std::make_unique<TextRenderer>();
+	_mainMenu = std::make_unique<MainMenu>([this] {
+		onStartPlaying();
+	});
 
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glDepthFunc(GL_LEQUAL);
+	glClearColor(0x87 / 255.0f, 0xCE / 255.0f, 0xEB / 255.0f, 1.0f);
 }
 
 int Game::run()
@@ -43,10 +47,10 @@ int Game::run()
 		_fpsCounter->update(Time::getDeltaTime());
 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		glClearColor(0x87 / 255.0f, 0xCE / 255.0f, 0xEB / 255.0f, 1.0f);
 
 		switch (_state.game) {
 			case MAIN_MENU:
+				mainMenu();
 				break ;
 			case PLAYING:
 				play();
@@ -104,4 +108,15 @@ void Game::play()
 	_hud->draw();
 
 	_textRenderer->drawText(std::to_string(_fpsCounter->getFPS()) + " FPS", glm::vec2(10, 10), .3f, glm::vec3(1.0f));
+}
+
+void Game::mainMenu()
+{
+	_mainMenu->update();
+	_mainMenu->render();
+}
+
+void Game::onStartPlaying()
+{
+	action(PLAY);
 }

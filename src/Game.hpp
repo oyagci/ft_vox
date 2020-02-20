@@ -6,6 +6,7 @@
 #include "PlayerHUD.hpp"
 #include "FPSCounter.hpp"
 #include "World.hpp"
+#include "MainMenu.hpp"
 
 using namespace lazy;
 using namespace graphics;
@@ -33,6 +34,7 @@ public:
 	Game();
 
 	int run();
+	void onStartPlaying();
 
 private:
 	void action(GameAction action);
@@ -45,5 +47,6 @@ private:
 	std::unique_ptr<World> _world;
 	std::unique_ptr<PlayerHUD> _hud;
 	std::unique_ptr<FPSCounter> _fpsCounter;
+	std::unique_ptr<MainMenu> _mainMenu;
 	GameState _state;
 };
