@@ -4,11 +4,16 @@
 
 TextRenderer::TextRenderer()
 {
+	setup();
+}
+
+void TextRenderer::setup()
+{
 	_shader.addVertexShader("shaders/text.vs.glsl")
 		   .addFragmentShader("shaders/text.fs.glsl");
 	_shader.link();
 
-	glm::mat4 projection = glm::ortho(0.0f, 1280.0f, 0.0f, 720.0f);
+	glm::mat4 projection = glm::ortho(0.0f, 2560.0f, 0.0f, 1440.0f);
 
 	_shader.bind();
 	_shader.setUniform4x4f("projection", projection);

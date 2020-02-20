@@ -27,6 +27,7 @@ srcs = [
 	'src/Cubemap.cpp',
 	'src/Game.cpp',
 	'src/MainMenu.cpp',
+	'src/Button.cpp',
 ]
 
 cmake = import('cmake')

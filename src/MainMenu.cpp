@@ -1,5 +1,6 @@
 #include "MainMenu.hpp"
 #include "TextureManager.hpp"
+#include "Button.hpp"
 
 MainMenu::MainMenu(std::function<void()> onStartPlaying) : _onStartPlaying(onStartPlaying)
 {
@@ -10,7 +11,7 @@ MainMenu::MainMenu(std::function<void()> onStartPlaying) : _onStartPlaying(onSta
 		{ GL_TEXTURE_MIN_FILTER, GL_NEAREST },
 	});
 
-	glm::mat4 projection = glm::ortho(0.0f, 1280.0f, 0.0f, 720.0f);
+	glm::mat4 projection = glm::ortho(0.0f, 2560.0f, 0.0f, 1440.0f);
 
 	_shader.addVertexShader("shaders/hud.vs.glsl")
 		.addFragmentShader("shaders/hud.fs.glsl")
@@ -22,9 +23,9 @@ MainMenu::MainMenu(std::function<void()> onStartPlaying) : _onStartPlaying(onSta
 
 	glm::vec3 bg[] = {
 		glm::vec3(0.0f, 0.0f, 0.0f),
-		glm::vec3(1280.0f, 0.0f, 0.0f),
-		glm::vec3(1280.0f, 720.0f, 0.0f),
-		glm::vec3(0.0f, 720.0f, 0.0f),
+		glm::vec3(2560.0f, 0.0f, 0.0f),
+		glm::vec3(2560.0f, 1440.0f, 0.0f),
+		glm::vec3(0.0f, 1440.0f, 0.0f),
 	};
 	glm::uvec3 inds[] = {
 		glm::uvec3(0, 1, 2),
@@ -32,9 +33,9 @@ MainMenu::MainMenu(std::function<void()> onStartPlaying) : _onStartPlaying(onSta
 	};
 	glm::vec2 tex[] = {
 		glm::vec2(0.0f,            0.0f),
-		glm::vec2(1280.0f / 32.0f, 0.0f),
-		glm::vec2(1280.0f / 32.0f, 720.0f / 32.0f),
-		glm::vec2(0.0f,            720.0f / 32.0f),
+		glm::vec2(2560.0f / 32.0f, 0.0f),
+		glm::vec2(2560.0f / 32.0f, 1440.0f / 32.0f),
+		glm::vec2(0.0f,            1440.0f / 32.0f),
 	};
 
 	for (auto const &p : bg) {
@@ -47,13 +48,28 @@ MainMenu::MainMenu(std::function<void()> onStartPlaying) : _onStartPlaying(onSta
 		_background.addUv(t);
 	}
 	_background.build();
+
+	_playButton = std::make_unique<Button>(glm::vec2(2560.0f / 2.0f, 1440.0f / 2.0f),
+			glm::vec2(200.0f, 30.0f), _onStartPlaying, Button::Anchor::Center);
+	_playButton->setText("Play");
+
+	_buttonShader.addVertexShader("shaders/button.vs.glsl")
+		.addFragmentShader("shaders/button.fs.glsl")
+		.link();
+	_buttonShader.bind();
+	_buttonShader.setUniform4x4f("projectionMatrix", projection);
+	_buttonShader.unbind();
 }
 
 void MainMenu::update()
 {
 	if (lazy::inputs::input::getMouse().getButton(0) == GLFW_PRESS) {
-		_onStartPlaying();
+		auto clickPos = lazy::inputs::input::getMouse().getPosition();
+		if (_playButton->isInside(clickPos)) {
+			_onStartPlaying();
+		}
 	}
+	_playButton->update();
 }
 
 void MainMenu::render()
@@ -63,5 +79,7 @@ void MainMenu::render()
 	_background.draw();
 	_shader.unbind();
 
-	tr.drawText("Click to Start Playing", glm::vec2(10, 10), .5f, glm::vec3(1.0f, 1.0f, 1.0f));
+	_buttonShader.bind();
+	_playButton->draw();
+	_buttonShader.unbind();
 }

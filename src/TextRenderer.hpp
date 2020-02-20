@@ -9,6 +9,7 @@ class TextRenderer
 public:
 	TextRenderer();
 
+	void setup();
 	void drawText(std::string text, glm::vec2 pos, GLfloat scale, glm::vec3 color);
 
 private:
