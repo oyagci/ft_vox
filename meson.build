@@ -6,7 +6,8 @@ project('ft_vox', 'cpp',
 	  'cpp_args=-Wno-class-memaccess',
 	  'c_std=gnu17',
 	  'c_args=-Wno-pedantic -Wno-unused-parameter -Wno-sign-compare -Wno-format-truncation',
-	  'werror=false'])
+	  'werror=false',
+	  'optimization=2'])
 
 srcs = [
 	'src/main.cpp',
