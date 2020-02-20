@@ -70,9 +70,11 @@ void Game::action(GameAction action)
 {
 	switch (action) {
 		case PLAY:
+			_display->showCursor(false);
 			_state.game = PLAYING;
 			break ;
 		case PAUSE:
+			_display->showCursor(true);
 			_state.game = PAUSED;
 			break ;
 		default:
