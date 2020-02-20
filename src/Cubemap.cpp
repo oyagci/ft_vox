@@ -12,12 +12,12 @@ Cubemap::Cubemap()
 void Cubemap::setupTexture()
 {
 	std::array<std::string, 6> paths = {
-		"img/skybox/right.jpg",
-		"img/skybox/left.jpg",
-		"img/skybox/top.jpg",
-		"img/skybox/bottom.jpg",
-		"img/skybox/front.jpg",
-		"img/skybox/back.jpg",
+		"img/sky_side.png",
+		"img/sky_side.png",
+		"img/sky_top.png",
+		"img/sky_bot.png",
+		"img/sky_side.png",
+		"img/sky_side.png",
 	};
 
 	glGenTextures(1, &_texture);
