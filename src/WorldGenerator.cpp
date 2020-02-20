@@ -39,8 +39,9 @@ void WorldGenerator::update(Camera const &camera)
 
 	std::priority_queue<ChunkPriority, std::vector<ChunkPriority>, std::greater<ChunkPriority>> priority;
 	for (auto const &c : _chunksToGenerate) {
-		if (camera.sphereInFrustum(glm::vec3(c.x, 32.0f, c.z),
-				glm::length(glm::vec3(64.0f, 64.0f, 0.0f)))) {
+		glm::vec3 chunkOffset(Chunk::CHUNK_SIZE / 2.0f, Chunk::CHUNK_SIZE / 2.0f, Chunk::CHUNK_SIZE / 2.0f);
+		float chunkRadius = glm::length(chunkOffset);
+		if (camera.sphereInFrustum(glm::vec3(c.x, 0.0f, c.z) + chunkOffset, chunkRadius)) {
 			priority.push(ChunkPriority(glm::length(camera.getPosition() - c), c));
 		}
 	}
