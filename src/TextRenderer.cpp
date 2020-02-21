@@ -36,7 +36,7 @@ void TextRenderer::setup()
 		return ;
 	}
 	FT_Face face;
-	if (FT_New_Face(lib, "fonts/Ubuntu-R.ttf", 0, &face)) {
+	if (FT_New_Face(lib, "./fonts/MinecraftRegular-Bmg3.otf", 0, &face)) {
 		std::cout << "ERROR::FREETYPE: Failed to load font" << std::endl;
 		return ;
 	}
