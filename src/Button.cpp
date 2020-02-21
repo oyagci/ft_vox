@@ -83,7 +83,8 @@ void Button::draw()
 {
 	TextureManager::instance().bind("Button", GL_TEXTURE0);
 	_mesh.draw();
-	_textRenderer.drawText(_text, _position + glm::vec2(16.0f, 7.0f), 0.5f, glm::vec3(0.0f, 0.0f, 0.0f));
+	_textRenderer.drawText(_text, _position + glm::vec2(292.0f, 22.0f), 0.6f, glm::vec3(0.0f, 0.0f, 0.0f));
+	_textRenderer.drawText(_text, _position + glm::vec2(290.0f, 24.0f), 0.6f, glm::vec3(1.0f, 1.0f, 1.0f));
 }
 
 void Button::setText(std::string const &text)
