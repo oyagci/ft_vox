@@ -17,9 +17,18 @@ bool Texture::load(std::string const &path)
 	unsigned char *data = stbi_load(path.c_str(), &_width, &_height, &_nChannel, 0);
 
 	if (data) {
+		GLuint format = 3;
+
+		if (_nChannel == 3) {
+			format = GL_RGB;
+		}
+		else if (_nChannel == 4) {
+			format = GL_RGBA;
+		}
+
 		glTexImage2D(GL_TEXTURE_2D, 0,
-			GL_RGBA, _width, _height, 0,
-			GL_RGBA, GL_UNSIGNED_BYTE, data);
+			format, _width, _height, 0,
+			format, GL_UNSIGNED_BYTE, data);
 		glGenerateMipmap(GL_TEXTURE_2D);
 		stbi_image_free(data);
 		return true;
