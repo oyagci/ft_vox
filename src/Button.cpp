@@ -1,41 +1,49 @@
 #include "Button.hpp"
+#include "TextureManager.hpp"
 
 Button::Button(glm::vec2 position, glm::vec2 size, std::function<void()> onClick, Anchor anchorPoint) :
 	_onClick(onClick)
 {
-	glm::vec3 anchorOffset(0.0f, 0.0f, 0.0f);
+	TextureManager::instance().createTexture("Button", "img/button.png", {
+		{ GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE },
+		{ GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE },
+		{ GL_TEXTURE_MIN_FILTER, GL_NEAREST },
+		{ GL_TEXTURE_MAG_FILTER, GL_NEAREST }
+	});
+
+	glm::vec2 anchorOffset(0.0f, 0.0f);
 
 	switch (anchorPoint) {
 	case Anchor::TopLeft:
-		anchorOffset = -glm::vec3(0.0f, size.y, 0.0f);
+		anchorOffset = -glm::vec2(0.0f, size.y);
 		break ;
 	case Anchor::TopCenter:
-		anchorOffset = -glm::vec3(size.x / 2.0f, size.y, 0.0f);
+		anchorOffset = -glm::vec2(size.x / 2.0f, size.y);
 		break ;
 	case Anchor::TopRight:
-		anchorOffset = -glm::vec3(size.x, size.y, 0.0f);
+		anchorOffset = -glm::vec2(size.x, size.y);
 		break ;
 	case Anchor::Left:
-		anchorOffset = -glm::vec3(0.0f, size.y / 2.0f, 0.0f);
+		anchorOffset = -glm::vec2(0.0f, size.y / 2.0f);
 		break ;
 	case Anchor::Center:
-		anchorOffset = -glm::vec3(size.x / 2.0f, size.y / 2.0f, 0.0f);
+		anchorOffset = -glm::vec2(size.x / 2.0f, size.y / 2.0f);
 		break ;
 	case Anchor::Right:
-		anchorOffset = -glm::vec3(size.x, size.y / 2.0f, 0.0f);
+		anchorOffset = -glm::vec2(size.x, size.y / 2.0f);
 		break ;
 	case Anchor::BottomLeft:
-		anchorOffset = -glm::vec3(0.0f, 0.0f, 0.0f);
+		anchorOffset = -glm::vec2(0.0f, 0.0f);
 		break ;
 	case Anchor::BottomCenter:
-		anchorOffset = -glm::vec3(size.x / 2.0f, 0.0f, 0.0f);
+		anchorOffset = -glm::vec2(size.x / 2.0f, 0.0f);
 		break ;
 	case Anchor::BottomRight:
-		anchorOffset = -glm::vec3(size.x, 0.0f, 0.0f);
+		anchorOffset = -glm::vec2(size.x, 0.0f);
 		break ;
 	}
 
-	_position = position + glm::vec2(anchorOffset.x, anchorOffset.y);
+	_position = position + anchorOffset;
 	_size = size;
 
 	glm::vec3 quad[] = {
@@ -56,7 +64,7 @@ Button::Button(glm::vec2 position, glm::vec2 size, std::function<void()> onClick
 	};
 
 	for (auto const &p : quad) {
-		_mesh.addPosition(p + anchorOffset);
+		_mesh.addPosition(p + glm::vec3(anchorOffset, 0.0f));
 	}
 	for (auto const &i : inds) {
 		_mesh.addTriangle(i);
