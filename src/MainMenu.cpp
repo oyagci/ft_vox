@@ -50,7 +50,7 @@ MainMenu::MainMenu(std::function<void()> onStartPlaying) : _onStartPlaying(onSta
 	_background.build();
 
 	_playButton = std::make_unique<Button>(glm::vec2(2560.0f / 2.0f, 1440.0f / 2.0f),
-			glm::vec2(200.0f, 30.0f), _onStartPlaying, Button::Anchor::Center);
+			glm::vec2(640.0f, 64.0f), _onStartPlaying, Button::Anchor::Center);
 	_playButton->setText("Play");
 
 	_buttonShader.addVertexShader("shaders/button.vs.glsl")

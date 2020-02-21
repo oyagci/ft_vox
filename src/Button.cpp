@@ -73,6 +73,7 @@ void Button::update()
 
 void Button::draw()
 {
+	TextureManager::instance().bind("Button", GL_TEXTURE0);
 	_mesh.draw();
 	_textRenderer.drawText(_text, _position + glm::vec2(16.0f, 7.0f), 0.5f, glm::vec3(0.0f, 0.0f, 0.0f));
 }
