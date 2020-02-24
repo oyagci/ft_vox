@@ -11,7 +11,7 @@ using lazy::graphics::Shader;
 class MainMenu
 {
 public:
-	MainMenu(std::function<void()> onStartPlaying);
+	MainMenu(std::function<void()> onStartPlaying, std::function<void()> onExit);
 
 	void update();
 	void render();
@@ -23,6 +23,8 @@ private:
 	TextRenderer tr;
 
 	std::unique_ptr<Button> _playButton;
+	std::unique_ptr<Button> _exitButton;
 
 	std::function<void()> _onStartPlaying;
+	std::function<void()> _onExitGame;
 };

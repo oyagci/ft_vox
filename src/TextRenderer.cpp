@@ -2,6 +2,8 @@
 #include <ft2build.h>
 #include FT_FREETYPE_H
 
+using namespace anchor;
+
 TextRenderer::TextRenderer()
 {
 	setup();
@@ -74,7 +76,7 @@ void TextRenderer::setup()
 	FT_Done_FreeType(lib);
 }
 
-void TextRenderer::drawText(std::string text, glm::vec2 pos, GLfloat scale, glm::vec3 color)
+void TextRenderer::drawText(std::string text, glm::vec2 pos, GLfloat scale, glm::vec3 color, Anchor anchor)
 {
 	_shader.bind();
 	_shader.setUniform3f("textColor", color);
@@ -82,9 +84,21 @@ void TextRenderer::drawText(std::string text, glm::vec2 pos, GLfloat scale, glm:
 	glActiveTexture(GL_TEXTURE0);
 	glBindVertexArray(_vao);
 
+	float textWidth = 0.0f;
+	float maxHeight = 0.0f;
+	for (auto &c : text) {
+        Character const &ch = _characters[c];
+		textWidth += (ch.advance >> 6) * scale;
+		maxHeight = ch.bearing.y * scale > maxHeight ? ch.bearing.y * scale : maxHeight;
+	}
+
+	glm::vec2 anchorOffset = calculateOffset(anchor, glm::vec2(textWidth, maxHeight));
+
+	pos += anchorOffset;
+
 	for (auto &c : text)
 	{
-        Character ch = _characters[c];
+        Character const &ch = _characters[c];
 
         GLfloat xpos = pos.x + ch.bearing.x * scale;
         GLfloat ypos = pos.y - (ch.size.y - ch.bearing.y) * scale;

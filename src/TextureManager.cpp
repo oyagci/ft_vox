@@ -3,6 +3,8 @@
 void TextureManager::createTexture(std::string const &name, std::string const &path,
 	std::vector<std::pair<GLenum, GLenum>> parameters)
 {
+	if (_textures.find(name) != _textures.end()) { return ; }
+
 	_textures[name] = std::make_unique<Texture>(name);
 
 	_textures[name]->bind(GL_TEXTURE0);

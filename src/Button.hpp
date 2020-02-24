@@ -2,23 +2,13 @@
 
 #include "lazy.hpp"
 #include "TextRenderer.hpp"
+#include "Anchor.hpp"
 
 using lazy::graphics::Mesh;
+using namespace anchor;
 
 class Button
 {
-public:
-	enum class Anchor {
-		TopLeft,
-		TopCenter,
-		TopRight,
-		Left,
-		Center,
-		Right,
-		BottomLeft,
-		BottomCenter,
-		BottomRight,
-	};
 public:
 	Button(glm::vec2 position, glm::vec2 size, std::function<void()> onClick,
 		Anchor anchorPoint = Anchor::Center);
@@ -30,11 +20,7 @@ public:
 
 	glm::vec2 getPosition() const { return _position; }
 	glm::vec2 getSize() const { return _size; }
-
-	bool isInside(glm::vec2 pos) {
-		return pos.x >= _position.x && pos.x <= _position.x + _size.x &&
-			pos.y >= _position.y && pos.y <= _position.y + _size.y;
-	}
+	bool isInside(glm::vec2 pos) const;
 
 private:
 	Mesh _mesh;
@@ -43,4 +29,5 @@ private:
 	std::function<void()> _onClick;
 	std::string _text;
 	TextRenderer _textRenderer;
+	Anchor _anchor;
 };

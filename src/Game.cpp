@@ -23,6 +23,8 @@ Game::Game()
 	_textRenderer = std::make_unique<TextRenderer>();
 	_mainMenu = std::make_unique<MainMenu>([this] {
 		onStartPlaying();
+	}, [this] {
+		onExit();
 	});
 
 	glEnable(GL_BLEND);
@@ -77,6 +79,9 @@ void Game::action(GameAction action)
 			_display->showCursor(true);
 			_state.game = PAUSED;
 			break ;
+		case EXIT:
+			_state.game = EXITING;
+			glfwSetWindowShouldClose(_display->getWindow(), GLFW_TRUE);
 		default:
 			break ;
 	};
@@ -109,7 +114,7 @@ void Game::play()
 	glEnable(GL_BLEND);
 	_hud->draw();
 
-	_textRenderer->drawText(std::to_string(_fpsCounter->getFPS()) + " FPS", glm::vec2(10, 10), .3f, glm::vec3(1.0f));
+	_textRenderer->drawText(std::to_string(_fpsCounter->getFPS()) + " FPS", glm::vec2(10, 10), 0.5f, glm::vec3(1.0f));
 }
 
 void Game::mainMenu()
@@ -121,4 +126,9 @@ void Game::mainMenu()
 void Game::onStartPlaying()
 {
 	action(PLAY);
+}
+
+void Game::onExit()
+{
+	action(EXIT);
 }

@@ -29,7 +29,7 @@ Chunk::Chunk(unsigned int seed, glm::ivec2 pos, World *world) : _world(world)
 		_offsetTime = 1.0f;
 	}
 
-	glm::vec3 seedOffset(seed % 1000000, 0, seed % 1000000);
+	glm::vec3 seedOffset(seed % 1000000, 0.0f, seed % 1000000);
 
 	for (std::size_t x = 0; x < CHUNK_SIZE; x++) {
 		for (std::size_t y = CHUNK_SIZE - 1; y + 1 > 0; y--) {

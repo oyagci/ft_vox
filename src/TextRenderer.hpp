@@ -1,8 +1,10 @@
 #pragma once
 
 #include <lazy.hpp>
+#include "Anchor.hpp"
 
 using namespace lazy::graphics;
+using namespace anchor;
 
 class TextRenderer
 {
@@ -10,7 +12,7 @@ public:
 	TextRenderer();
 
 	void setup();
-	void drawText(std::string text, glm::vec2 pos, GLfloat scale, glm::vec3 color);
+	void drawText(std::string text, glm::vec2 pos, GLfloat scale, glm::vec3 color, Anchor anchor = Anchor::BottomLeft);
 
 private:
 	GLuint _vao;

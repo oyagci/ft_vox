@@ -28,6 +28,7 @@ srcs = [
 	'src/Game.cpp',
 	'src/MainMenu.cpp',
 	'src/Button.cpp',
+	'src/Anchor.cpp',
 ]
 
 cmake = import('cmake')

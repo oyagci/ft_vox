@@ -2,7 +2,8 @@
 #include "TextureManager.hpp"
 #include "Button.hpp"
 
-MainMenu::MainMenu(std::function<void()> onStartPlaying) : _onStartPlaying(onStartPlaying)
+MainMenu::MainMenu(std::function<void()> onStartPlaying, std::function<void()> onExitGame) :
+	_onStartPlaying(onStartPlaying), _onExitGame(onExitGame)
 {
 	TextureManager::instance().createTexture("MenuBackground", "img/terrain_512.png", {
 		{ GL_TEXTURE_WRAP_S, GL_REPEAT },
@@ -50,8 +51,12 @@ MainMenu::MainMenu(std::function<void()> onStartPlaying) : _onStartPlaying(onSta
 	_background.build();
 
 	_playButton = std::make_unique<Button>(glm::vec2(2560.0f / 2.0f, 1440.0f / 2.0f),
-			glm::vec2(640.0f, 64.0f), _onStartPlaying, Button::Anchor::Center);
+			glm::vec2(640.0f, 64.0f), _onStartPlaying, Anchor::Center);
 	_playButton->setText("Play");
+
+	_exitButton = std::make_unique<Button>(glm::vec2(2560.0f / 2.0f, 1440.0f / 2.0f - (64.0f + 8.0f)),
+			glm::vec2(640.0f, 64.0f), _onStartPlaying, Anchor::Center);
+	_exitButton->setText("Quit Game");
 
 	_buttonShader.addVertexShader("shaders/button.vs.glsl")
 		.addFragmentShader("shaders/button.fs.glsl")
@@ -64,12 +69,26 @@ MainMenu::MainMenu(std::function<void()> onStartPlaying) : _onStartPlaying(onSta
 void MainMenu::update()
 {
 	if (lazy::inputs::input::getMouse().getButton(0) == GLFW_PRESS) {
+
+		int scrWidth = 2540;
+		int scrHeight = 1440;
+
 		auto clickPos = lazy::inputs::input::getMouse().getPosition();
+
+		// Mouse (0,0) is on the top-left of the screen
+		// But OpenGL uses the bottom-left as (0,0)
+		// This fixes the mouses (0,0) to be at the bottom-left
+		clickPos = glm::vec2(scrWidth, scrHeight) - clickPos;
+
 		if (_playButton->isInside(clickPos)) {
 			_onStartPlaying();
 		}
+		else if (_exitButton->isInside(clickPos)) {
+			_onExitGame();
+		}
 	}
 	_playButton->update();
+	_exitButton->update();
 }
 
 void MainMenu::render()
@@ -79,7 +98,16 @@ void MainMenu::render()
 	_background.draw();
 	_shader.unbind();
 
+	tr.drawText("ft_vox", glm::vec2(2540.0f / 2.0f, 1440.0f - 100.0f) + glm::vec2(5.0f, -5.0f),
+		2.0f, glm::vec3(0.0f, 0.0f, 0.0f), Anchor::Top);
+	tr.drawText("ft_vox", glm::vec2(2540.0f / 2.0f, 1440.0f - 100.0f),
+		2.0f, glm::vec3(1.0f, 1.0f, 1.0f), Anchor::Top);
+
 	_buttonShader.bind();
 	_playButton->draw();
+	_buttonShader.bind();
+	_exitButton->draw();
 	_buttonShader.unbind();
+
+	tr.drawText("ft_vox", glm::vec2(10.0f, 10.0f), 0.4f, glm::vec3(1.0f, 1.0f, 1.0f));
 }

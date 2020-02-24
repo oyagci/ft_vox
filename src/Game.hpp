@@ -20,11 +20,13 @@ private:
 		MAIN_MENU,
 		PLAYING,
 		PAUSED,
+		EXITING,
 	};
 
 	enum GameAction {
 		PLAY,
 		PAUSE,
+		EXIT,
 	};
 
 	struct GameState {
@@ -35,6 +37,7 @@ public:
 
 	int run();
 	void onStartPlaying();
+	void onExit();
 
 private:
 	void action(GameAction action);
