@@ -3,7 +3,7 @@
 #include "Anchor.hpp"
 
 Button::Button(glm::vec2 position, glm::vec2 size, std::function<void()> onClick, Anchor anchorPoint) :
-	_onClick(onClick), _anchor(anchorPoint)
+	_onClick(onClick), _anchor(anchorPoint), _canBeClicked(true)
 {
 	TextureManager::instance().createTexture("Button", "img/button.png", {
 		{ GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE },
@@ -44,6 +44,8 @@ Button::Button(glm::vec2 position, glm::vec2 size, std::function<void()> onClick
 		_mesh.addUv(t);
 	}
 	_mesh.build();
+
+	lazy::inputs::input::getMouse().attach(this);
 }
 
 void Button::update()
@@ -63,8 +65,17 @@ void Button::setText(std::string const &text)
 	_text = text;
 }
 
-bool Button::isInside(glm::vec2 pos) const
+void Button::onClickUpInside()
 {
-	return pos.x >= _position.x && pos.x <= _position.x + _size.x &&
-		   pos.y >= _position.y && pos.y <= _position.y + _size.y;
+	_canBeClicked = false;
+	_onClick();
+}
+
+void Button::onHover()
+{
+}
+
+glm::vec4 Button::getObservedArea() const
+{
+	return glm::vec4(_position, _size);
 }

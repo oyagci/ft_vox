@@ -11,7 +11,7 @@ Game::Game()
 	_display->enableCap(GL_DEPTH_TEST);
 	_display->enableCap(GL_CULL_FACE);
 	_display->enableCap(GL_BLEND);
-	_display->setFullscreen(true);
+	_display->setFullscreen(false);
 
 	maths::transform t = { glm::vec3(32, 64, 32), glm::quat(), glm::vec3(1), nullptr };
 	_camera = std::make_unique<Camera>(*_display, t);

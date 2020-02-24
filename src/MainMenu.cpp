@@ -57,7 +57,7 @@ MainMenu::MainMenu(glm::vec2 size, std::function<void()> onStartPlaying, std::fu
 	_playButton->setText("Singleplayer");
 
 	_exitButton = std::make_unique<Button>(glm::vec2(_size.x / 2.0f, _size.y / 2.0f - (64.0f + 8.0f)),
-			glm::vec2(640.0f, 64.0f), _onStartPlaying, Anchor::Center);
+			glm::vec2(640.0f, 64.0f), _onExitGame, Anchor::Center);
 	_exitButton->setText("Quit Game");
 
 	_buttonShader.addVertexShader("shaders/button.vs.glsl")
@@ -70,23 +70,6 @@ MainMenu::MainMenu(glm::vec2 size, std::function<void()> onStartPlaying, std::fu
 
 void MainMenu::update()
 {
-	if (lazy::inputs::input::getMouse().getButton(0) == GLFW_PRESS) {
-
-		// TODO: Use real screen size instead of const
-		auto clickPos = (lazy::inputs::input::getMouse().getPosition() / glm::vec2(2560.0f, 1440.0f)) * _size;
-
-		// Mouse (0,0) is on the top-left of the window
-		// But OpenGL uses the bottom-left as (0,0)
-		// This fixes the mouses (0,0) to be at the bottom-left
-		clickPos = _size - clickPos;
-
-		if (_playButton->isInside(clickPos)) {
-			_onStartPlaying();
-		}
-		else if (_exitButton->isInside(clickPos)) {
-			_onExitGame();
-		}
-	}
 	_playButton->update();
 	_exitButton->update();
 }

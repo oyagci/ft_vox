@@ -7,7 +7,7 @@
 using lazy::graphics::Mesh;
 using namespace anchor;
 
-class Button
+class Button : public lazy::inputs::IMouseObserver
 {
 public:
 	Button(glm::vec2 position, glm::vec2 size, std::function<void()> onClick,
@@ -20,7 +20,13 @@ public:
 
 	glm::vec2 getPosition() const { return _position; }
 	glm::vec2 getSize() const { return _size; }
-	bool isInside(glm::vec2 pos) const;
+
+	// IMouseObserver member functions
+	void onClickUpInside() override;
+	void onHover() override;
+	glm::vec4 getObservedArea() const override;
+	bool canBeClicked() const override { return _canBeClicked; }
+	void setCanBeClicked(bool val) { _canBeClicked = val; }
 
 private:
 	Mesh _mesh;
@@ -30,4 +36,5 @@ private:
 	std::string _text;
 	TextRenderer _textRenderer;
 	Anchor _anchor;
+	bool _canBeClicked;
 };
