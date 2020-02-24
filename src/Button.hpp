@@ -37,4 +37,5 @@ private:
 	TextRenderer _textRenderer;
 	Anchor _anchor;
 	bool _canBeClicked;
+	bool _isHovering;
 };

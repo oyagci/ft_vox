@@ -11,6 +11,12 @@ Button::Button(glm::vec2 position, glm::vec2 size, std::function<void()> onClick
 		{ GL_TEXTURE_MIN_FILTER, GL_NEAREST },
 		{ GL_TEXTURE_MAG_FILTER, GL_NEAREST }
 	});
+	TextureManager::instance().createTexture("ButtonHovering", "img/button_hover.png", {
+		{ GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE },
+		{ GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE },
+		{ GL_TEXTURE_MIN_FILTER, GL_NEAREST },
+		{ GL_TEXTURE_MAG_FILTER, GL_NEAREST }
+	});
 
 	glm::vec2 anchorOffset = calculateOffset(anchorPoint, size);
 
@@ -50,11 +56,27 @@ Button::Button(glm::vec2 position, glm::vec2 size, std::function<void()> onClick
 
 void Button::update()
 {
+	if (!_canBeClicked) { return ; }
+
+	glm::vec2 const &mousePos = glm::vec2(1280.0f, 720.0f) - lazy::inputs::input::getMouse().getPosition();
+
+	if (mousePos.x >= _position.x && mousePos.x <= _position.x + _size.x &&
+	    mousePos.y >= _position.y && mousePos.y <= _position.y + _size.y) {
+		_isHovering = true;
+	}
+	else {
+		_isHovering = false;
+	}
 }
 
 void Button::draw()
 {
-	TextureManager::instance().bind("Button", GL_TEXTURE0);
+	if (_isHovering) {
+		TextureManager::instance().bind("ButtonHovering", GL_TEXTURE0);
+	}
+	else {
+		TextureManager::instance().bind("Button", GL_TEXTURE0);
+	}
 	_mesh.draw();
 	_textRenderer.drawText(_text, _position + (_size / 2.0f) + glm::vec2(2.0f, -3.0f), 0.6f, glm::vec3(0.0f, 0.0f, 0.0f), _anchor);
 	_textRenderer.drawText(_text, _position + (_size / 2.0f), 0.6f, glm::vec3(1.0f, 1.0f, 1.0f), _anchor);
