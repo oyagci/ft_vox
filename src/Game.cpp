@@ -21,11 +21,9 @@ Game::Game()
 	_hud = std::make_unique<PlayerHUD>();
 	_fpsCounter = std::make_unique<FPSCounter>();
 	_textRenderer = std::make_unique<TextRenderer>();
-	_mainMenu = std::make_unique<MainMenu>([this] {
-		onStartPlaying();
-	}, [this] {
-		onExit();
-	});
+	_mainMenu = std::make_unique<MainMenu>(glm::vec2(_display->getWidth(), _display->getHeight()),
+		[this] { onStartPlaying(); },
+		[this] { onExit(); });
 
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);

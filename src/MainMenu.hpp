@@ -11,7 +11,11 @@ using lazy::graphics::Shader;
 class MainMenu
 {
 public:
-	MainMenu(std::function<void()> onStartPlaying, std::function<void()> onExit);
+	MainMenu() = delete;
+	MainMenu(MainMenu const &) = delete;
+	MainMenu(glm::vec2 size, std::function<void()> onStartPlaying, std::function<void()> onExit);
+
+	void operator=(MainMenu const &) = delete;
 
 	void update();
 	void render();
@@ -21,6 +25,7 @@ private:
 	Shader _shader;
 	Shader _buttonShader;
 	TextRenderer tr;
+	glm::vec2 _size;
 
 	std::unique_ptr<Button> _playButton;
 	std::unique_ptr<Button> _exitButton;

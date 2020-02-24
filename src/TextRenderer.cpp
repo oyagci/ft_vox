@@ -4,8 +4,10 @@
 
 using namespace anchor;
 
-TextRenderer::TextRenderer()
+TextRenderer::TextRenderer(float width, float height)
 {
+	_width = width;
+	_height = height;
 	setup();
 }
 
@@ -15,7 +17,7 @@ void TextRenderer::setup()
 		   .addFragmentShader("shaders/text.fs.glsl");
 	_shader.link();
 
-	glm::mat4 projection = glm::ortho(0.0f, 2560.0f, 0.0f, 1440.0f);
+	glm::mat4 projection = glm::ortho(0.0f, static_cast<float>(_width), 0.0f, static_cast<float>(_height));
 
 	_shader.bind();
 	_shader.setUniform4x4f("projection", projection);

@@ -2,8 +2,8 @@
 #include "TextureManager.hpp"
 #include "Button.hpp"
 
-MainMenu::MainMenu(std::function<void()> onStartPlaying, std::function<void()> onExitGame) :
-	_onStartPlaying(onStartPlaying), _onExitGame(onExitGame)
+MainMenu::MainMenu(glm::vec2 size, std::function<void()> onStartPlaying, std::function<void()> onExitGame) :
+	tr(1280.0f, 720.0f), _onStartPlaying(onStartPlaying), _onExitGame(onExitGame)
 {
 	TextureManager::instance().createTexture("MenuBackground", "img/terrain_512.png", {
 		{ GL_TEXTURE_WRAP_S, GL_REPEAT },
@@ -12,7 +12,9 @@ MainMenu::MainMenu(std::function<void()> onStartPlaying, std::function<void()> o
 		{ GL_TEXTURE_MIN_FILTER, GL_NEAREST },
 	});
 
-	glm::mat4 projection = glm::ortho(0.0f, 2560.0f, 0.0f, 1440.0f);
+	_size = size;
+
+	glm::mat4 projection = glm::ortho(0.0f, size.x, 0.0f, size.y);
 
 	_shader.addVertexShader("shaders/hud.vs.glsl")
 		.addFragmentShader("shaders/hud.fs.glsl")
@@ -24,9 +26,9 @@ MainMenu::MainMenu(std::function<void()> onStartPlaying, std::function<void()> o
 
 	glm::vec3 bg[] = {
 		glm::vec3(0.0f, 0.0f, 0.0f),
-		glm::vec3(2560.0f, 0.0f, 0.0f),
-		glm::vec3(2560.0f, 1440.0f, 0.0f),
-		glm::vec3(0.0f, 1440.0f, 0.0f),
+		glm::vec3(_size.x, 0.0f, 0.0f),
+		glm::vec3(_size.x, _size.y, 0.0f),
+		glm::vec3(0.0f, _size.y, 0.0f),
 	};
 	glm::uvec3 inds[] = {
 		glm::uvec3(0, 1, 2),
@@ -34,9 +36,9 @@ MainMenu::MainMenu(std::function<void()> onStartPlaying, std::function<void()> o
 	};
 	glm::vec2 tex[] = {
 		glm::vec2(0.0f,            0.0f),
-		glm::vec2(2560.0f / 32.0f, 0.0f),
-		glm::vec2(2560.0f / 32.0f, 1440.0f / 32.0f),
-		glm::vec2(0.0f,            1440.0f / 32.0f),
+		glm::vec2(_size.x / 32.0f, 0.0f),
+		glm::vec2(_size.x / 32.0f, _size.y / 32.0f),
+		glm::vec2(0.0f,            _size.y / 32.0f),
 	};
 
 	for (auto const &p : bg) {
@@ -50,11 +52,11 @@ MainMenu::MainMenu(std::function<void()> onStartPlaying, std::function<void()> o
 	}
 	_background.build();
 
-	_playButton = std::make_unique<Button>(glm::vec2(2560.0f / 2.0f, 1440.0f / 2.0f),
+	_playButton = std::make_unique<Button>(glm::vec2(_size.x / 2.0f, _size.y / 2.0f),
 			glm::vec2(640.0f, 64.0f), _onStartPlaying, Anchor::Center);
-	_playButton->setText("Play");
+	_playButton->setText("Singleplayer");
 
-	_exitButton = std::make_unique<Button>(glm::vec2(2560.0f / 2.0f, 1440.0f / 2.0f - (64.0f + 8.0f)),
+	_exitButton = std::make_unique<Button>(glm::vec2(_size.x / 2.0f, _size.y / 2.0f - (64.0f + 8.0f)),
 			glm::vec2(640.0f, 64.0f), _onStartPlaying, Anchor::Center);
 	_exitButton->setText("Quit Game");
 
@@ -70,15 +72,13 @@ void MainMenu::update()
 {
 	if (lazy::inputs::input::getMouse().getButton(0) == GLFW_PRESS) {
 
-		int scrWidth = 2540;
-		int scrHeight = 1440;
+		// TODO: Use real screen size instead of const
+		auto clickPos = (lazy::inputs::input::getMouse().getPosition() / glm::vec2(2560.0f, 1440.0f)) * _size;
 
-		auto clickPos = lazy::inputs::input::getMouse().getPosition();
-
-		// Mouse (0,0) is on the top-left of the screen
+		// Mouse (0,0) is on the top-left of the window
 		// But OpenGL uses the bottom-left as (0,0)
 		// This fixes the mouses (0,0) to be at the bottom-left
-		clickPos = glm::vec2(scrWidth, scrHeight) - clickPos;
+		clickPos = _size - clickPos;
 
 		if (_playButton->isInside(clickPos)) {
 			_onStartPlaying();
@@ -98,9 +98,9 @@ void MainMenu::render()
 	_background.draw();
 	_shader.unbind();
 
-	tr.drawText("ft_vox", glm::vec2(2540.0f / 2.0f, 1440.0f - 100.0f) + glm::vec2(5.0f, -5.0f),
+	tr.drawText("ft_vox", glm::vec2(_size.x / 2.0f, _size.y - 100.0f) + glm::vec2(5.0f, -5.0f),
 		2.0f, glm::vec3(0.0f, 0.0f, 0.0f), Anchor::Top);
-	tr.drawText("ft_vox", glm::vec2(2540.0f / 2.0f, 1440.0f - 100.0f),
+	tr.drawText("ft_vox", glm::vec2(_size.x / 2.0f, _size.y - 100.0f),
 		2.0f, glm::vec3(1.0f, 1.0f, 1.0f), Anchor::Top);
 
 	_buttonShader.bind();
@@ -109,5 +109,5 @@ void MainMenu::render()
 	_exitButton->draw();
 	_buttonShader.unbind();
 
-	tr.drawText("ft_vox", glm::vec2(10.0f, 10.0f), 0.4f, glm::vec3(1.0f, 1.0f, 1.0f));
+	tr.drawText("ft_vox v0.1", glm::vec2(10.0f, 10.0f), 0.4f, glm::vec3(1.0f, 1.0f, 1.0f));
 }
