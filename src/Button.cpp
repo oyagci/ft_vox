@@ -2,8 +2,8 @@
 #include "TextureManager.hpp"
 #include "Anchor.hpp"
 
-Button::Button(glm::vec2 position, glm::vec2 size, std::function<void()> onClick, Anchor anchorPoint) :
-	_onClick(onClick), _anchor(anchorPoint), _canBeClicked(true)
+Button::Button(Display &display, glm::vec2 position, glm::vec2 size, std::function<void()> onClick, Anchor anchorPoint) :
+	_onClick(onClick), _anchor(anchorPoint), _canBeClicked(true), _textRenderer(display.getWidth(), display.getHeight())
 {
 	TextureManager::instance().createTexture("Button", "img/button.png", {
 		{ GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE },
@@ -56,17 +56,6 @@ Button::Button(glm::vec2 position, glm::vec2 size, std::function<void()> onClick
 
 void Button::update()
 {
-	if (!_canBeClicked) { return ; }
-
-	glm::vec2 const &mousePos = glm::vec2(1280.0f, 720.0f) - lazy::inputs::input::getMouse().getPosition();
-
-	if (mousePos.x >= _position.x && mousePos.x <= _position.x + _size.x &&
-	    mousePos.y >= _position.y && mousePos.y <= _position.y + _size.y) {
-		_isHovering = true;
-	}
-	else {
-		_isHovering = false;
-	}
 }
 
 void Button::draw()
@@ -93,8 +82,9 @@ void Button::onClickUpInside()
 	_onClick();
 }
 
-void Button::onHover()
+void Button::onHover(bool val)
 {
+	_isHovering = val;
 }
 
 glm::vec4 Button::getObservedArea() const

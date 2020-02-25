@@ -13,7 +13,7 @@ class MainMenu
 public:
 	MainMenu() = delete;
 	MainMenu(MainMenu const &) = delete;
-	MainMenu(glm::vec2 size, std::function<void()> onStartPlaying, std::function<void()> onExit);
+	MainMenu(Display &display, glm::vec2 size, std::function<void()> onStartPlaying, std::function<void()> onExit);
 
 	void operator=(MainMenu const &) = delete;
 

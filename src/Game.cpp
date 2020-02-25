@@ -11,7 +11,7 @@ Game::Game()
 	_display->enableCap(GL_DEPTH_TEST);
 	_display->enableCap(GL_CULL_FACE);
 	_display->enableCap(GL_BLEND);
-	_display->setFullscreen(false);
+	_display->setFullscreen(true);
 
 	maths::transform t = { glm::vec3(32, 64, 32), glm::quat(), glm::vec3(1), nullptr };
 	_camera = std::make_unique<Camera>(*_display, t);
@@ -20,8 +20,8 @@ Game::Game()
 	_world = std::make_unique<World>(*_camera);
 	_hud = std::make_unique<PlayerHUD>();
 	_fpsCounter = std::make_unique<FPSCounter>();
-	_textRenderer = std::make_unique<TextRenderer>();
-	_mainMenu = std::make_unique<MainMenu>(glm::vec2(_display->getWidth(), _display->getHeight()),
+	_textRenderer = std::make_unique<TextRenderer>(_display->getWidth(), _display->getHeight());
+	_mainMenu = std::make_unique<MainMenu>(*_display, glm::vec2(_display->getWidth(), _display->getHeight()),
 		[this] { onStartPlaying(); },
 		[this] { onExit(); });
 

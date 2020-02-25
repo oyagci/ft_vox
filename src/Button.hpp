@@ -10,7 +10,7 @@ using namespace anchor;
 class Button : public lazy::inputs::IMouseObserver
 {
 public:
-	Button(glm::vec2 position, glm::vec2 size, std::function<void()> onClick,
+	Button(Display &display, glm::vec2 position, glm::vec2 size, std::function<void()> onClick,
 		Anchor anchorPoint = Anchor::Center);
 
 	void update();
@@ -23,7 +23,7 @@ public:
 
 	// IMouseObserver member functions
 	void onClickUpInside() override;
-	void onHover() override;
+	void onHover(bool) override;
 	glm::vec4 getObservedArea() const override;
 	bool canBeClicked() const override { return _canBeClicked; }
 	void setCanBeClicked(bool val) { _canBeClicked = val; }

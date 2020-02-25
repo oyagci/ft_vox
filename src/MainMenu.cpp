@@ -2,8 +2,8 @@
 #include "TextureManager.hpp"
 #include "Button.hpp"
 
-MainMenu::MainMenu(glm::vec2 size, std::function<void()> onStartPlaying, std::function<void()> onExitGame) :
-	tr(1280.0f, 720.0f), _onStartPlaying(onStartPlaying), _onExitGame(onExitGame)
+MainMenu::MainMenu(Display &display, glm::vec2 size, std::function<void()> onStartPlaying, std::function<void()> onExitGame) :
+	tr(display.getWidth(), display.getHeight()), _onStartPlaying(onStartPlaying), _onExitGame(onExitGame)
 {
 	TextureManager::instance().createTexture("MenuBackground", "img/terrain_512.png", {
 		{ GL_TEXTURE_WRAP_S, GL_REPEAT },
@@ -52,11 +52,11 @@ MainMenu::MainMenu(glm::vec2 size, std::function<void()> onStartPlaying, std::fu
 	}
 	_background.build();
 
-	_playButton = std::make_unique<Button>(glm::vec2(_size.x / 2.0f, _size.y / 2.0f),
+	_playButton = std::make_unique<Button>(display, glm::vec2(_size.x / 2.0f, _size.y / 2.0f),
 			glm::vec2(640.0f, 64.0f), _onStartPlaying, Anchor::Center);
 	_playButton->setText("Singleplayer");
 
-	_exitButton = std::make_unique<Button>(glm::vec2(_size.x / 2.0f, _size.y / 2.0f - (64.0f + 8.0f)),
+	_exitButton = std::make_unique<Button>(display, glm::vec2(_size.x / 2.0f, _size.y / 2.0f - (64.0f + 8.0f)),
 			glm::vec2(640.0f, 64.0f), _onExitGame, Anchor::Center);
 	_exitButton->setText("Quit Game");
 
