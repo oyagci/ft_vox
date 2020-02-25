@@ -29,6 +29,7 @@ srcs = [
 	'src/MainMenu.cpp',
 	'src/Button.cpp',
 	'src/Anchor.cpp',
+	'src/UI.cpp',
 ]
 
 cmake = import('cmake')

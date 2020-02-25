@@ -24,6 +24,7 @@ Game::Game()
 	_mainMenu = std::make_unique<MainMenu>(*_display, glm::vec2(_display->getWidth(), _display->getHeight()),
 		[this] { onStartPlaying(); },
 		[this] { onExit(); });
+	_ui = std::make_unique<UI>();
 
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
