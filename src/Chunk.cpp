@@ -4,6 +4,7 @@
 #include <mutex>
 #include "World.hpp"
 #include "Time.hpp"
+#include "Profiler.hpp"
 
 using lazy::utils::Time;
 
@@ -131,9 +132,13 @@ void Chunk::build()
 
 void Chunk::draw()
 {
+	PROFILER_START();
+
 	if (_state == ChunkState::BUILT || _state == ChunkState::DONE) {
 		_mesh.draw();
 	}
+
+	PROFILER_STOP();
 }
 
 void Chunk::action(ChunkAction action)

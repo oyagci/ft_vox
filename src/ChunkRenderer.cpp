@@ -3,6 +3,7 @@
 #include "Settings.hpp"
 #include "TextureManager.hpp"
 #include "World.hpp"
+#include "Profiler.hpp"
 
 ChunkRenderer::ChunkRenderer(World *world) : _world(world)
 {
@@ -37,6 +38,8 @@ bool ChunkRenderer::isInView(Camera &camera, Chunk &chunk)
 }
 void ChunkRenderer::render(Camera &camera, Shader &shader)
 {
+	PROFILER_START();
+
 	int n = 0;
 	TextureManager::instance().bind("Blocks", GL_TEXTURE0);
 	for (auto &m : _chunkMap) {
@@ -56,6 +59,8 @@ void ChunkRenderer::render(Camera &camera, Shader &shader)
 		std::to_string(_chunkMap.size()) + " total)",
 		glm::vec2(10.0f, 30.0f), .3f, glm::vec3(1.0f, 1.0f, 1.0f));
 	glDisable(GL_BLEND);
+
+	PROFILER_STOP();
 }
 
 void ChunkRenderer::update()

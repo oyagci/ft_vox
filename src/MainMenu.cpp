@@ -1,6 +1,7 @@
 #include "MainMenu.hpp"
 #include "TextureManager.hpp"
 #include "Button.hpp"
+#include "Profiler.hpp"
 
 MainMenu::MainMenu(Display &display, glm::vec2 size, std::function<void()> onStartPlaying, std::function<void()> onExitGame) :
 	tr(display.getWidth(), display.getHeight()), _onStartPlaying(onStartPlaying), _onExitGame(onExitGame)
@@ -76,6 +77,8 @@ void MainMenu::update()
 
 void MainMenu::render()
 {
+	PROFILER_START();
+
 	_shader.bind();
 	TextureManager::instance().bind("MenuBackground", GL_TEXTURE0);
 	_background.draw();
@@ -93,4 +96,6 @@ void MainMenu::render()
 	_buttonShader.unbind();
 
 	tr.drawText("ft_vox v0.1", glm::vec2(10.0f, 10.0f), 0.4f, glm::vec3(1.0f, 1.0f, 1.0f));
+
+	PROFILER_STOP();
 }

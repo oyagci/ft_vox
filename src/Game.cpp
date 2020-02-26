@@ -2,6 +2,7 @@
 #include "Time.hpp"
 #include "Settings.hpp"
 #include "stb_image.h"
+#include "Profiler.hpp"
 
 Game::Game()
 {
@@ -87,6 +88,8 @@ void Game::action(GameAction action)
 
 void Game::play()
 {
+	PROFILER_START();
+
 	float deltaTime = Time::getDeltaTime();
 
 	float ms = 30.0f;
@@ -112,7 +115,10 @@ void Game::play()
 	glEnable(GL_BLEND);
 	_hud->draw();
 
+	_textRenderer->drawText(std::to_string(_fpsCounter->getFPS()) + " FPS", glm::vec2(12, 8), 0.5f, glm::vec3(0.0f));
 	_textRenderer->drawText(std::to_string(_fpsCounter->getFPS()) + " FPS", glm::vec2(10, 10), 0.5f, glm::vec3(1.0f));
+
+	PROFILER_STOP();
 }
 
 void Game::mainMenu()

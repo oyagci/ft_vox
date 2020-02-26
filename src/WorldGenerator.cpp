@@ -4,6 +4,7 @@
 #include "Settings.hpp"
 #include "World.hpp"
 #include <list>
+#include "Profiler.hpp"
 
 WorldGenerator::WorldGenerator(World *world) : _pool(1)
 {

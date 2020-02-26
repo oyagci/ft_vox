@@ -1,6 +1,7 @@
 #include "World.hpp"
 #include "Settings.hpp"
 #include "TextureManager.hpp"
+#include "Profiler.hpp"
 
 World::World(Camera &camera) : _camera(camera)
 {
@@ -29,6 +30,8 @@ World::World(Camera &camera) : _camera(camera)
 
 void World::render()
 {
+	PROFILER_START();
+
 	_shader->bind();
 	_shader->setUniform4x4f("projectionMatrix", _camera.getProjectionMatrix());
 	_shader->setUniform4x4f("viewMatrix", _camera.getViewMatrix());
@@ -44,6 +47,8 @@ void World::render()
 	_cubemapShader->setUniform1i("cubemap", 0);
 	_cubemap->draw();
 	_cubemapShader->unbind();
+
+	PROFILER_STOP();
 }
 
 void World::update()
