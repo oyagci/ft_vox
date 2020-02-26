@@ -35,19 +35,35 @@ cmake = import('cmake')
 
 lazyGL = cmake.subproject('LazyGL')
 
-dep_lazyGL = lazyGL.dependency('LazyGL')
-glew = dependency('glew', required : true)
-glfw = dependency('glfw3', required : true)
-pthread = dependency('threads', required : true)
-gl = dependency('GL', required : true)
-x11 = dependency('x11', required : true)
-xi = dependency('xi', required : true)
-xrandr = dependency('xrandr', required : true)
-dl = meson.get_compiler('cpp').find_library('dl')
-m = meson.get_compiler('cpp').find_library('m')
-ft = meson.get_compiler('cpp').find_library('freetype')
+if build_machine.system() == 'linux'
+	dep_lazyGL = lazyGL.dependency('LazyGL')
+	glew = dependency('glew', required : true)
+	glfw = dependency('glfw3', required : true)
+	pthread = dependency('threads', required : true)
+	gl = dependency('GL', required : true)
+	x11 = dependency('x11', required : true)
+	xi = dependency('xi', required : true)
+	xrandr = dependency('xrandr', required : true)
+	dl = meson.get_compiler('cpp').find_library('dl')
+	m = meson.get_compiler('cpp').find_library('m')
+	ft = meson.get_compiler('cpp').find_library('freetype')
 
-executable('ft_vox',
-	srcs,
-	include_directories : include_directories(['src/', '/usr/include/freetype2/']),
-	dependencies: [ dep_lazyGL, pthread, glew, glfw, x11, xi, xrandr, dl, m, ft ])
+	executable('ft_vox',
+		srcs,
+		include_directories : include_directories(['src/', '/usr/include/freetype2/']),
+		dependencies: [ dep_lazyGL, pthread, glew, glfw, x11, xi, xrandr, dl, m, ft ])
+elif build_machine.system() == 'darwin'
+	dep_lazyGL = lazyGL.dependency('LazyGL')
+	glew = dependency('glew', required : true)
+	glfw = meson.get_compiler('cpp').find_library('glfw', dirs: '~/.brew/lib')
+	pthread = dependency('threads', required : true)
+	gl = dependency('GL', required : true)
+	dl = meson.get_compiler('cpp').find_library('dl')
+	m = meson.get_compiler('cpp').find_library('m')
+	ft = meson.get_compiler('cpp').find_library('freetype', dirs: '~/.brew/lib')
+
+	executable('ft_vox',
+		srcs,
+		include_directories : include_directories(['src/', '/Users/oyagci/.brew/include/freetype2']),
+		dependencies: [ dep_lazyGL, pthread, glew, glfw, gl, dl, m, ft ])
+endif
