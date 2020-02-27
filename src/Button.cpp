@@ -1,9 +1,10 @@
 #include "Button.hpp"
 #include "TextureManager.hpp"
 #include "Anchor.hpp"
+#include "TextComponent.hpp"
 
-Button::Button(Display &display, glm::vec2 position, glm::vec2 size, std::function<void()> onClick, Anchor anchorPoint) :
-	_onClick(onClick), _anchor(anchorPoint), _canBeClicked(true), _textRenderer(display.getWidth(), display.getHeight())
+Button::Button(glm::vec2 position, glm::vec2 size, std::function<void()> onClick, Anchor anchorPoint) :
+	_onClick(onClick), _anchor(anchorPoint), _canBeClicked(true)
 {
 	TextureManager::instance().createTexture("Button", "img/button.png", {
 		{ GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE },
@@ -24,10 +25,10 @@ Button::Button(Display &display, glm::vec2 position, glm::vec2 size, std::functi
 	_size = size;
 
 	glm::vec3 quad[] = {
-		glm::vec3(_position.x,          _position.y,          0.0f),
-		glm::vec3(_position.x + size.x, _position.y,          0.0f),
-		glm::vec3(_position.x + size.x, _position.y + size.y, 0.0f),
-		glm::vec3(_position.x,          _position.y + size.y, 0.0f),
+		glm::vec3(0.0f,          0.0f,          0.0f),
+		glm::vec3(0.0f + size.x, 0.0f,          0.0f),
+		glm::vec3(0.0f + size.x, 0.0f + size.y, 0.0f),
+		glm::vec3(0.0f,          0.0f + size.y, 0.0f),
 	};
 	glm::uvec3 inds[] = {
 		glm::uvec3(0, 1, 2),
@@ -52,6 +53,9 @@ Button::Button(Display &display, glm::vec2 position, glm::vec2 size, std::functi
 	_mesh.build();
 
 	lazy::inputs::input::getMouse().attach(this);
+
+	auto textComponent = createSubComponent<TextComponent>();
+	//std::make_shared<TextComponent>(_text, _position + (_size / 2.0f), 0.6f, glm::vec3(1.0f, 1.0f, 1.0f), _anchor);
 }
 
 void Button::update()
@@ -67,8 +71,6 @@ void Button::draw()
 		TextureManager::instance().bind("Button", GL_TEXTURE0);
 	}
 	_mesh.draw();
-	_textRenderer.drawText(_text, _position + (_size / 2.0f) + glm::vec2(2.0f, -3.0f), 0.6f, glm::vec3(0.0f, 0.0f, 0.0f), _anchor);
-	_textRenderer.drawText(_text, _position + (_size / 2.0f), 0.6f, glm::vec3(1.0f, 1.0f, 1.0f), _anchor);
 }
 
 void Button::setText(std::string const &text)

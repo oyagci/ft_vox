@@ -7,7 +7,7 @@ Game::Game()
 {
 	_state.game = MAIN_MENU;
 
-	_display = std::make_unique<Display>("ft_vox", 1280, 720);
+	_display = std::make_unique<Display>("ft_vox", 1920, 1080);
 	_display->enableCap(GL_DEPTH_TEST);
 	_display->enableCap(GL_CULL_FACE);
 	_display->enableCap(GL_BLEND);
@@ -61,6 +61,9 @@ int Game::run()
 			default:
 				break ;
 		}
+
+		_ui->update();
+		_ui->render();
 
 	}
 

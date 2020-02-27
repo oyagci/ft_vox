@@ -52,13 +52,13 @@ MainMenu::MainMenu(Display &display, glm::vec2 size, std::function<void()> onSta
 	}
 	_background.build();
 
-	_playButton = std::make_unique<Button>(display, glm::vec2(_size.x / 2.0f, _size.y / 2.0f),
-			glm::vec2(640.0f, 64.0f), _onStartPlaying, Anchor::Center);
-	_playButton->setText("Singleplayer");
+//	_playButton = std::make_unique<Button>(glm::vec2(_size.x / 2.0f, _size.y / 2.0f),
+//			glm::vec2(640.0f, 64.0f), _onStartPlaying, Anchor::Center);
+//	_playButton->setText("Singleplayer");
 
-	_exitButton = std::make_unique<Button>(display, glm::vec2(_size.x / 2.0f, _size.y / 2.0f - (64.0f + 8.0f)),
-			glm::vec2(640.0f, 64.0f), _onExitGame, Anchor::Center);
-	_exitButton->setText("Quit Game");
+//	_exitButton = std::make_unique<Button>(glm::vec2(_size.x / 2.0f, _size.y / 2.0f - (64.0f + 8.0f)),
+//			glm::vec2(640.0f, 64.0f), _onExitGame, Anchor::Center);
+//	_exitButton->setText("Quit Game");
 
 	_buttonShader.addVertexShader("shaders/button.vs.glsl")
 		.addFragmentShader("shaders/button.fs.glsl")
@@ -70,8 +70,8 @@ MainMenu::MainMenu(Display &display, glm::vec2 size, std::function<void()> onSta
 
 void MainMenu::update()
 {
-	_playButton->update();
-	_exitButton->update();
+//	_playButton->update();
+//	_exitButton->update();
 }
 
 void MainMenu::render()
@@ -86,11 +86,11 @@ void MainMenu::render()
 	tr.drawText("ft_vox", glm::vec2(_size.x / 2.0f, _size.y - 100.0f),
 		2.0f, glm::vec3(1.0f, 1.0f, 1.0f), Anchor::Top);
 
-	_buttonShader.bind();
-	_playButton->draw();
-	_buttonShader.bind();
-	_exitButton->draw();
-	_buttonShader.unbind();
+//	_buttonShader.bind();
+//	_playButton->draw();
+//	_buttonShader.bind();
+//	_exitButton->draw();
+//	_buttonShader.unbind();
 
 	tr.drawText("ft_vox v0.1", glm::vec2(10.0f, 10.0f), 0.4f, glm::vec3(1.0f, 1.0f, 1.0f));
 }

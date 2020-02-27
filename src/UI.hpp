@@ -5,6 +5,9 @@
 #include <optional>
 #include <memory>
 #include "UIScene.hpp"
+#include "lazy.hpp"
+
+using lazy::graphics::Shader;
 
 class UI
 {
@@ -32,7 +35,10 @@ private:
 	bool loadScene(std::string const &name);
 
 	void renderScene(std::shared_ptr<IUIScene> scene);
+	void renderComponents(std::vector<std::shared_ptr<ASceneComponent>> components);
 
 	UIState _state;
 	std::map<std::string, std::shared_ptr<IUIScene>> _scenes;
+
+	Shader _shader;
 };

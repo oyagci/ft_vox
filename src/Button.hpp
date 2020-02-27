@@ -3,23 +3,24 @@
 #include "lazy.hpp"
 #include "TextRenderer.hpp"
 #include "Anchor.hpp"
+#include "SceneComponent.hpp"
 
 using lazy::graphics::Mesh;
 using namespace anchor;
 
-class Button : public lazy::inputs::IMouseObserver
+class Button : public lazy::inputs::IMouseObserver, public ASceneComponent
 {
 public:
-	Button(Display &display, glm::vec2 position, glm::vec2 size, std::function<void()> onClick,
+	Button(glm::vec2 position, glm::vec2 size, std::function<void()> onClick,
 		Anchor anchorPoint = Anchor::Center);
 
-	void update();
-	void draw();
+	void update() override;
+	void draw() override;
 
 	void setText(std::string const &text);
 
-	glm::vec2 getPosition() const { return _position; }
-	glm::vec2 getSize() const { return _size; }
+	glm::vec2 getPosition() const override { return _position; }
+	glm::vec2 getSize() const override { return _size; }
 
 	// IMouseObserver member functions
 	void onClickUpInside() override;
@@ -34,7 +35,6 @@ private:
 	glm::vec2 _size;
 	std::function<void()> _onClick;
 	std::string _text;
-	TextRenderer _textRenderer;
 	Anchor _anchor;
 	bool _canBeClicked;
 	bool _isHovering;
