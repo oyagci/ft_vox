@@ -30,6 +30,11 @@ protected:
 		return component;
 	}
 
+	/*
+	 * Call a function registered to the UI
+	 */
+	void call(std::string const &funcName);
+
 private:
 	std::vector<std::shared_ptr<ASceneComponent>> _subComponents;
 };

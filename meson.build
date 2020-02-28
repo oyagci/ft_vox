@@ -30,6 +30,7 @@ srcs = [
 	'src/Button.cpp',
 	'src/Anchor.cpp',
 	'src/UI.cpp',
+	'src/SceneComponent.cpp',
 ]
 
 cmake = import('cmake')
