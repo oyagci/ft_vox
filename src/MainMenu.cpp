@@ -36,9 +36,9 @@ MainMenu::MainMenu(Display &display, glm::vec2 size, std::function<void()> onSta
 	};
 	glm::vec2 tex[] = {
 		glm::vec2(0.0f,            0.0f),
-		glm::vec2(_size.x / 32.0f, 0.0f),
-		glm::vec2(_size.x / 32.0f, _size.y / 32.0f),
-		glm::vec2(0.0f,            _size.y / 32.0f),
+		glm::vec2(_size.x / 64.0f, 0.0f),
+		glm::vec2(_size.x / 64.0f, _size.y / 64.0f),
+		glm::vec2(0.0f,            _size.y / 64.0f),
 	};
 
 	for (auto const &p : bg) {
