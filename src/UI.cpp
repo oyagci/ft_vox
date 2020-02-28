@@ -58,7 +58,7 @@ auto UI::getScene(std::string const &name) -> std::optional<std::shared_ptr<IUIS
 template<class T>
 bool UI::loadScene(std::string const &name)
 {
-	std::shared_ptr<T> scene = std::make_shared<T>();
+	std::shared_ptr<T> scene = std::make_shared<T>(this);
 	_scenes[name] = scene;
 
 	return true;
@@ -83,4 +83,18 @@ void UI::renderComponents(std::vector<std::shared_ptr<ASceneComponent>> componen
 		c->draw();
 		renderComponents(c->getSubComponents());
 	}
+}
+
+void UI::call(const std::string &name)
+{
+	if (_callbacks.find(name) == _callbacks.end()) { return ; }
+
+	_callbacks[name]();
+}
+
+void UI::registerFunc(std::string const &name, std::function<void()> cb)
+{
+	if (_callbacks.find(name) != _callbacks.end()) { return ; }
+
+	_callbacks[name] = cb;
 }
