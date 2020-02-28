@@ -4,11 +4,14 @@
 #include <vector>
 #include <memory>
 
-class UI;
+class IUIScene;
 
 class ASceneComponent
 {
 public:
+	ASceneComponent() = delete;
+	ASceneComponent(IUIScene *parent) : _scene(parent) {}
+
 	virtual ~ASceneComponent() {}
 	virtual void update() = 0;
 	virtual void draw() = 0;
@@ -20,11 +23,11 @@ public:
 	}
 
 protected:
-	template<typename T,
+	template<typename T, typename... Args,
 	typename = std::enable_if_t<std::is_base_of<ASceneComponent, T>::value>>
-	std::shared_ptr<T> createSubComponent()
+	std::shared_ptr<T> createSubComponent(Args... args)
 	{
-		auto component = std::make_shared<T>();
+		auto component = std::make_shared<T>(_scene, std::forward<Args>(args)...);
 
 		_subComponents.push_back(component);
 		return component;
@@ -37,4 +40,5 @@ protected:
 
 private:
 	std::vector<std::shared_ptr<ASceneComponent>> _subComponents;
+	IUIScene *_scene;
 };

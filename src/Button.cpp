@@ -3,19 +3,12 @@
 #include "Anchor.hpp"
 #include "TextComponent.hpp"
 
-Button::Button()
+Button::Button(IUIScene *scene) : ASceneComponent(scene)
 {
-	setup(glm::vec2(0.0f, 0.0f), glm::vec2(640.0f, 64.0f), [] {},
-		Anchor::Center);
+	setup(glm::vec2(0.0f, 0.0f), glm::vec2(640.0f, 64.0f), Anchor::Center);
 }
 
-Button::Button(glm::vec2 position, glm::vec2 size, std::function<void()> onClick, Anchor anchorPoint) :
-	_onClick(onClick), _anchor(anchorPoint), _canBeClicked(true)
-{
-	setup(position, size, onClick, anchorPoint);
-}
-
-void Button::setup(glm::vec2 position, glm::vec2 size, std::function<void()> onClick, Anchor anchorPoint)
+void Button::setup(glm::vec2 position, glm::vec2 size, Anchor anchorPoint)
 {
 	TextureManager::instance().createTexture("Button", "img/button.png", {
 		{ GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE },
@@ -33,8 +26,8 @@ void Button::setup(glm::vec2 position, glm::vec2 size, std::function<void()> onC
 	glm::vec2 anchorOffset = calculateOffset(anchorPoint, size);
 	_position = position + anchorOffset;
 	_size = size;
-	_onClick = onClick;
 	_anchor = anchorPoint;
+	_onClick = [] {};
 
 	_label = createSubComponent<Label>();
 	_label->setPosition(_position);

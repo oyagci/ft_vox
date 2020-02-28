@@ -6,10 +6,8 @@
 class Label : public ASceneComponent
 {
 public:
-	Label() : _tr(1920.0f, 1080.0f), _scale(0.6f)
-	{
-		_onClick = [this] { call("singleplayerStart"); };
-	}
+	Label(IUIScene *scene) : ASceneComponent(scene), _tr(1920.0f, 1080.0f), _scale(0.6f)
+	{}
 
 	void update() override {};
 
@@ -35,5 +33,4 @@ private:
 	TextRenderer _tr;
 	glm::vec2 _position;
 	float _scale;
-	std::function<void()> _onClick;
 };

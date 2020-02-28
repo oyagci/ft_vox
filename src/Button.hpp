@@ -12,10 +12,8 @@ using namespace anchor;
 class Button : public lazy::inputs::IMouseObserver, public ASceneComponent
 {
 public:
-	Button();
+	Button(IUIScene *scene);
 	~Button();
-	Button(glm::vec2 position, glm::vec2 size, std::function<void()> onClick,
-		Anchor anchorPoint = Anchor::Center);
 
 	void update() override;
 	void draw() override;
@@ -35,14 +33,15 @@ public:
 	bool canBeClicked() const override { return _canBeClicked; }
 	void setCanBeClicked(bool val) { _canBeClicked = val; }
 
+	std::function<void()> _onClick;
+
 private:
-	void setup(glm::vec2 position, glm::vec2 size, std::function<void()> onClick, Anchor anchorPoint);
+	void setup(glm::vec2 position, glm::vec2 size, Anchor anchorPoint);
 	void buildMesh();
 
 	Mesh _mesh;
 	glm::vec2 _position;
 	glm::vec2 _size;
-	std::function<void()> _onClick;
 	std::string _text;
 	Anchor _anchor;
 	bool _canBeClicked;

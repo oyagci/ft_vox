@@ -10,7 +10,7 @@ using anchor::Anchor;
 class TextComponent : public ASceneComponent
 {
 public:
-	TextComponent()
+	TextComponent(IUIScene *scene) : ASceneComponent(scene)
 	{
 	}
 
