@@ -36,6 +36,8 @@ public:
 	 */
 	void registerFunc(std::string const &name, std::function<void()>);
 
+	void showScene(std::string const &sceneName);
+
 private:
 	void action(UIAction action, std::string const &);
 
@@ -44,7 +46,7 @@ private:
 	template<class T>
 	bool loadScene(std::string const &name);
 
-	void renderScene(std::shared_ptr<IUIScene> scene);
+	void renderScene(IUIScene &scene);
 
 	void renderComponents(std::vector<std::shared_ptr<ASceneComponent>> components);
 

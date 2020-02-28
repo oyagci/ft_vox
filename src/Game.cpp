@@ -26,6 +26,8 @@ Game::Game()
 		[this] { onExit(); });
 	_ui = std::make_unique<UI>();
 
+	_ui->registerFunc("playSingleplayer", [this] { onStartPlaying(); });
+
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glDepthFunc(GL_LEQUAL);
@@ -75,6 +77,7 @@ void Game::action(GameAction action)
 	switch (action) {
 		case PLAY:
 			_display->showCursor(false);
+			_ui->showScene("playerHud");
 			_state.game = PLAYING;
 			break ;
 		case PAUSE:

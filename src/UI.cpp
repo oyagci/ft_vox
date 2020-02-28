@@ -24,7 +24,7 @@ void UI::update()
 
 void UI::render()
 {
-	renderScene(_state.currentScene);
+	renderScene(*_state.currentScene);
 }
 
 void UI::action(UIAction action, std::string const &val)
@@ -64,10 +64,10 @@ bool UI::loadScene(std::string const &name)
 	return true;
 }
 
-void UI::renderScene(std::shared_ptr<IUIScene> scene)
+void UI::renderScene(IUIScene &scene)
 {
 	_shader.bind();
-	renderComponents(scene->getSceneComponents());
+	renderComponents(scene.getSceneComponents());
 	_shader.unbind();
 }
 
@@ -97,4 +97,9 @@ void UI::registerFunc(std::string const &name, std::function<void()> cb)
 	if (_callbacks.find(name) != _callbacks.end()) { return ; }
 
 	_callbacks[name] = cb;
+}
+
+void UI::showScene(std::string const &sceneName)
+{
+	action(CHANGE_SCENE, sceneName);
 }
