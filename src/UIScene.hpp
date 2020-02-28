@@ -7,6 +7,8 @@
 class IUIScene
 {
 public:
+	IUIScene(UI *uiController) { _uiController = uiController; }
+
 	virtual ~IUIScene() {};
 	virtual void update() = 0;
 
@@ -27,4 +29,5 @@ public:
 
 private:
 	std::vector<std::shared_ptr<ASceneComponent>> _sceneComponents;
+	UI *_uiController;
 };

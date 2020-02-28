@@ -6,15 +6,16 @@
 #include "SceneComponent.hpp"
 #include "Button.hpp"
 
+class UI;
+
 class MainMenuScene : public IUIScene
 {
 public:
-	MainMenuScene() {
-		auto button = std::make_shared<Button>(
-			glm::vec2(1920.0f / 2.0f, 1080.0f / 2.0f),
-			glm::vec2(640.0f, 64.0f), [] {}, Anchor::Center);
-
+	MainMenuScene() = delete;
+	MainMenuScene(UI *uiController) : IUIScene(uiController) {
 		_button = createSceneComponent<Button>();
+		_button->setPosition(glm::vec2(1920.0f / 2.0f, 1080.0f / 2.0f));
+		_button->setText("Singleplayer");
 	};
 	~MainMenuScene() {};
 
