@@ -4,6 +4,8 @@
 #include <vector>
 #include <memory>
 
+class UI;
+
 class ASceneComponent
 {
 public:
@@ -17,8 +19,10 @@ public:
 		return _subComponents;
 	}
 
-	template<class T>
-	std::shared_ptr<ASceneComponent> createSubComponent()
+protected:
+	template<typename T,
+	typename = std::enable_if_t<std::is_base_of<ASceneComponent, T>::value>>
+	std::shared_ptr<T> createSubComponent()
 	{
 		auto component = std::make_shared<T>();
 
