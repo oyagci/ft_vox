@@ -1,6 +1,8 @@
 #pragma once
 
+#include <memory>
 #include "SceneComponent.hpp"
+#include <type_traits>
 
 class IUIScene
 {
@@ -13,10 +15,11 @@ public:
 		return _sceneComponents;
 	}
 
-	template<class T>
-	std::shared_ptr<ASceneComponent> createSceneComponent()
+	template<typename T, typename... Args,
+	typename = std::enable_if_t<std::is_base_of<ASceneComponent, T>::value>>
+	std::shared_ptr<T> createSceneComponent(Args... args)
 	{
-		auto component = std::make_shared<T>();
+		auto component = std::make_shared<T>(std::forward<Args>(args)...);
 
 		_sceneComponents.push_back(component);
 		return component;
