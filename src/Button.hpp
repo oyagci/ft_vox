@@ -30,7 +30,7 @@ public:
 	std::function<void()> _onClick;
 
 private:
-	void setup(glm::vec2 position, glm::vec2 size, Anchor anchorPoint);
+	void setup(glm::vec2 size, Anchor anchorPoint);
 	void buildMesh();
 
 	Mesh _mesh;

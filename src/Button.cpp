@@ -5,10 +5,10 @@
 
 Button::Button(IUIScene *scene) : ASceneComponent(scene)
 {
-	setup(glm::vec2(0.0f, 0.0f), glm::vec2(640.0f, 64.0f), Anchor::Center);
+	setup(glm::vec2(640.0f, 64.0f), Anchor::Center);
 }
 
-void Button::setup(glm::vec2 position, glm::vec2 size, Anchor anchorPoint)
+void Button::setup(glm::vec2 size, Anchor anchorPoint)
 {
 	TextureManager::instance().createTexture("Button", "img/button.png", {
 		{ GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE },
