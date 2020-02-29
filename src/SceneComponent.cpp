@@ -26,7 +26,9 @@ glm::vec2 ASceneComponent::getScreenPosition() const
 		break ;
 	};
 
+	auto offset = getOffset();
 	position += anchorOff;
+	position += offset;
 
 	modelMatrix = glm::translate(modelMatrix, glm::vec3(position, 0.0f));
 	glm::vec3 screenPosition = glm::vec4(position, 0.0f, 1.0f) * modelMatrix;

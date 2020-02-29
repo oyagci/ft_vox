@@ -16,11 +16,12 @@ public:
 	void operator=(TextRenderer const &) = delete;
 
 	void setup();
-	void drawText(std::string text, glm::vec2 pos, GLfloat scale, glm::vec3 color, Anchor anchor = Anchor::BottomLeft);
+	void drawText(std::string text, GLfloat scale, glm::vec3 color, Anchor anchor = Anchor::BottomLeft);
 
 private:
 	GLuint _vao;
 	GLuint _vbo;
+	GLuint _ubo;
 	Shader _shader;
 	int _width;
 	int _height;

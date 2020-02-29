@@ -18,7 +18,7 @@ public:
 	{
 	}
 
-	void draw() override
+	void draw(Shader &shader) override
 	{
 	}
 };

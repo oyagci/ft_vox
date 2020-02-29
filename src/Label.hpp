@@ -9,15 +9,16 @@ public:
 	Label(IUIScene *scene) : ASceneComponent(scene), _tr(2560.0f, 1440.0f), _scale(0.6f)
 	{}
 
-	void update() override {};
+	void draw(Shader &shader) override
+	{
+		shader.setUniform4f("color", glm::vec4(glm::vec3(1.0f), 1.0f));
+		_tr.drawText(_text, _scale, glm::vec3(1.0f, 1.0f, 1.0f), getAnchor());
 
-	void draw() override {
-		_tr.drawText(_text, getScreenPosition() + glm::vec2(2.0f, -2.0f), _scale, glm::vec3(0.0f, 0.0f, 0.0f),
-			Anchor::Center);
-		_tr.drawText(_text, getScreenPosition(), _scale, glm::vec3(1.0f, 1.0f, 1.0f), Anchor::Center);
+		shader.setUniform4f("color", glm::vec4(0.0f));
 	};
 
 	void setText(std::string const &text) { _text = text; }
+	void setScale(float value) { _scale = value; }
 
 private:
 	std::string _text;

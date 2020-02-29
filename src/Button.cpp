@@ -80,7 +80,7 @@ void Button::update()
 {
 }
 
-void Button::draw()
+void Button::draw(Shader &shader)
 {
 	if (_isHovering) {
 		TextureManager::instance().bind("ButtonHovering", GL_TEXTURE0);

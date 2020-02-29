@@ -13,23 +13,31 @@ TextRenderer::TextRenderer(float width, float height)
 
 void TextRenderer::setup()
 {
-	_shader.addVertexShader("shaders/text.vs.glsl")
-		   .addFragmentShader("shaders/text.fs.glsl");
-	_shader.link();
+	GLfloat texCoords [6][2] = {
+		{ 0.0, 0.0 },
+		{ 0.0, 1.0 },
+		{ 1.0, 1.0 },
 
-	glm::mat4 projection = glm::ortho(0.0f, static_cast<float>(_width), 0.0f, static_cast<float>(_height));
-
-	_shader.bind();
-	_shader.setUniform4x4f("projection", projection);
+		{ 0.0, 0.0 },
+		{ 1.0, 1.0 },
+		{ 1.0, 0.0 }
+	};
 
 	glGenVertexArrays(1, &_vao);
 	glGenBuffers(1, &_vbo);
+	glGenBuffers(1, &_ubo);
 
 	glBindVertexArray(_vao);
+
 	glBindBuffer(GL_ARRAY_BUFFER, _vbo);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 6 * 4, nullptr, GL_DYNAMIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 6 * 2, nullptr, GL_DYNAMIC_DRAW);
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 4, 0);
+	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 2, 0);
+
+	glBindBuffer(GL_ARRAY_BUFFER, _ubo);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(texCoords), texCoords, GL_STATIC_DRAW);
+	glEnableVertexAttribArray(2);
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 2, 0);
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
@@ -78,10 +86,9 @@ void TextRenderer::setup()
 	FT_Done_FreeType(lib);
 }
 
-void TextRenderer::drawText(std::string text, glm::vec2 pos, GLfloat scale, glm::vec3 color, Anchor anchor)
+void TextRenderer::drawText(std::string text, GLfloat scale, glm::vec3 color, Anchor anchor)
 {
-	_shader.bind();
-	_shader.setUniform3f("textColor", color);
+	glm::vec2 pos(0.0f);
 
 	glActiveTexture(GL_TEXTURE0);
 	glBindVertexArray(_vao);
@@ -94,8 +101,8 @@ void TextRenderer::drawText(std::string text, glm::vec2 pos, GLfloat scale, glm:
 		maxHeight = ch.bearing.y * scale > maxHeight ? ch.bearing.y * scale : maxHeight;
 	}
 
+	// Calculate anchor offset to align text to the desired side
 	glm::vec2 anchorOffset = calculateOffset(anchor, glm::vec2(textWidth, maxHeight));
-
 	pos += anchorOffset;
 
 	for (auto &c : text)
@@ -109,16 +116,15 @@ void TextRenderer::drawText(std::string text, glm::vec2 pos, GLfloat scale, glm:
         GLfloat h = ch.size.y * scale;
 
         // Update VBO for each character
-        GLfloat vertices[6][4] = {
-            { xpos,     ypos + h,   0.0, 0.0 },
-            { xpos,     ypos,       0.0, 1.0 },
-            { xpos + w, ypos,       1.0, 1.0 },
+        GLfloat vertices[6][2] = {
+            { xpos,     ypos + h, },
+            { xpos,     ypos,     },
+            { xpos + w, ypos,     },
 
-            { xpos,     ypos + h,   0.0, 0.0 },
-            { xpos + w, ypos,       1.0, 1.0 },
-            { xpos + w, ypos + h,   1.0, 0.0 }
+            { xpos,     ypos + h, },
+            { xpos + w, ypos,     },
+            { xpos + w, ypos + h, },
         };
-
         // Render glyph texture over quad
         glBindTexture(GL_TEXTURE_2D, ch.texture);
 

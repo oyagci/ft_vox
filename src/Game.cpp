@@ -27,6 +27,7 @@ Game::Game()
 	_ui = std::make_unique<UI>(_display->getWidth(), _display->getHeight());
 
 	_ui->registerFunc("playSingleplayer", [this] { onStartPlaying(); });
+	_ui->registerFunc("quitGame", [this] { onExit(); });
 
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -119,7 +120,7 @@ void Game::play()
 	glEnable(GL_BLEND);
 	_hud->draw();
 
-	_textRenderer->drawText(std::to_string(_fpsCounter->getFPS()) + " FPS", glm::vec2(10, 10), 0.5f, glm::vec3(1.0f));
+//	_textRenderer->drawText(std::to_string(_fpsCounter->getFPS()) + " FPS", 0.5f, glm::vec3(1.0f));
 }
 
 void Game::mainMenu()

@@ -16,7 +16,7 @@ public:
 	~Button();
 
 	void update() override;
-	void draw() override;
+	void draw(Shader &shader) override;
 
 	void setText(std::string const &text);
 

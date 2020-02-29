@@ -57,7 +57,8 @@ auto UI::getScene(std::string const &name) -> std::optional<std::shared_ptr<IUIS
 	return scene;
 }
 
-template<class T>
+template<class T,
+typename = std::enable_if_t<std::is_base_of<IUIScene, T>::value>>
 bool UI::loadScene(std::string const &name)
 {
 	std::shared_ptr<T> scene = std::make_shared<T>(this);
@@ -73,16 +74,61 @@ void UI::renderScene(IUIScene &scene)
 	_shader.unbind();
 }
 
-void UI::renderComponents(std::vector<std::shared_ptr<ASceneComponent>> components)
+void UI::renderComponents(std::vector<std::shared_ptr<ASceneComponent>> components,
+	ASceneComponent *parent, glm::vec2 parentPos)
 {
 	for (auto &c : components) {
-		glm::mat4 modelMatrix = glm::translate(glm::mat4(1.0f),
-			glm::vec3(c->getScreenPosition(), 0.0f));
+		glm::vec2 position(0.0f);
+		glm::vec2 anchorOff = calculateOffset(c->getAnchor(), c->getSize());
+		glm::mat4 modelMatrix(1.0f);
 
+		glm::vec2 parentSize = parent ? parent->getSize() : glm::vec2(2560.0f, 1440.0f);
+
+		switch (c->getOrigin()) {
+		case Origin::TopLeft:
+			position = glm::vec2(0.0f, parentSize.y);
+			break ;
+		case Origin::Top:
+			position = glm::vec2(parentSize.x / 2.0f, parentSize.y);
+			break ;
+		case Origin::TopRight:
+			position = glm::vec2(parentSize.x, parentSize.y);
+			break ;
+		case Origin::Left:
+			position = glm::vec2(0.0f, parentSize.y / 2.0f);
+			break ;
+		case Origin::Right:
+			position = glm::vec2(parentSize.x, parentSize.y / 2.0f);
+			break ;
+		case Origin::Center:
+			position = parentSize / 2.0f;
+			break ;
+		case Origin::BottomLeft:
+			position = glm::vec2(0.0f, 0.0f);
+			break ;
+		case Origin::Bottom:
+			position = glm::vec2(parentSize.x / 2.0f, 0.0f);
+			break ;
+		case Origin::BottomRight:
+			position = glm::vec2(parentSize.x, 0.0f);
+			break ;
+		default:
+			break ;
+		};
+
+		auto offset = c->getOffset();
+		position += anchorOff;
+		position += offset;
+
+		modelMatrix = glm::translate(glm::mat4(1.0f),
+			glm::vec3(parentPos + position, 0.0f));
+
+		_shader.bind();
 		_shader.setUniform4x4f("modelMatrix", modelMatrix);
 
-		c->draw();
-		renderComponents(c->getSubComponents());
+		c->draw(_shader);
+
+		renderComponents(c->getSubComponents(), c.get(), position);
 	}
 }
 

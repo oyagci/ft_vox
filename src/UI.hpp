@@ -43,12 +43,14 @@ private:
 
 	std::optional<std::shared_ptr<IUIScene>> getScene(std::string const &name);
 
-	template<class T>
+	template<class T,
+	typename = std::enable_if_t<std::is_base_of<IUIScene, T>::value>>
 	bool loadScene(std::string const &name);
 
 	void renderScene(IUIScene &scene);
 
-	void renderComponents(std::vector<std::shared_ptr<ASceneComponent>> components);
+	void renderComponents(std::vector<std::shared_ptr<ASceneComponent>> components,
+		ASceneComponent *parent = nullptr, glm::vec2 parentPos = glm::vec2(0.0f, 0.0f));
 
 	UIState _state;
 	std::map<std::string, std::shared_ptr<IUIScene>> _scenes;

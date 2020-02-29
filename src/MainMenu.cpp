@@ -81,10 +81,8 @@ void MainMenu::render()
 	_background.draw();
 	_shader.unbind();
 
-	tr.drawText("ft_vox", glm::vec2(_size.x / 2.0f, _size.y - 100.0f) + glm::vec2(5.0f, -5.0f),
-		2.0f, glm::vec3(0.0f, 0.0f, 0.0f), Anchor::Top);
-	tr.drawText("ft_vox", glm::vec2(_size.x / 2.0f, _size.y - 100.0f),
-		2.0f, glm::vec3(1.0f, 1.0f, 1.0f), Anchor::Top);
+	tr.drawText("ft_vox", 2.0f, glm::vec3(0.0f, 0.0f, 0.0f), Anchor::Top);
+	tr.drawText("ft_vox", 2.0f, glm::vec3(1.0f, 1.0f, 1.0f), Anchor::Top);
 
 //	_buttonShader.bind();
 //	_playButton->draw();
@@ -92,5 +90,5 @@ void MainMenu::render()
 //	_exitButton->draw();
 //	_buttonShader.unbind();
 
-	tr.drawText("ft_vox v0.1", glm::vec2(10.0f, 10.0f), 0.4f, glm::vec3(1.0f, 1.0f, 1.0f));
+	tr.drawText("ft_vox v0.1", 0.4f, glm::vec3(1.0f, 1.0f, 1.0f));
 }
