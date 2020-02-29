@@ -1,6 +1,7 @@
 #include "UI.hpp"
 #include <iostream>
 #include "MainMenuScene.hpp"
+#include "PlayerHUDScene.hpp"
 
 UI::UI()
 {
@@ -14,6 +15,7 @@ UI::UI()
 	_shader.unbind();
 
 	loadScene<MainMenuScene>("mainMenu");
+	loadScene<PlayerHUDScene>("playerHud");
 	action(CHANGE_SCENE, "mainMenu");
 }
 
