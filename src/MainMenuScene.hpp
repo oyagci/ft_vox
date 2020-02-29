@@ -13,16 +13,16 @@ class MainMenuScene : public IUIScene
 public:
 	MainMenuScene() = delete;
 	MainMenuScene(UI *uiController) : IUIScene(uiController) {
-		_button = createSceneComponent<Button>();
-		_button->setAnchor(Anchor::Center);
-		_button->setOrigin(Origin::Center);
-		_button->setText("Singleplayer");
-		_button->_onClick = [this] { call("playSingleplayer"); };
+		_spButton = createSceneComponent<Button>();
+		_spButton->setAnchor(Anchor::Center);
+		_spButton->setOrigin(Origin::Center);
+		_spButton->setText("Singleplayer");
+		_spButton->_onClick = [this] { call("playSingleplayer"); };
 	};
 	~MainMenuScene() {};
 
 	void update() override {};
 
 private:
-	std::shared_ptr<Button> _button;
+	std::shared_ptr<Button> _spButton;
 };
