@@ -3,14 +3,14 @@
 #include "MainMenuScene.hpp"
 #include "PlayerHUDScene.hpp"
 
-UI::UI()
+UI::UI(float width, float height)
 {
 	_shader.addVertexShader("shaders/ui.vs.glsl")
 		.addFragmentShader("shaders/ui.fs.glsl")
 		.link();
 
 	_shader.bind();
-	_shader.setUniform4x4f("projectionMatrix", glm::ortho(0.0f, 1920.0f, 0.0f, 1080.0f));
+	_shader.setUniform4x4f("projectionMatrix", glm::ortho(0.0f, width, 0.0f, height));
 	_shader.setUniform4x4f("modelMatrix", glm::mat4(1.0f));
 	_shader.unbind();
 
@@ -76,10 +76,9 @@ void UI::renderScene(IUIScene &scene)
 void UI::renderComponents(std::vector<std::shared_ptr<ASceneComponent>> components)
 {
 	for (auto &c : components) {
-		glm::vec3 position(c->getPosition(), 0.0f);
-		glm::mat4 modelMatrix(1.0f);
+		glm::mat4 modelMatrix = glm::translate(glm::mat4(1.0f),
+			glm::vec3(c->getScreenPosition(), 0.0f));
 
-		modelMatrix = glm::translate(modelMatrix, position);
 		_shader.setUniform4x4f("modelMatrix", modelMatrix);
 
 		c->draw();

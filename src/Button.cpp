@@ -23,14 +23,15 @@ void Button::setup(glm::vec2 position, glm::vec2 size, Anchor anchorPoint)
 		{ GL_TEXTURE_MAG_FILTER, GL_NEAREST }
 	});
 
-	glm::vec2 anchorOffset = calculateOffset(anchorPoint, size);
-	_position = position + anchorOffset;
-	_size = size;
-	_anchor = anchorPoint;
-	_onClick = [] {};
+	setAnchor(anchorPoint);
+	setOrigin(Origin::Center);
+	setSize(size);
+
+	_onClick = [] { /* noop */ };
 
 	_label = createSubComponent<Label>();
-	_label->setPosition(_position);
+	_label->setOrigin(Origin::Center);
+	_label->setAnchor(Anchor::Center);
 	_label->setText("Hello");
 
 	buildMesh();
@@ -42,10 +43,10 @@ void Button::setup(glm::vec2 position, glm::vec2 size, Anchor anchorPoint)
 void Button::buildMesh()
 {
 	glm::vec3 quad[] = {
-		glm::vec3(0.0f,           0.0f,           0.0f),
-		glm::vec3(0.0f + _size.x, 0.0f,           0.0f),
-		glm::vec3(0.0f + _size.x, 0.0f + _size.y, 0.0f),
-		glm::vec3(0.0f,           0.0f + _size.y, 0.0f),
+		glm::vec3(0.0f,               0.0f,               0.0f),
+		glm::vec3(0.0f + getSize().x, 0.0f,               0.0f),
+		glm::vec3(0.0f + getSize().x, 0.0f + getSize().y, 0.0f),
+		glm::vec3(0.0f,               0.0f + getSize().y, 0.0f),
 	};
 	glm::uvec3 inds[] = {
 		glm::uvec3(0, 1, 2),
@@ -108,22 +109,5 @@ void Button::onHover(bool val)
 
 glm::vec4 Button::getObservedArea() const
 {
-	return glm::vec4(_position, _size);
-}
-
-void Button::setPosition(glm::vec2 position)
-{
-	auto anchorOffset = calculateOffset(_anchor, _size);
-	_position = position + anchorOffset;
-	_label->setPosition(_position);
-}
-
-void Button::setSize(glm::vec2 size)
-{
-	auto anchorOffset = calculateOffset(_anchor, _size);
-
-	_position -= anchorOffset;
-	_size = size;
-	setPosition(_position);
-	buildMesh();
+	return glm::vec4(getScreenPosition(), getSize());
 }

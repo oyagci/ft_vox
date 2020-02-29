@@ -24,7 +24,7 @@ Game::Game()
 	_mainMenu = std::make_unique<MainMenu>(*_display, glm::vec2(_display->getWidth(), _display->getHeight()),
 		[this] { onStartPlaying(); },
 		[this] { onExit(); });
-	_ui = std::make_unique<UI>();
+	_ui = std::make_unique<UI>(_display->getWidth(), _display->getHeight());
 
 	_ui->registerFunc("playSingleplayer", [this] { onStartPlaying(); });
 

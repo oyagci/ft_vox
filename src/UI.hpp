@@ -21,7 +21,7 @@ private:
 		CHANGE_SCENE,
 	};
 public:
-	UI();
+	UI(float width, float height);
 
 	void update();
 	void render();

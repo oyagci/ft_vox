@@ -20,12 +20,6 @@ public:
 
 	void setText(std::string const &text);
 
-	glm::vec2 getPosition() const override { return _position; }
-	glm::vec2 getSize() const override { return _size; }
-
-	void setPosition(glm::vec2);
-	void setSize(glm::vec2);
-
 	// IMouseObserver member functions
 	void onClickUpInside() override;
 	void onHover(bool) override;
@@ -40,10 +34,7 @@ private:
 	void buildMesh();
 
 	Mesh _mesh;
-	glm::vec2 _position;
-	glm::vec2 _size;
 	std::string _text;
-	Anchor _anchor;
 	bool _canBeClicked;
 	bool _isHovering;
 	std::shared_ptr<Label> _label;

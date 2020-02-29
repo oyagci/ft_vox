@@ -21,14 +21,4 @@ public:
 	void draw() override
 	{
 	}
-
-	glm::vec2 getPosition() const override
-	{
-		return glm::vec2(0.0f, 0.0f);
-	}
-
-	glm::vec2 getSize() const override
-	{
-		return glm::vec2(0.0f, 0.0f);
-	}
 };
