@@ -5,6 +5,7 @@
 #include "UIScene.hpp"
 #include "SceneComponent.hpp"
 #include "Button.hpp"
+#include "MainMenuBackground.hpp"
 
 class UI;
 
@@ -12,7 +13,11 @@ class MainMenuScene : public IUIScene
 {
 public:
 	MainMenuScene() = delete;
-	MainMenuScene(UI *uiController) : IUIScene(uiController) {
+	MainMenuScene(UI *uiController, glm::vec2 size) : IUIScene(uiController, size) {
+		_background = createSceneComponent<MainMenuBackground>();
+		_background->setAnchor(Anchor::BottomLeft);
+		_background->setOrigin(Origin::BottomLeft);
+
 		_spButton = createSceneComponent<Button>();
 		_spButton->setAnchor(Anchor::Center);
 		_spButton->setOrigin(Origin::Center);
@@ -32,6 +37,13 @@ public:
 		_titleLabel->setOrigin(Origin::Top);
 		_titleLabel->setScale(2.5f);
 		_titleLabel->setOffset(glm::vec2(0.0f, -150.0f));
+
+		_versionLabel = createSceneComponent<Label>();
+		_versionLabel->setText("ft_vox v0.0.1");
+		_versionLabel->setAnchor(Anchor::BottomLeft);
+		_versionLabel->setOrigin(Origin::BottomLeft);
+		_versionLabel->setScale(.4f);
+		_versionLabel->setOffset(glm::vec2(10.0f, 10.0f));
 	};
 	~MainMenuScene() {};
 
@@ -41,4 +53,6 @@ private:
 	std::shared_ptr<Label> _titleLabel;
 	std::shared_ptr<Button> _spButton;
 	std::shared_ptr<Button> _quitButton;
+	std::shared_ptr<Label> _versionLabel;
+	std::shared_ptr<MainMenuBackground> _background;
 };

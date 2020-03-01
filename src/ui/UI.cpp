@@ -14,6 +14,8 @@ UI::UI(float width, float height)
 	_shader.setUniform4x4f("modelMatrix", glm::mat4(1.0f));
 	_shader.unbind();
 
+	_size = glm::vec2(width, height);
+
 	loadScene<MainMenuScene>("mainMenu");
 	loadScene<PlayerHUDScene>("playerHud");
 	action(CHANGE_SCENE, "mainMenu");
@@ -61,7 +63,7 @@ template<class T,
 typename = std::enable_if_t<std::is_base_of<IUIScene, T>::value>>
 bool UI::loadScene(std::string const &name)
 {
-	std::shared_ptr<T> scene = std::make_shared<T>(this);
+	std::shared_ptr<T> scene = std::make_shared<T>(this, _size);
 	_scenes[name] = scene;
 
 	return true;

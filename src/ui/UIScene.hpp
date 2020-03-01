@@ -10,7 +10,10 @@ class IUIScene
 {
 public:
 	IUIScene() = delete;
-	IUIScene(UI *uiController) { _uiController = uiController; }
+	IUIScene(UI *uiController, glm::vec2 size) {
+		_uiController = uiController;
+		_size = size;
+	}
 
 	virtual ~IUIScene() {};
 	virtual void update() = 0;
@@ -32,7 +35,10 @@ public:
 
 	void call(std::string const &name);
 
+	glm::vec2 getSize() { return _size; };
+
 private:
 	std::vector<std::shared_ptr<ASceneComponent>> _sceneComponents;
 	UI *_uiController;
+	glm::vec2 _size;
 };

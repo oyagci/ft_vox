@@ -21,9 +21,6 @@ Game::Game()
 	_hud = std::make_unique<PlayerHUD>();
 	_fpsCounter = std::make_unique<FPSCounter>();
 	_textRenderer = std::make_unique<TextRenderer>(_display->getWidth(), _display->getHeight());
-	_mainMenu = std::make_unique<MainMenu>(*_display, glm::vec2(_display->getWidth(), _display->getHeight()),
-		[this] { onStartPlaying(); },
-		[this] { onExit(); });
 	_ui = std::make_unique<UI>(_display->getWidth(), _display->getHeight());
 
 	_ui->registerFunc("playSingleplayer", [this] { onStartPlaying(); });
@@ -125,8 +122,6 @@ void Game::play()
 
 void Game::mainMenu()
 {
-	_mainMenu->update();
-	_mainMenu->render();
 }
 
 void Game::onStartPlaying()

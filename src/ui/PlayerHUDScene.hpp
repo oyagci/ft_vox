@@ -5,7 +5,7 @@
 class PlayerHUDScene : public IUIScene
 {
 public:
-	PlayerHUDScene(UI *uiController) : IUIScene(uiController)
+	PlayerHUDScene(UI *uiController, glm::vec2 size) : IUIScene(uiController, size)
 	{
 	}
 
