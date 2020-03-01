@@ -16,7 +16,7 @@ public:
 	}
 
 	virtual ~IUIScene() {};
-	virtual void update() = 0;
+	virtual void update() {};
 
 	std::vector<std::shared_ptr<ASceneComponent>> getSceneComponents()
 	{

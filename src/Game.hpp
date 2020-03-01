@@ -48,7 +48,6 @@ private:
 	std::unique_ptr<TextRenderer> _textRenderer;
 	std::unique_ptr<Camera> _camera;
 	std::unique_ptr<World> _world;
-	std::unique_ptr<PlayerHUD> _hud;
 	std::unique_ptr<FPSCounter> _fpsCounter;
 	std::unique_ptr<UI> _ui;
 	GameState _state;

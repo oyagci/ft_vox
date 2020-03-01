@@ -18,7 +18,6 @@ Game::Game()
 	_camera->setProjection(glm::radians(80.0f), 0.1f, 1000.0f);
 
 	_world = std::make_unique<World>(*_camera);
-	_hud = std::make_unique<PlayerHUD>();
 	_fpsCounter = std::make_unique<FPSCounter>();
 	_textRenderer = std::make_unique<TextRenderer>(_display->getWidth(), _display->getHeight());
 	_ui = std::make_unique<UI>(_display->getWidth(), _display->getHeight());
@@ -115,7 +114,6 @@ void Game::play()
 	_world->update();
 	_world->render();
 	glEnable(GL_BLEND);
-	_hud->draw();
 
 //	_textRenderer->drawText(std::to_string(_fpsCounter->getFPS()) + " FPS", 0.5f, glm::vec3(1.0f));
 }
