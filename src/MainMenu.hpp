@@ -3,7 +3,7 @@
 #include <memory>
 #include "lazy.hpp"
 #include "TextRenderer.hpp"
-#include "Button.hpp"
+#include "ui/Button.hpp"
 
 using lazy::graphics::Mesh;
 using lazy::graphics::Shader;

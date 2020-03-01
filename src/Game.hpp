@@ -7,7 +7,7 @@
 #include "FPSCounter.hpp"
 #include "World.hpp"
 #include "MainMenu.hpp"
-#include "UI.hpp"
+#include "ui/UI.hpp"
 
 using namespace lazy;
 using namespace graphics;

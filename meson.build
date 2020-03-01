@@ -27,11 +27,11 @@ srcs = [
 	'src/Cubemap.cpp',
 	'src/Game.cpp',
 	'src/MainMenu.cpp',
-	'src/Button.cpp',
 	'src/Anchor.cpp',
-	'src/UI.cpp',
-	'src/SceneComponent.cpp',
-	'src/UIScene.cpp',
+	'src/ui/Button.cpp',
+	'src/ui/UI.cpp',
+	'src/ui/SceneComponent.cpp',
+	'src/ui/UIScene.cpp',
 ]
 
 cmake = import('cmake')

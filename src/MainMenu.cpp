@@ -1,6 +1,5 @@
 #include "MainMenu.hpp"
 #include "TextureManager.hpp"
-#include "Button.hpp"
 
 MainMenu::MainMenu(Display &display, glm::vec2 size, std::function<void()> onStartPlaying, std::function<void()> onExitGame) :
 	tr(display.getWidth(), display.getHeight()), _onStartPlaying(onStartPlaying), _onExitGame(onExitGame)
