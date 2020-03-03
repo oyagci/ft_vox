@@ -24,6 +24,16 @@ UI::UI(float width, float height)
 void UI::update()
 {
 	_state.currentScene->update();
+	updateComponents(_state.currentScene->getSceneComponents());
+}
+
+void UI::updateComponents(std::vector<std::shared_ptr<ASceneComponent>> components)
+{
+	for (auto &c : components)
+	{
+		c->update();
+		updateComponents(c->getSubComponents());
+	}
 }
 
 void UI::render()

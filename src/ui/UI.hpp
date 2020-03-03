@@ -52,6 +52,8 @@ private:
 	void renderComponents(std::vector<std::shared_ptr<ASceneComponent>> components,
 		ASceneComponent *parent = nullptr, glm::vec2 parentPos = glm::vec2(0.0f, 0.0f));
 
+	void updateComponents(std::vector<std::shared_ptr<ASceneComponent>> components);
+
 private:
 	UIState _state;
 	std::map<std::string, std::shared_ptr<IUIScene>> _scenes;
