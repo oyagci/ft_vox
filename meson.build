@@ -9,6 +9,14 @@ project('ft_vox', 'cpp',
 	  'werror=false',
 	  'optimization=2'])
 
+conf_data = configuration_data()
+conf_data.set('version', 'v0.0.2')
+configure_inc = '.'
+
+configure_file(input: 'config.h.in',
+			   output: 'config.h',
+			   configuration: conf_data)
+
 srcs = [
 	'src/main.cpp',
 	'src/SimplexNoise.cpp',
@@ -34,6 +42,9 @@ srcs = [
 	'src/ui/MainMenuBackground.cpp',
 ]
 
+incdirs = [ 'src/' ]
+incdirs += configure_inc
+
 cmake = import('cmake')
 
 lazyGL = cmake.subproject('LazyGL')
@@ -51,9 +62,11 @@ if build_machine.system() == 'linux'
 	m = meson.get_compiler('cpp').find_library('m')
 	ft = meson.get_compiler('cpp').find_library('freetype')
 
+	incdirs += [ '/usr/include/freetype2/' ]
+
 	executable('ft_vox',
 		srcs,
-		include_directories : include_directories(['src/', '/usr/include/freetype2/']),
+		include_directories : include_directories(incdirs),
 		dependencies: [ dep_lazyGL, pthread, glew, glfw, x11, xi, xrandr, dl, m, ft ])
 elif build_machine.system() == 'darwin'
 	dep_lazyGL = lazyGL.dependency('LazyGL')
@@ -65,8 +78,10 @@ elif build_machine.system() == 'darwin'
 	m = meson.get_compiler('cpp').find_library('m')
 	ft = meson.get_compiler('cpp').find_library('freetype', dirs: '~/.brew/lib')
 
+	incdirs += [ '/Users/oyagci/.brew/include/freetype2' ]
+
 	executable('ft_vox',
 		srcs,
-		include_directories : include_directories(['src/', '/Users/oyagci/.brew/include/freetype2']),
+		include_directories : include_directories(incdirs),
 		dependencies: [ dep_lazyGL, pthread, glew, glfw, gl, dl, m, ft ])
 endif

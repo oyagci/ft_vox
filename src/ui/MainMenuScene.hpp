@@ -6,6 +6,7 @@
 #include "SceneComponent.hpp"
 #include "Button.hpp"
 #include "MainMenuBackground.hpp"
+#include <config.h>
 
 class UI;
 
@@ -39,7 +40,7 @@ public:
 		_titleLabel->setOffset(glm::vec2(0.0f, -150.0f));
 
 		_versionLabel = createSceneComponent<Label>();
-		_versionLabel->setText("ft_vox v0.0.1");
+		_versionLabel->setText(std::string("ft_vox ") + std::string(VERSION_STR));
 		_versionLabel->setAnchor(Anchor::BottomLeft);
 		_versionLabel->setOrigin(Origin::BottomLeft);
 		_versionLabel->setScale(.4f);
