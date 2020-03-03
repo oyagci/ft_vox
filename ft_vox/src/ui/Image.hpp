@@ -28,10 +28,10 @@ public:
 		_quad = Mesh();
 		setSize(glm::vec2(width, height));
 		std::array<glm::vec3, 4> verts = {
-			glm::vec3(-(width / 2.0f), -(height / 2.0f), 0.0f),
-			glm::vec3( (width / 2.0f), -(height / 2.0f), 0.0f),
-			glm::vec3( (width / 2.0f),  (height / 2.0f), 0.0f),
-			glm::vec3(-(width / 2.0f),  (height / 2.0f), 0.0f),
+			glm::vec3(0.0f,  0.0f,   0.0f),
+			glm::vec3(width, 0.0f,   0.0f),
+			glm::vec3(width, height, 0.0f),
+			glm::vec3(0.0f,  height, 0.0f),
 		};
 
 		std::array<glm::vec3, 4> tex = {
