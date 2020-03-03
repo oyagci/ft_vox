@@ -84,7 +84,9 @@ void UI::renderComponents(std::vector<std::shared_ptr<ASceneComponent>> componen
 		glm::vec2 anchorOff = calculateOffset(c->getAnchor(), c->getSize());
 		glm::mat4 modelMatrix(1.0f);
 
-		glm::vec2 parentSize = parent ? parent->getSize() : glm::vec2(2560.0f, 1440.0f);
+		// TODO: Do this switch in ASceneComponent::getScreenPosition()
+		//       (getScreenPosition needs to access the parent's size)
+		glm::vec2 parentSize = parent ? parent->getSize() : _size;
 
 		switch (c->getOrigin()) {
 		case Origin::TopLeft:
