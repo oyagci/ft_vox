@@ -128,6 +128,34 @@ void Game::play()
 		glfwSetWindowShouldClose(_display->getWindow(), GLFW_TRUE);
 	}
 
+	if (input::getKeyboard().getKey(GLFW_KEY_1)) {
+		_ui->call("setHotbarItem", 0);
+	}
+	if (input::getKeyboard().getKey(GLFW_KEY_2)) {
+		_ui->call("setHotbarItem", 1);
+	}
+	if (input::getKeyboard().getKey(GLFW_KEY_3)) {
+		_ui->call("setHotbarItem", 2);
+	}
+	if (input::getKeyboard().getKey(GLFW_KEY_4)) {
+		_ui->call("setHotbarItem", 3);
+	}
+	if (input::getKeyboard().getKey(GLFW_KEY_5)) {
+		_ui->call("setHotbarItem", 4);
+	}
+	if (input::getKeyboard().getKey(GLFW_KEY_6)) {
+		_ui->call("setHotbarItem", 5);
+	}
+	if (input::getKeyboard().getKey(GLFW_KEY_7)) {
+		_ui->call("setHotbarItem", 6);
+	}
+	if (input::getKeyboard().getKey(GLFW_KEY_8)) {
+		_ui->call("setHotbarItem", 7);
+	}
+	if (input::getKeyboard().getKey(GLFW_KEY_9)) {
+		_ui->call("setHotbarItem", 8);
+	}
+
 	_camera->input(ms * deltaTime, 0.001f, {
 		GLFW_KEY_W,
 		GLFW_KEY_S,
@@ -229,4 +257,9 @@ void Game::onStartPlaying()
 void Game::onExit()
 {
 	action(EXIT);
+}
+
+void Game::setHotbarItem(int slot)
+{
+	_ui->call("setHotbarItem", slot);
 }
