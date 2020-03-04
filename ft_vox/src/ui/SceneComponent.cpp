@@ -1,6 +1,5 @@
 #include "SceneComponent.hpp"
 #include "UI.hpp"
-#include "UIScene.hpp"
 
 void ASceneComponent::call(std::string const &funcName)
 {

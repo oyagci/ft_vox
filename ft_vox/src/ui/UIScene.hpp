@@ -3,6 +3,7 @@
 #include <memory>
 #include "SceneComponent.hpp"
 #include <type_traits>
+#include <functional>
 
 class UI;
 
@@ -33,7 +34,17 @@ public:
 		return component;
 	}
 
-	void call(std::string const &name);
+	template <typename ... Args>
+	void call(std::string const &name, Args... args)
+	{
+		_uiController->call(name, std::forward<Args>(args)...);
+	}
+
+	template <typename ... Args>
+	void registerFunc(std::string const &name, std::function<void(Args...)> f)
+	{
+		_uiController->registerFunc(name, f);
+	}
 
 	glm::vec2 getSize() { return _size; };
 

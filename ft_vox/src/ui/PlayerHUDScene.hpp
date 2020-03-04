@@ -1,6 +1,6 @@
 #pragma once
 
-#include "UIScene.hpp"
+#include "UI.hpp"
 #include "Image.hpp"
 #include "Hotbar.hpp"
 
@@ -11,6 +11,9 @@ public:
 	{
 		_hotbar = createSceneComponent<Hotbar>();
 		_hotbar->setSize(getSize());
+
+		uiController->registerFunc("setHotbarItem",
+			Callback<int>([this] (int index) { _hotbar->setSlot(index); }));
 	}
 private:
 	std::shared_ptr<Hotbar> _hotbar;

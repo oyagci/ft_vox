@@ -1,5 +1,5 @@
 #include "MainMenuBackground.hpp"
-#include "UIScene.hpp"
+#include "UI.hpp"
 
 MainMenuBackground::MainMenuBackground(IUIScene *parent) : ASceneComponent(parent) {
 	TextureManager::instance().createTexture("MenuBackground", "img/bg.png", {

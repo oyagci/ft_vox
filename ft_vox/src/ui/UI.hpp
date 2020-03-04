@@ -4,11 +4,32 @@
 #include <map>
 #include <optional>
 #include <memory>
-#include "UIScene.hpp"
+#include <type_traits>
+#include "SceneComponent.hpp"
 #include "lazy.hpp"
 #include <functional>
+#include "UIScene.hpp"
 
 using lazy::graphics::Shader;
+
+class BaseCallback
+{
+public:
+	virtual ~BaseCallback() {}
+};
+
+
+template <typename ... Args>
+class Callback : public BaseCallback
+{
+private:
+	typedef std::function<void(Args...)> FuncType;
+	FuncType _f;
+public:
+	Callback() {}
+	Callback(FuncType f) { _f = f; }
+	void operator()(Args... args) { if (_f) { _f(args...); } }
+};
 
 class UI
 {
@@ -28,14 +49,33 @@ public:
 	void render();
 
 	/*
-	 * Call a registered callback from a UI component
+	 * Call a registered callback from a UI component or the game
 	 */
-	void call(std::string const &funcName);
+	template <typename... Args>
+	void call(const std::string &name, Args... args)
+	{
+		if (_callbacks.find(name) == _callbacks.end()) { return ; }
+
+		typedef Callback<Args...> CallbackType;
+
+		CallbackType *cb = dynamic_cast<CallbackType*>(_callbacks[name].get());
+
+		if (cb) {
+			(*cb)(args...);
+		}
+	}
 
 	/*
-	 * Register a callback to be used by a UI component
+	 * Register a callback to be used by a UI component or the game
 	 */
-	void registerFunc(std::string const &name, std::function<void()>);
+	template <typename T,
+	typename = std::enable_if_t<std::is_base_of<BaseCallback, T>::value>>
+	void registerFunc(std::string const &name, const T &cb)
+	{
+		if (_callbacks.find(name) != _callbacks.end()) { return ; }
+
+		_callbacks.insert(std::pair<std::string, std::shared_ptr<BaseCallback>>(name, std::make_shared<T>(cb)));
+	}
 
 	void showScene(std::string const &sceneName);
 
@@ -62,9 +102,12 @@ private:
 	void updateComponents(std::vector<std::shared_ptr<ASceneComponent>> components);
 
 private:
+
 	UIState _state;
 	std::map<std::string, std::shared_ptr<IUIScene>> _scenes;
 	Shader _shader;
-	std::map<std::string, std::function<void()>> _callbacks;
+
+	std::map<std::string, std::shared_ptr<BaseCallback>> _callbacks;
+
 	glm::vec2 _size;
 };

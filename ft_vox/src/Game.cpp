@@ -28,8 +28,8 @@ Game::Game()
 	_textRenderer = std::make_unique<TextRenderer>(_display->getWidth(), _display->getHeight());
 	_ui = std::make_unique<UI>(_display->getWidth(), _display->getHeight());
 
-	_ui->registerFunc("playSingleplayer", [this] { onStartPlaying(); });
-	_ui->registerFunc("quitGame", [this] { onExit(); });
+	_ui->registerFunc("playSingleplayer", Callback<>([this] { onStartPlaying(); }));
+	_ui->registerFunc("quitGame", Callback<>([this] { onExit(); }));
 
 	_gBuffer = std::make_unique<GBuffer>();
 	_gBuffer->shader().bind();

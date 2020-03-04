@@ -2,6 +2,7 @@
 #include <iostream>
 #include "MainMenuScene.hpp"
 #include "PlayerHUDScene.hpp"
+#include "UIScene.hpp"
 
 UI::UI(int width, int height)
 {
@@ -134,20 +135,6 @@ void UI::renderComponents(std::vector<std::shared_ptr<ASceneComponent>> componen
 
 		renderComponents(c->getSubComponents(), c.get(), position);
 	}
-}
-
-void UI::call(const std::string &name)
-{
-	if (_callbacks.find(name) == _callbacks.end()) { return ; }
-
-	_callbacks[name]();
-}
-
-void UI::registerFunc(std::string const &name, std::function<void()> cb)
-{
-	if (_callbacks.find(name) != _callbacks.end()) { return ; }
-
-	_callbacks[name] = cb;
 }
 
 void UI::showScene(std::string const &sceneName)

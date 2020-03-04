@@ -2,7 +2,7 @@
 
 #include <vector>
 #include <memory>
-#include "UIScene.hpp"
+#include "UI.hpp"
 #include "SceneComponent.hpp"
 #include "Button.hpp"
 #include "MainMenuBackground.hpp"
