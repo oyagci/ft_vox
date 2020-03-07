@@ -24,7 +24,7 @@ void main()
 
 	if (light.light.hasShadow == 1)
 	{
-		finalLight *= calcBlurredShadowFactor(light.light.shadowMap, light.light.shadowProjection, fragPos, 3, 20);
+		finalLight *= calcBlurredShadowFactor(light.light.shadowMap, light.light.shadowProjection, fragPos, 2, 10);
 	}
 
 	frag_color = finalLight;

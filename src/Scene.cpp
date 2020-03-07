@@ -24,7 +24,8 @@ void Scene::render(Shader &shader)
     {
         for (int z = 0; z < 10; z++)
         {
-            shader.setUniform4x4f("modelMatrix", glm::translate(glm::vec3(x * 10, 0, z * 10)) * glm::scale(glm::vec3(1, 1, 1)));
+            float h = -COS(x + z);
+            shader.setUniform4x4f("modelMatrix", glm::translate(glm::vec3(x * 10, h * 3 + 2, z * 10)) * glm::scale(glm::vec3(1, 1, 1)));
             _basicCube.draw();
         }
     }

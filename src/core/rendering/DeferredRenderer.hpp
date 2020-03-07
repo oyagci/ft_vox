@@ -15,7 +15,8 @@ private:
     enum Geom {
         POSITION,
         NORMAL,
-        ALBEDO
+        ALBEDO,
+        DEPTH
     };
 
     int                         _width;
@@ -25,7 +26,12 @@ private:
     Shader                      _quadShader;
     QuadPrimitive               _quad;
     std::array<glm::vec4, 8>    _frustumCorners;
-    std::vector<glm::vec3>      _ssaoKernel;
+
+    GLuint                      _ssaoKernelTexture;
+    std::vector<GLfloat>        _ssaoKernel;
+    GLuint                      _ssaoNoiseTexture;
+    Framebuffer                 _ssaoPass;
+    Shader                      _ssaoShader;
 
 public:
     DeferredRenderer();
@@ -33,8 +39,10 @@ public:
 
     void resize(int width, int height);
 
-    void genSSAOKernel(int size);
-    
+    void genSSAOKernel(const int size);
+    void genSSAONoise(const int size);
+    void genSSAOPass(int width, int height);
+    void bindSSAO(Camera &camera);
 
     void update(Camera &camera);
     void renderScene(Camera &camera, Scene &scene);
@@ -45,4 +53,5 @@ public:
 
     Shader getGBufferShader() const { return _gbufferShader; }
     Framebuffer getGBuffer() const { return _gbuffer; }
+    Framebuffer getSSAOPass() const { return _ssaoPass; }
 };

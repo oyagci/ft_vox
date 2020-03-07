@@ -16,6 +16,7 @@ private:
     DeferredRenderer    _deferred;
     QuadPrimitive       _quad;
     Shader              _quadShader;
+    Shader              _quadShaderDebug;
     int                 _width;
     int                 _height;
     bool                _resized;
