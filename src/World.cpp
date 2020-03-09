@@ -19,6 +19,9 @@ World::World(Camera &camera) : _camera(camera)
 	_shader->addVertexShader("shaders/basic.vs.glsl")
 		.addFragmentShader("shaders/basic.fs.glsl");
 	_shader->link();
+	_shader->bind();
+	_shader->setUniform1f("fogStart", 128.0f);
+	_shader->unbind();
 
 	_cubemap = std::make_unique<Cubemap>();
 	_cubemapShader = std::make_unique<Shader>();
