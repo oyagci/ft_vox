@@ -6,10 +6,10 @@
 #include <queue>
 #include <mutex>
 #include "ChunkFactory.hpp"
-#include "threadpool/threadpool.hpp"
 #include <list>
 #include <queue>
 #include "TextRenderer.hpp"
+#include <future>
 
 class World;
 
@@ -17,6 +17,7 @@ class WorldGenerator
 {
 public:
 	WorldGenerator(World *world);
+	~WorldGenerator();
 
 	void update(Camera const &camera);
 	void setCameraPosition(glm::vec3 pos);
@@ -45,7 +46,6 @@ private:
 
 	std::unique_ptr<ChunkFactory> _factory;
 	std::list<glm::vec3> _chunksToGenerate;
-	std::priority_queue<ChunkPriority, std::vector<ChunkPriority>, std::greater<ChunkPriority>> _priority;
 
 	glm::vec3 _camPos;
 
@@ -53,9 +53,45 @@ private:
 	std::queue<std::shared_ptr<Chunk>> _chunks;
 	std::vector<glm::vec3> _generatedChunks;
 
-	thread_pool _pool;
-
 	glm::ivec3 lastGridPos;
 	unsigned int _seed;
+
+	template <typename T>
+	class BlockingQueue {
+		public:
+			void enqueue(T item)
+			{
+				std::unique_lock<std::mutex> l(_qLock);
+				_queue.push(item);
+			}
+
+			T dequeue()
+			{
+				std::unique_lock<std::mutex> l(_qLock);
+				T pos = _queue.front();
+				_queue.pop();
+				return pos;
+			}
+
+			bool empty()
+			{
+				std::unique_lock<std::mutex> l(_qLock);
+				return _queue.size() == 0;
+			}
+
+			size_t size()
+			{
+				std::unique_lock<std::mutex> l(_qLock);
+				return _queue.size();
+			}
+
+		private:
+			std::queue<T> _queue;
+			std::mutex _qLock;
+	};
+
+	std::future<void> _job;
+	BlockingQueue<glm::vec3> _jobs;
+	std::atomic_bool _stopGeneration;
 };
 

@@ -5,10 +5,28 @@
 #include "World.hpp"
 #include <list>
 
-WorldGenerator::WorldGenerator(World *world) : _pool(1)
+WorldGenerator::WorldGenerator(World *world)
 {
 	_seed = std::any_cast<unsigned int>(Settings::instance().get("seed"));
 	_factory = std::make_unique<ChunkFactory>(world, _seed);
+
+	_stopGeneration.store(false);
+	_job = std::async(std::launch::async, [this] {
+		while (_stopGeneration.load() == false) {
+			if (!_jobs.empty()) {
+				glm::vec3 pos = _jobs.dequeue();
+				std::shared_ptr<Chunk> chunk = _factory->getChunk(pos);
+				std::unique_lock<std::mutex> l(_cl);
+				_chunks.push(chunk);
+			}
+		}
+	});
+}
+
+WorldGenerator::~WorldGenerator()
+{
+	_stopGeneration.store(true);
+	_job.wait();
 }
 
 void WorldGenerator::genChunksAroundPlayer()
@@ -26,7 +44,6 @@ void WorldGenerator::genChunksAroundPlayer()
 	}
 }
 
-
 void WorldGenerator::update(Camera const &camera)
 {
 	_camPos = camera.getPosition();
@@ -37,25 +54,25 @@ void WorldGenerator::update(Camera const &camera)
 	}
 	lastGridPos = gridPos;
 
-	std::priority_queue<ChunkPriority, std::vector<ChunkPriority>, std::greater<ChunkPriority>> priority;
+	std::priority_queue<struct ChunkPriority, std::vector<struct ChunkPriority>, std::greater<struct ChunkPriority>>
+		priority;
 	for (auto const &c : _chunksToGenerate) {
-		glm::vec3 chunkOffset(Chunk::CHUNK_SIZE / 2.0f, Chunk::CHUNK_SIZE / 2.0f, Chunk::CHUNK_SIZE / 2.0f);
-		float chunkRadius = glm::length(chunkOffset);
-		if (camera.sphereInFrustum(glm::vec3(c.x, 0.0f, c.z) + chunkOffset, chunkRadius)) {
+		glm::vec3 chunkCenter(Chunk::CHUNK_SIZE / 2.0f, Chunk::CHUNK_SIZE / 2.0f, Chunk::CHUNK_SIZE / 2.0f);
+		float chunkRadius = glm::length(chunkCenter);
+		if (camera.sphereInFrustum(glm::vec3(c.x, 0.0f, c.z) + chunkCenter, chunkRadius)) {
 			priority.push(ChunkPriority(glm::length(camera.getPosition() - c), c));
+		}
+		else {
+			priority.push(ChunkPriority(glm::length(camera.getPosition() - c) + 128, c));
 		}
 	}
 
-	if (!_chunksToGenerate.empty() && !_pool.isFull()) {
-		if (priority.size() > 0) {
+	if (!_chunksToGenerate.empty() && priority.size() > 0) {
+		if (_jobs.size() < 4) {
 			glm::vec3 chunkPos = priority.top().position;
 			priority.pop();
 			_chunksToGenerate.remove(chunkPos);
-			_pool.enqueue_work([=] {
-					std::shared_ptr<Chunk> chunk = _factory->getChunk(chunkPos);
-					std::unique_lock<std::mutex> l(_cl);
-					_chunks.push(chunk);
-			});
+			_jobs.enqueue(chunkPos);
 		}
 	}
 }
@@ -63,6 +80,7 @@ void WorldGenerator::update(Camera const &camera)
 std::list<std::shared_ptr<Chunk>> WorldGenerator::takeChunks()
 {
 	std::list<std::shared_ptr<Chunk>> tmp;
+	std::unique_lock<std::mutex> l(_cl);
 
 	while (!_chunks.empty()) {
 		std::shared_ptr<Chunk> c = _chunks.front();
