@@ -2,6 +2,7 @@
 #include "Time.hpp"
 #include "Settings.hpp"
 #include "stb_image.h"
+#include "GameEvents.hpp"
 
 Game &Game::get()
 {
@@ -57,6 +58,10 @@ Game::Game()
 	glDepthFunc(GL_LEQUAL);
 	glClearColor(0x87 / 255.0f, 0xCE / 255.0f, 0xEB / 255.0f, 1.0f);
 	glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
+
+	GameEvents::instance().onKeyboardKeypress += Callback<int>([this] (int keycode) {
+		_ui->call("setHotbarItem", keycode - GLFW_KEY_1);
+	});
 }
 
 int Game::run()
@@ -129,31 +134,31 @@ void Game::play()
 	}
 
 	if (input::getKeyboard().getKey(GLFW_KEY_1)) {
-		_ui->call("setHotbarItem", 0);
+		GameEvents::instance().KeyboardKeypress(GLFW_KEY_1);
 	}
 	if (input::getKeyboard().getKey(GLFW_KEY_2)) {
-		_ui->call("setHotbarItem", 1);
+		GameEvents::instance().KeyboardKeypress(GLFW_KEY_2);
 	}
 	if (input::getKeyboard().getKey(GLFW_KEY_3)) {
-		_ui->call("setHotbarItem", 2);
+		GameEvents::instance().KeyboardKeypress(GLFW_KEY_3);
 	}
 	if (input::getKeyboard().getKey(GLFW_KEY_4)) {
-		_ui->call("setHotbarItem", 3);
+		GameEvents::instance().KeyboardKeypress(GLFW_KEY_4);
 	}
 	if (input::getKeyboard().getKey(GLFW_KEY_5)) {
-		_ui->call("setHotbarItem", 4);
+		GameEvents::instance().KeyboardKeypress(GLFW_KEY_5);
 	}
 	if (input::getKeyboard().getKey(GLFW_KEY_6)) {
-		_ui->call("setHotbarItem", 5);
+		GameEvents::instance().KeyboardKeypress(GLFW_KEY_6);
 	}
 	if (input::getKeyboard().getKey(GLFW_KEY_7)) {
-		_ui->call("setHotbarItem", 6);
+		GameEvents::instance().KeyboardKeypress(GLFW_KEY_7);
 	}
 	if (input::getKeyboard().getKey(GLFW_KEY_8)) {
-		_ui->call("setHotbarItem", 7);
+		GameEvents::instance().KeyboardKeypress(GLFW_KEY_8);
 	}
 	if (input::getKeyboard().getKey(GLFW_KEY_9)) {
-		_ui->call("setHotbarItem", 8);
+		GameEvents::instance().KeyboardKeypress(GLFW_KEY_9);
 	}
 
 	_camera->input(ms * deltaTime, 0.001f, {
