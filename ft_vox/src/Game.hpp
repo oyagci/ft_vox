@@ -55,8 +55,6 @@ private:
 	void play();
 	void mainMenu();
 
-	void setHotbarItem(int slot);
-
 	std::unique_ptr<Display> _display;
 	std::unique_ptr<TextRenderer> _textRenderer;
 	std::unique_ptr<Camera> _camera;

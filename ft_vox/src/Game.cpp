@@ -258,8 +258,3 @@ void Game::onExit()
 {
 	action(EXIT);
 }
-
-void Game::setHotbarItem(int slot)
-{
-	_ui->call("setHotbarItem", slot);
-}
