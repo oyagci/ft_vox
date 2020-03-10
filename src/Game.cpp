@@ -11,7 +11,7 @@ Game::Game()
 	_display->enableCap(GL_DEPTH_TEST);
 	_display->enableCap(GL_CULL_FACE);
 	_display->enableCap(GL_BLEND);
-	_display->setFullscreen(true);
+	_display->setFullscreen(false);
 
 	maths::transform t = { glm::vec3(32, 64, 32), glm::quat(), glm::vec3(1), nullptr };
 	_camera = std::make_unique<Camera>(*_display, t);
@@ -29,6 +29,40 @@ Game::Game()
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glDepthFunc(GL_LEQUAL);
 	glClearColor(0x87 / 255.0f, 0xCE / 255.0f, 0xEB / 255.0f, 1.0f);
+
+	GameEvents::instance().onKeyboardKeypress += Callback<int>([this] (int keycode) {
+		_ui->call("setHotbarItem", keycode - GLFW_KEY_1);
+	});
+
+	std::vector<std::pair<std::string, int>> keybinds = {
+		{ "Jump",   GLFW_KEY_SPACE },
+		{ "Fire",   GLFW_KEY_SPACE },
+		{ "Sprint", GLFW_KEY_LEFT_SHIFT },
+	};
+	std::vector<std::tuple<std::string, int, float>> axisBinds = {
+		{ "MoveForward", GLFW_KEY_W,  1.0f },
+		{ "MoveForward", GLFW_KEY_S, -1.0f },
+		{ "MoveRight",   GLFW_KEY_D,  1.0f },
+		{ "MoveRight",   GLFW_KEY_A, -1.0f },
+	};
+
+	_inputController = std::make_unique<InputController>();
+	for (auto const &k : keybinds) {
+		_inputController->mapAction(k.first, k.second);
+	}
+	for (auto const &a : axisBinds) {
+		_inputController->mapAxis(std::get<0>(a), std::get<1>(a), std::get<2>(a));
+	}
+
+	_inputController->bindAction("Jump", IE_Pressed, Callback<>([] {
+		std::cout << "Start Jump" << std::endl;
+	}));
+	_inputController->bindAction("Jump", IE_Released, Callback<>([] {
+		std::cout << "Stop Jump" << std::endl;
+	}));
+	_inputController->bindAxis("MoveRight", Callback<float>([] (float amount) {
+		std::cout << "MoveRight : " << amount << std::endl;
+	}));
 }
 
 int Game::run()
@@ -94,12 +128,40 @@ void Game::play()
 	float deltaTime = Time::getDeltaTime();
 
 	float ms = 30.0f;
-	if (input::getKeyboard().getKey(GLFW_KEY_LEFT_SHIFT)) {
-		ms = 500.0f;
-	}
-	if (input::getKeyboard().getKey(GLFW_KEY_ESCAPE)) {
-		glfwSetWindowShouldClose(_display->getWindow(), GLFW_TRUE);
-	}
+//	if (input::getKeyboard().getKey(GLFW_KEY_LEFT_SHIFT)) {
+//		ms = 500.0f;
+//	}
+//	if (input::getKeyboard().getKey(GLFW_KEY_ESCAPE)) {
+//		glfwSetWindowShouldClose(_display->getWindow(), GLFW_TRUE);
+//	}
+//
+//	if (input::getKeyboard().getKey(GLFW_KEY_1)) {
+//		GameEvents::instance().KeyboardKeypress(GLFW_KEY_1);
+//	}
+//	if (input::getKeyboard().getKey(GLFW_KEY_2)) {
+//		GameEvents::instance().KeyboardKeypress(GLFW_KEY_2);
+//	}
+//	if (input::getKeyboard().getKey(GLFW_KEY_3)) {
+//		GameEvents::instance().KeyboardKeypress(GLFW_KEY_3);
+//	}
+//	if (input::getKeyboard().getKey(GLFW_KEY_4)) {
+//		GameEvents::instance().KeyboardKeypress(GLFW_KEY_4);
+//	}
+//	if (input::getKeyboard().getKey(GLFW_KEY_5)) {
+//		GameEvents::instance().KeyboardKeypress(GLFW_KEY_5);
+//	}
+//	if (input::getKeyboard().getKey(GLFW_KEY_6)) {
+//		GameEvents::instance().KeyboardKeypress(GLFW_KEY_6);
+//	}
+//	if (input::getKeyboard().getKey(GLFW_KEY_7)) {
+//		GameEvents::instance().KeyboardKeypress(GLFW_KEY_7);
+//	}
+//	if (input::getKeyboard().getKey(GLFW_KEY_8)) {
+//		GameEvents::instance().KeyboardKeypress(GLFW_KEY_8);
+//	}
+//	if (input::getKeyboard().getKey(GLFW_KEY_9)) {
+//		GameEvents::instance().KeyboardKeypress(GLFW_KEY_9);
+//	}
 
 	_camera->input(ms * deltaTime, 0.001f, {
 		GLFW_KEY_W,
