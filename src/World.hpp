@@ -1,7 +1,6 @@
 #pragma once
 #include <memory>
 #include "WorldGenerator.hpp"
-#include "IRenderer.hpp"
 #include <list>
 #include <vector>
 #include <lazy.hpp>
@@ -11,12 +10,12 @@
 using lazy::graphics::Camera;
 using lazy::graphics::Shader;
 
-class World : public IRenderer
+class World
 {
 public:
 	World(Camera &cam);
 
-	void render() override;
+	void render();
 	void update();
 	std::optional<Chunk::Block> getBlock(int x, int y, int z);
 	std::optional<std::shared_ptr<Chunk>> getChunk(glm::ivec2 pos);

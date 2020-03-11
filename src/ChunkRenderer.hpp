@@ -6,7 +6,6 @@
 #include <unordered_map>
 #include <glm/vec3.hpp>
 #include "Chunk.hpp"
-#include "IRenderer.hpp"
 #include "TextRenderer.hpp"
 #include "Texture.hpp"
 
