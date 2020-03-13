@@ -45,6 +45,7 @@ int Game::run()
 		_display->updateInputs();
 		_camera->update();
 		_fpsCounter->update(Time::getDeltaTime());
+		_ecs.Update(Time::getDeltaTime());
 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 

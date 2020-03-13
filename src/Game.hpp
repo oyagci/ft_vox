@@ -7,6 +7,7 @@
 #include "FPSCounter.hpp"
 #include "World.hpp"
 #include "ui/UI.hpp"
+#include "ecs/ecs.hpp"
 
 using namespace lazy;
 using namespace graphics;
@@ -50,5 +51,8 @@ private:
 	std::unique_ptr<World> _world;
 	std::unique_ptr<FPSCounter> _fpsCounter;
 	std::unique_ptr<UI> _ui;
+
+	ecs::ECSEngine _ecs;
+
 	GameState _state;
 };

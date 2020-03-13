@@ -40,6 +40,7 @@ srcs = [
 	'src/ui/SceneComponent.cpp',
 	'src/ui/UIScene.cpp',
 	'src/ui/MainMenuBackground.cpp',
+	'src/ecs/ECSEngine.cpp',
 ]
 
 incdirs = [ 'src/' ]
