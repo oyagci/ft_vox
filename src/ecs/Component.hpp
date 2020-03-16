@@ -4,15 +4,11 @@ namespace ecs {
 
 struct IComponentBase
 {
-public:
-	IComponentBase() = default;
 	virtual ~IComponentBase() {}
 };
 
-struct IComponent : public IComponentBase
+struct IComponent : IComponentBase
 {
-public:
-	IComponent() = default;
 	virtual ~IComponent() {}
 };
 
