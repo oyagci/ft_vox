@@ -19,5 +19,11 @@ private:
 public:
 	Callback() {}
 	Callback(FuncType f) { _f = f; }
-	void operator()(Args... args) { if (_f) { _f(args...); } }
+
+	void operator()(Args... args) noexcept(std::is_nothrow_invocable<decltype(_f)>::value)
+	{
+		if (_f) {
+			_f(args...);
+		}
+	}
 };
