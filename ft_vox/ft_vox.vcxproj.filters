@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="ui">
+      <UniqueIdentifier>{C3795900-AF05-880B-18B4-880B045F880B}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\Anchor.hpp" />
+    <ClInclude Include="src\Chunk.hpp" />
+    <ClInclude Include="src\ChunkFactory.hpp" />
+    <ClInclude Include="src\ChunkRenderer.hpp" />
+    <ClInclude Include="src\Cubemap.hpp" />
+    <ClInclude Include="src\FPSCounter.hpp" />
+    <ClInclude Include="src\Game.hpp" />
+    <ClInclude Include="src\IRenderer.hpp" />
+    <ClInclude Include="src\PlayerHUD.hpp" />
+    <ClInclude Include="src\Settings.hpp" />
+    <ClInclude Include="src\SimplexNoise.hpp" />
+    <ClInclude Include="src\TextRenderer.hpp" />
+    <ClInclude Include="src\Texture.hpp" />
+    <ClInclude Include="src\TextureManager.hpp" />
+    <ClInclude Include="src\Time.hpp" />
+    <ClInclude Include="src\World.hpp" />
+    <ClInclude Include="src\WorldGenerator.hpp" />
+    <ClInclude Include="src\stb_image.h" />
+    <ClInclude Include="src\ui\Button.hpp">
+      <Filter>ui</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ui\Image.hpp">
+      <Filter>ui</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ui\Label.hpp">
+      <Filter>ui</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ui\MainMenuBackground.hpp">
+      <Filter>ui</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ui\MainMenuScene.hpp">
+      <Filter>ui</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ui\PlayerHUDScene.hpp">
+      <Filter>ui</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ui\SceneComponent.hpp">
+      <Filter>ui</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ui\TextComponent.hpp">
+      <Filter>ui</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ui\UI.hpp">
+      <Filter>ui</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ui\UIScene.hpp">
+      <Filter>ui</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\Anchor.cpp" />
+    <ClCompile Include="src\Chunk.cpp" />
+    <ClCompile Include="src\ChunkFactory.cpp" />
+    <ClCompile Include="src\ChunkRenderer.cpp" />
+    <ClCompile Include="src\Cubemap.cpp" />
+    <ClCompile Include="src\FPSCounter.cpp" />
+    <ClCompile Include="src\Game.cpp" />
+    <ClCompile Include="src\PlayerHUD.cpp" />
+    <ClCompile Include="src\Settings.cpp" />
+    <ClCompile Include="src\SimplexNoise.cpp" />
+    <ClCompile Include="src\TextRenderer.cpp" />
+    <ClCompile Include="src\Texture.cpp" />
+    <ClCompile Include="src\TextureManager.cpp" />
+    <ClCompile Include="src\Time.cpp" />
+    <ClCompile Include="src\World.cpp" />
+    <ClCompile Include="src\WorldGenerator.cpp" />
+    <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\stb_image.cpp" />
+    <ClCompile Include="src\ui\Button.cpp">
+      <Filter>ui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ui\MainMenuBackground.cpp">
+      <Filter>ui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ui\SceneComponent.cpp">
+      <Filter>ui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ui\UI.cpp">
+      <Filter>ui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ui\UIScene.cpp">
+      <Filter>ui</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

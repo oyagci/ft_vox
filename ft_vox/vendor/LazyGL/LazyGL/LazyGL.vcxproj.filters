@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="graphics">
+      <UniqueIdentifier>{36EF08BC-22BC-63C7-4BD5-516F37019955}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="graphics\textures">
+      <UniqueIdentifier>{E9D9876C-55F0-8502-9E67-11240ABD568A}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="inputs">
+      <UniqueIdentifier>{C8A1D204-B443-FDDA-9DFE-102F893F842B}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="maths">
+      <UniqueIdentifier>{229BEA0F-8EAF-12C1-5731-B620C3040FF2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="utils">
+      <UniqueIdentifier>{169C8510-82B0-ADC1-4B32-5121B705AAF2}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\sources\graphics\Camera.hpp">
+      <Filter>graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\sources\graphics\Display.hpp">
+      <Filter>graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\sources\graphics\Mesh.hpp">
+      <Filter>graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\sources\graphics\Shader.hpp">
+      <Filter>graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\sources\graphics\textures\Framebuffer.hpp">
+      <Filter>graphics\textures</Filter>
+    </ClInclude>
+    <ClInclude Include="..\sources\inputs\Input.hpp">
+      <Filter>inputs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\sources\inputs\Keyboard.hpp">
+      <Filter>inputs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\sources\inputs\Mouse.hpp">
+      <Filter>inputs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\sources\inputs\MouseObserver.hpp">
+      <Filter>inputs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\sources\maths\maths.hpp">
+      <Filter>maths</Filter>
+    </ClInclude>
+    <ClInclude Include="..\sources\maths\transform.hpp">
+      <Filter>maths</Filter>
+    </ClInclude>
+    <ClInclude Include="..\sources\utils\fileutils.hpp">
+      <Filter>utils</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\sources\graphics\Camera.cpp">
+      <Filter>graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\sources\graphics\Display.cpp">
+      <Filter>graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\sources\graphics\Mesh.cpp">
+      <Filter>graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\sources\graphics\Shader.cpp">
+      <Filter>graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\sources\graphics\textures\Framebuffer.cpp">
+      <Filter>graphics\textures</Filter>
+    </ClCompile>
+    <ClCompile Include="..\sources\inputs\Input.cpp">
+      <Filter>inputs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\sources\inputs\Keyboard.cpp">
+      <Filter>inputs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\sources\inputs\Mouse.cpp">
+      <Filter>inputs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\sources\maths\maths.cpp">
+      <Filter>maths</Filter>
+    </ClCompile>
+    <ClCompile Include="..\sources\utils\fileutils.cpp">
+      <Filter>utils</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>
