@@ -16,7 +16,7 @@ WorldGenerator::WorldGenerator(World *world)
 			auto empty = [this]() -> auto { return _jobs.empty(); };
 			if (!empty()) {
 				glm::vec3 pos = _jobs.dequeue();
-				std::shared_ptr<Chunk> chunk = _factory->getChunk(pos);
+				std::shared_ptr<ChunkController> chunk = _factory->getChunk(pos);
 				std::unique_lock<std::mutex> l(_cl);
 				_chunks.push(chunk);
 			}
@@ -78,13 +78,13 @@ void WorldGenerator::update(Camera const &camera)
 	}
 }
 
-std::list<std::shared_ptr<Chunk>> WorldGenerator::takeChunks()
+std::list<std::shared_ptr<ChunkController>> WorldGenerator::takeChunks()
 {
-	std::list<std::shared_ptr<Chunk>> tmp;
+	std::list<std::shared_ptr<ChunkController>> tmp;
 	std::unique_lock<std::mutex> l(_cl);
 
 	while (!_chunks.empty()) {
-		std::shared_ptr<Chunk> c = _chunks.front();
+		std::shared_ptr<ChunkController> c = _chunks.front();
 		tmp.push_front(c);
 		_chunks.pop();
 	}

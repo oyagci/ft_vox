@@ -12,12 +12,12 @@ ChunkRenderer::~ChunkRenderer()
 {
 }
 
-void ChunkRenderer::addChunk(std::shared_ptr<Chunk> chunk)
+void ChunkRenderer::addChunk(std::shared_ptr<ChunkController> chunk)
 {
 	_chunkMap[chunk->getPosition()] = chunk;
 }
 
-bool ChunkRenderer::isInView(Camera &camera, Chunk &chunk)
+bool ChunkRenderer::isInView(Camera &camera, ChunkController &chunk)
 {
 	int rd = std::any_cast<int>(Settings::instance().get("renderDistance"));
 	glm::vec2 pos = chunk.getPosition();

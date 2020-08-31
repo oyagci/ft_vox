@@ -19,8 +19,9 @@ namespace lazy
 
 		GLuint Shader::createShader(const char *sources, GLenum type)
 		{
-			GLuint shader;
-			if ((shader = glCreateShader(type)) == GL_FALSE)
+			GLuint shader = glCreateShader(type);
+
+			if (shader == GL_FALSE)
 				throw std::runtime_error("Shader error: Unable to create shader !");
 
 			glShaderSource(shader, 1, &sources, NULL);
@@ -72,7 +73,10 @@ namespace lazy
 		{
 			if (shaders.find("compute") != shaders.end())
 				return *this;
-			shaders["compute"] = createShader(utils::LoadShader(path).c_str(), GL_COMPUTE_SHADER);
+
+			auto shader = utils::LoadShader(path);
+
+			shaders["compute"] = createShader(shader.c_str(), GL_COMPUTE_SHADER);
 
 			return *this;
 		}
@@ -90,8 +94,12 @@ namespace lazy
 			if ((program = glCreateProgram()) == GL_FALSE)
 				throw std::runtime_error("Shader program error: Unable to create shader program !");
 
-			glAttachShader(program, shaders["vertex"]);
-			glAttachShader(program, shaders["fragment"]);
+			if (shaders.find("vertex") != shaders.end())
+				glAttachShader(program, shaders["vertex"]);
+			if (shaders.find("fragment") != shaders.end())
+				glAttachShader(program, shaders["fragment"]);
+			if (shaders.find("compute") != shaders.end())
+				glAttachShader(program, shaders["compute"]);
 
 			glLinkProgram(program);
 
@@ -100,13 +108,20 @@ namespace lazy
 
 			if (result == GL_FALSE)
 			{
-				GLint length;
-				glGetShaderiv(program, GL_INFO_LOG_LENGTH, &length);
-				GLchar *msg = new GLchar[length];
-				glGetShaderInfoLog(program, length, &length, msg);
-				std::cout << "Shader error:\n" << msg << std::endl;
-				glDeleteShader(program);
-				delete[] msg;
+				std::cout << "Shader error:\n" << std::endl;
+
+				GLint length = 0;
+				glGetProgramiv(program, GL_INFO_LOG_LENGTH, &length);
+
+				if (length > 0) {
+					GLchar *msg = new GLchar[length];
+					glGetProgramInfoLog(program, length, &length, msg);
+
+					std::cout << msg << std::endl;
+
+					glDeleteShader(program);
+					delete[] msg;
+				}
 			}
 		}
 

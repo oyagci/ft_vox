@@ -8,12 +8,14 @@
   <ItemGroup>
     <ClInclude Include="src\Anchor.hpp" />
     <ClInclude Include="src\Chunk.hpp" />
+    <ClInclude Include="src\ChunkController.hpp" />
     <ClInclude Include="src\ChunkFactory.hpp" />
     <ClInclude Include="src\ChunkRenderer.hpp" />
     <ClInclude Include="src\Cubemap.hpp" />
     <ClInclude Include="src\FPSCounter.hpp" />
     <ClInclude Include="src\Game.hpp" />
     <ClInclude Include="src\IRenderer.hpp" />
+    <ClInclude Include="src\NoiseCompute.hpp" />
     <ClInclude Include="src\PlayerHUD.hpp" />
     <ClInclude Include="src\Settings.hpp" />
     <ClInclude Include="src\SimplexNoise.hpp" />
@@ -23,7 +25,6 @@
     <ClInclude Include="src\Time.hpp" />
     <ClInclude Include="src\World.hpp" />
     <ClInclude Include="src\WorldGenerator.hpp" />
-    <ClInclude Include="src\stb_image.h" />
     <ClInclude Include="src\ui\Button.hpp">
       <Filter>ui</Filter>
     </ClInclude>
@@ -58,11 +59,13 @@
   <ItemGroup>
     <ClCompile Include="src\Anchor.cpp" />
     <ClCompile Include="src\Chunk.cpp" />
+    <ClCompile Include="src\ChunkController.cpp" />
     <ClCompile Include="src\ChunkFactory.cpp" />
     <ClCompile Include="src\ChunkRenderer.cpp" />
     <ClCompile Include="src\Cubemap.cpp" />
     <ClCompile Include="src\FPSCounter.cpp" />
     <ClCompile Include="src\Game.cpp" />
+    <ClCompile Include="src\NoiseCompute.cpp" />
     <ClCompile Include="src\PlayerHUD.cpp" />
     <ClCompile Include="src\Settings.cpp" />
     <ClCompile Include="src\SimplexNoise.cpp" />

@@ -20,7 +20,7 @@ public:
 	void render() override;
 	void update();
 	std::optional<Chunk::Block> getBlock(int x, int y, int z);
-	std::optional<std::shared_ptr<Chunk>> getChunk(glm::ivec2 pos);
+	std::optional<std::shared_ptr<ChunkController>> getChunk(glm::ivec2 pos);
 
 	glm::vec3 getPlayerPosition() const { return _camera.getPosition(); }
 
@@ -35,7 +35,7 @@ private:
 	std::unique_ptr<Cubemap> _cubemap;
 	std::unique_ptr<Shader> _cubemapShader;
 
-	std::list<std::shared_ptr<Chunk>> _chunks;
+	std::list<std::shared_ptr<ChunkController>> _chunks;
 
 	Camera &_camera;
 

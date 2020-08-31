@@ -6,10 +6,10 @@ ChunkFactory::ChunkFactory(World *world, unsigned int seed) : _world(world), _se
 {
 }
 
-std::unique_ptr<Chunk> ChunkFactory::getChunk(glm::vec3 pos)
+std::unique_ptr<ChunkController> ChunkFactory::getChunk(glm::vec3 pos)
 {
 	glm::ivec2 finalPos(pos.x, pos.z);
-	std::unique_ptr<Chunk> chunk = std::make_unique<Chunk>(_seed, finalPos, _world);
+	std::unique_ptr<ChunkController> chunk = std::make_unique<ChunkController>(_seed, finalPos, _world);
 
 	return chunk;
 }

@@ -21,7 +21,7 @@ public:
 
 	void update(Camera const &camera);
 	void setCameraPosition(glm::vec3 pos);
-	std::list<std::shared_ptr<Chunk>> takeChunks();
+	std::list<std::shared_ptr<ChunkController>> takeChunks();
 	void removeChunksTooFar(std::vector<glm::vec2> chunksTooFar);
 
 private:
@@ -50,7 +50,7 @@ private:
 	glm::vec3 _camPos;
 
 	std::mutex _cl;
-	std::queue<std::shared_ptr<Chunk>> _chunks;
+	std::queue<std::shared_ptr<ChunkController>> _chunks;
 	std::vector<glm::vec3> _generatedChunks;
 
 	glm::ivec3 lastGridPos;

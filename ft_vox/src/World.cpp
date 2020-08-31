@@ -91,7 +91,7 @@ std::vector<glm::vec2> World::getChunksTooFar(glm::vec3 camPos)
 
 void World::removeChunksTooFar(std::vector<glm::vec2> chunksTooFar)
 {
-	std::list<std::shared_ptr<Chunk>> chunks;
+	std::list<std::shared_ptr<ChunkController>> chunks;
 	int n = 0;
 
 	for (auto &c : _chunks) {
@@ -132,9 +132,9 @@ std::optional<Chunk::Block> World::getBlock(int x, int y, int z)
 	return b;
 }
 
-std::optional<std::shared_ptr<Chunk>> World::getChunk(glm::ivec2 pos)
+std::optional<std::shared_ptr<ChunkController>> World::getChunk(glm::ivec2 pos)
 {
-	std::optional<std::shared_ptr<Chunk>> chunk;
+	std::optional<std::shared_ptr<ChunkController>> chunk;
 	std::unique_lock<std::mutex> l(_chunksLock);
 	for (auto &c : _chunks) {
 		glm::ivec2 gridPos(c->getPosition() / Chunk::CHUNK_SIZE);
