@@ -1,6 +1,7 @@
 #include "ChunkController.hpp"
 #include "World.hpp"
 #include "Time.hpp"
+#include <unordered_map>
 
 using lazy::utils::Time;
 
@@ -202,30 +203,22 @@ void ChunkController::genChunkFaces()
 
 glm::vec2 ChunkController::getTexturePosition(Chunk::BlockType type)
 {
-	if (type == Chunk::BlockType::GRASS) {
-		return glm::vec2(TEXTURE_TILE_SIZE * 11, TEXTURE_TILE_SIZE * 4);
+	static const std::unordered_map<Chunk::BlockType, glm::vec2> blocks = {
+		{ Chunk::BlockType::GRASS,       glm::vec2(TEXTURE_TILE_SIZE * 11, TEXTURE_TILE_SIZE * 4) },
+		{ Chunk::BlockType::GRASS_SIDE,  glm::vec2(TEXTURE_TILE_SIZE * 3, TEXTURE_TILE_SIZE * 15) },
+		{ Chunk::BlockType::STONE,       glm::vec2(TEXTURE_TILE_SIZE * 1, TEXTURE_TILE_SIZE * 15) },
+		{ Chunk::BlockType::DIRT,        glm::vec2(TEXTURE_TILE_SIZE * 2, TEXTURE_TILE_SIZE * 15) },
+		{ Chunk::BlockType::BEDROCK,     glm::vec2(TEXTURE_TILE_SIZE * 1, TEXTURE_TILE_SIZE * 14) },
+		{ Chunk::BlockType::OAK_LOG,     glm::vec2(TEXTURE_TILE_SIZE * 4, TEXTURE_TILE_SIZE * 14) },
+		{ Chunk::BlockType::OAK_LOG_TOP, glm::vec2(TEXTURE_TILE_SIZE * 5, TEXTURE_TILE_SIZE * 14) },
+		{ Chunk::BlockType::LEAF,        glm::vec2(TEXTURE_TILE_SIZE * 12, TEXTURE_TILE_SIZE * 4) },
+	};
+
+	auto block = blocks.find(type);
+	if (block != blocks.end()) {
+		return block->second;
 	}
-	else if (type == Chunk::BlockType::GRASS_SIDE) {
-		return glm::vec2(TEXTURE_TILE_SIZE * 3, TEXTURE_TILE_SIZE * 15);
-	}
-	else if (type == Chunk::BlockType::STONE) {
-		return glm::vec2(TEXTURE_TILE_SIZE * 1, TEXTURE_TILE_SIZE * 15);
-	}
-	else if (type == Chunk::BlockType::DIRT) {
-		return glm::vec2(TEXTURE_TILE_SIZE * 2, TEXTURE_TILE_SIZE * 15);
-	}
-	else if (type == Chunk::BlockType::BEDROCK) {
-		return glm::vec2(TEXTURE_TILE_SIZE * 1, TEXTURE_TILE_SIZE * 14);
-	}
-	else if (type == Chunk::BlockType::OAK_LOG) {
-		return glm::vec2(TEXTURE_TILE_SIZE * 4, TEXTURE_TILE_SIZE * 14);
-	}
-	else if (type == Chunk::BlockType::OAK_LOG_TOP) {
-		return glm::vec2(TEXTURE_TILE_SIZE * 5, TEXTURE_TILE_SIZE * 14);
-	}
-	else if (type == Chunk::BlockType::LEAF) {
-		return glm::vec2(TEXTURE_TILE_SIZE * 12, TEXTURE_TILE_SIZE * 4);
-	}
+
 	return glm::vec2(0, 15 * TEXTURE_TILE_SIZE);
 }
 
