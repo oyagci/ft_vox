@@ -10,7 +10,7 @@ ChunkController::ChunkController(unsigned int seed, glm::ivec2 pos, World *world
 	_position = pos;
 	_verticalOffset = -VERTICAL_OFFSET;
 	_offsetTime = 0.0f;
-	_state = ChunkState::NOT_GENERATED;
+	_state = std::make_unique<ChunkControllerState_NotGenerated>(this);
 }
 
 auto ChunkController::getBlock(std::size_t x, std::size_t y, std::size_t z) const -> Block
@@ -25,6 +25,7 @@ void ChunkController::setBlock(size_t x, size_t y, size_t z, Block val)
 
 void ChunkController::generate()
 {
+	_isGenerated.store(false);
 	auto f = std::async(std::launch::async, &ChunkController::genChunkFaces, this);
 }
 
@@ -37,85 +38,16 @@ void ChunkController::build()
 
 void ChunkController::draw()
 {
-	if (_state == ChunkState::BUILT || _state == ChunkState::DONE) {
-		_mesh.draw();
-	}
-}
-
-void ChunkController::action(ChunkAction action)
-{
-	switch (action) {
-	case ChunkAction::START_GENERATE:
-		if (_state == ChunkState::NOT_GENERATED) {
-			_state = ChunkState::IS_GENERATING;
-			generate();
-			ChunkController::action(ChunkAction::END_GENERATE);
-		}
-		break ;
-	case ChunkAction::END_GENERATE:
-		if (_state == ChunkState::IS_GENERATING) {
-			_state = ChunkState::NOT_BUILT;
-		}
-		break ;
-	case ChunkAction::START_BUILD:
-		if (_state == ChunkState::NOT_BUILT) {
-			build();
-			ChunkController::action(ChunkAction::END_BUILD);
-		}
-		break ;
-	case ChunkAction::END_BUILD:
-		if (_state == ChunkState::NOT_BUILT) {
-			_state = ChunkState::BUILT;
-		}
-		break ;
-	case ChunkAction::SET_DONE:
-		if (_state == ChunkState::BUILT) {
-			_state = ChunkState::DONE;
-		}
-		break ;
-	case ChunkAction::REGENERATE:
-		_state = ChunkState::NOT_GENERATED;
-		break ;
-	default:
-		break ;
-	}
+	_mesh.draw();
 }
 
 void ChunkController::update()
 {
-	float deltaTime = Time::getDeltaTime();
+	auto nextState = _state->OnUpdate();
 
-	auto cubicBezier = [] (float t, float p0, float p1, float p2, float p3) -> float {
-		float res = std::pow(1.0f - t, 3.0f) * p0 +
-					3.0f * std::pow(1.0f - t, 2.0f) * t * p1 +
-					3.0f * (1.0f - t) * std::pow(t , 2.0f) * p2 +
-					std::pow(t, 3.0f) * p3;
-		return res;
-	};
-
-	switch (_state) {
-	case ChunkState::NOT_GENERATED:
-		if (getUnavailableSides() == 0) {
-			onGenerate();
-		}
-		break ;
-	case ChunkState::NOT_BUILT:
-		onBuild();
-		break ;
-	case ChunkState::BUILT:
-		if (_offsetTime <= 1.0f) {
-			_verticalOffset = -VERTICAL_OFFSET + (cubicBezier(_offsetTime, 0.0f, 1.0f, 1.0f, 1.0f) * VERTICAL_OFFSET);
-			_offsetTime += VERTICAL_OFFSET_STEP * deltaTime;
-		}
-		else {
-			_verticalOffset = 0.0f;
-			_state = ChunkState::DONE;
-			action(ChunkAction::SET_DONE);
-		}
-		break;
-	default:
-		break;
-	};
+	if (nextState) {
+		_state.reset(*nextState);
+	}
 }
 
 int ChunkController::getVisibleFaces(int x, int y, int z)
@@ -264,6 +196,8 @@ void ChunkController::genChunkFaces()
 		}
 	}
 	_faces = std::move(faces);
+
+	_isGenerated.store(true);
 }
 
 glm::vec2 ChunkController::getTexturePosition(Chunk::BlockType type)
@@ -551,5 +485,73 @@ unsigned int ChunkController::getUnavailableSides()
 	}
 
 	return unavailable;
+}
+
+// Chunk Controller State
+// ======================
+
+std::optional<ChunkControllerState*> ChunkControllerState_NotGenerated::OnUpdate()
+{
+	if (_Controller->getUnavailableSides() == 0) {
+		_Controller->generate();
+		return std::make_optional(new ChunkControllerState_IsGenerating(_Controller));
+	}
+	return std::nullopt;
+}
+
+std::optional<ChunkControllerState*> ChunkControllerState_IsGenerating::OnUpdate()
+{
+	if (_Controller->_isGenerated.load() == true) {
+		return std::make_optional(new ChunkControllerState_NotBuilt(_Controller));
+	}
+	return std::nullopt;
+}
+
+std::optional<ChunkControllerState*> ChunkControllerState_NotBuilt::OnUpdate()
+{
+	_Controller->build();
+	return std::make_optional(new ChunkControllerState_Built(_Controller));
+}
+
+std::optional<ChunkControllerState*> ChunkControllerState_Built::OnDraw()
+{
+	_Controller->draw();
+	return std::nullopt;
+}
+
+std::optional<ChunkControllerState*> ChunkControllerState_Built::OnUpdate()
+{
+	float deltaTime = lazy::utils::Time::getDeltaTime();
+
+	auto cubicBezier = [] (float t, float p0, float p1, float p2, float p3) -> float {
+		float res = std::pow(1.0f - t, 3.0f) * p0 +
+					3.0f * std::pow(1.0f - t, 2.0f) * t * p1 +
+					3.0f * (1.0f - t) * std::pow(t , 2.0f) * p2 +
+					std::pow(t, 3.0f) * p3;
+		return res;
+	};
+
+	if (_Controller->_offsetTime <= 1.0f) {
+		_Controller->_verticalOffset = -ChunkController::VERTICAL_OFFSET + (cubicBezier(_Controller->_offsetTime, 0.0f, 1.0f, 1.0f, 1.0f) * _Controller->VERTICAL_OFFSET);
+		_Controller->_offsetTime += ChunkController::VERTICAL_OFFSET_STEP * deltaTime;
+	}
+	else {
+		_Controller->_verticalOffset = 0.0f;
+
+		return std::make_optional(new ChunkControllerState_Done(_Controller));
+	}
+
+	return std::nullopt;
+}
+
+std::optional<ChunkControllerState*> ChunkControllerState_Done::OnDraw()
+{
+	_Controller->draw();
+	return std::nullopt;
+}
+
+std::optional<ChunkControllerState*> ChunkControllerState_Done::OnRegenerate()
+{
+	return std::make_optional(new ChunkControllerState_NotGenerated(_Controller));
 }
 

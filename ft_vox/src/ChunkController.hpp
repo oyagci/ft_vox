@@ -5,10 +5,18 @@
 #include <glm/matrix.hpp>
 #include <memory>
 #include "Chunk.hpp"
+#include <optional>
+#include "Time.hpp"
+#include <atomic>
 
 using namespace lazy::graphics;
 
 class World;
+
+class ChunkControllerState;
+class ChunkControllerState_NotGenerated;
+class ChunkControllerState_IsGenerating;
+class ChunkControllerState_NotBuilt;
 
 class ChunkController
 {
@@ -34,22 +42,6 @@ public:
 	static constexpr float			TEXTURE_TILE_SIZE = static_cast<float>(TEXTURE_BLOCK_SIZE) / TEXTURE_TOTAL_SIZE;
 
 private:
-	enum class ChunkState {
-		NOT_GENERATED,
-		IS_GENERATING,
-		NOT_BUILT,
-		BUILT,
-		DONE,
-	};
-	enum class ChunkAction {
-		START_GENERATE,
-		END_GENERATE,
-		START_BUILD,
-		END_BUILD,
-		SET_DONE,
-		REGENERATE,
-	};
-
 	static constexpr float			VERTICAL_OFFSET = 32.0f;
 	static constexpr float			VERTICAL_OFFSET_STEP = 1.0f;
 
@@ -68,13 +60,9 @@ public:
 	unsigned int getUnavailableSides();
 	float getVerticalOffset() const { return _verticalOffset; }
 
-	void onGenerate() { action(ChunkAction::START_GENERATE); }
-	void onBuild() { action(ChunkAction::START_BUILD); }
-
 private:
 	void generate();
 	void build();
-	void action(ChunkAction action);
 
 	void genChunkFaces();
 	int getVisibleFaces(int x, int y, int z);
@@ -95,10 +83,86 @@ private:
 	Mesh _mesh;
 	glm::vec2 _position;
 	std::vector<Face> _faces;
-	ChunkState _state;
+	std::atomic_bool _isGenerated;
+
+	std::unique_ptr<ChunkControllerState> _state;
 
 	Chunk _data;
 
 	float _verticalOffset;
 	float _offsetTime;
+
+	friend class ChunkControllerState;
+	friend class ChunkControllerState_NotGenerated;
+	friend class ChunkControllerState_IsGenerating;
+	friend class ChunkControllerState_NotBuilt;
+	friend class ChunkControllerState_Built;
+};
+
+class ChunkControllerState
+{
+public:
+	ChunkControllerState(ChunkController *controller)
+		: _Controller(controller) {}
+	virtual ~ChunkControllerState() {}
+
+	virtual std::optional<ChunkControllerState*> OnRegenerate() { return std::nullopt; }
+	virtual std::optional<ChunkControllerState*> OnDraw()       { return std::nullopt; }
+	virtual std::optional<ChunkControllerState*> OnUpdate()     { return std::nullopt; }
+
+protected:
+	ChunkController *_Controller = nullptr;
+};
+
+// Chunk Controller State
+// ======================
+
+class ChunkControllerState_NotGenerated : public ChunkControllerState
+{
+public:
+	ChunkControllerState_NotGenerated(ChunkController *controller)
+		: ChunkControllerState(controller) {}
+
+	std::optional<ChunkControllerState*> OnUpdate() override;
+};
+
+
+class ChunkControllerState_IsGenerating : public ChunkControllerState
+{
+public:
+	ChunkControllerState_IsGenerating(ChunkController *controller)
+		: ChunkControllerState(controller) {}
+
+	std::optional<ChunkControllerState*> OnUpdate() override;
+};
+
+
+class ChunkControllerState_NotBuilt : public ChunkControllerState
+{
+public:
+	ChunkControllerState_NotBuilt(ChunkController *controller)
+		: ChunkControllerState(controller) {}
+
+	std::optional<ChunkControllerState*> OnUpdate() override;
+};
+
+
+class ChunkControllerState_Built : public ChunkControllerState
+{
+public:
+	ChunkControllerState_Built(ChunkController *controller)
+		: ChunkControllerState(controller) {}
+
+	std::optional<ChunkControllerState*> OnDraw() override;
+	std::optional<ChunkControllerState*> OnUpdate() override;
+};
+
+class ChunkControllerState_Done : public ChunkControllerState
+{
+public:
+	ChunkControllerState_Done(ChunkController *controller)
+		: ChunkControllerState(controller) {}
+
+	std::optional<ChunkControllerState*> OnRegenerate() override;
+	std::optional<ChunkControllerState*> OnDraw() override;
 };
