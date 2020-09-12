@@ -3,8 +3,14 @@
 #include "Settings.hpp"
 #include "stb_image.h"
 
+Game &Game::get()
+{
+	return *_instance;
+}
+
 Game::Game()
 {
+	_instance = this;
 	_state.game = MAIN_MENU;
 
 	_display = std::make_unique<Display>("ft_vox", 1920, 1080);
@@ -24,6 +30,8 @@ Game::Game()
 
 	_ui->registerFunc("playSingleplayer", [this] { onStartPlaying(); });
 	_ui->registerFunc("quitGame", [this] { onExit(); });
+
+	_blockTargeting = std::make_unique<BlockTargeting>();
 
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -55,6 +63,10 @@ int Game::run()
 				break ;
 			case PLAYING:
 				play();
+				glDisable(GL_CULL_FACE);
+				_blockTargeting->update(_camera->getPosition(), _camera->getTransform().forward());
+				_blockTargeting->draw();
+				glEnable(GL_CULL_FACE);
 				break ;
 			case PAUSED:
 				break ;

@@ -36,6 +36,8 @@ public:
 	Block at(std::size_t x, std::size_t y, std::size_t z) const;
 	void setBlock(std::size_t x, std::size_t y, std::size_t z, Block val);
 
+	inline auto &getOctree() const { return _blocks; }
+
 private:
 	Block _void = 0;
 

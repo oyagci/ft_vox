@@ -18,7 +18,7 @@ float simplexNoise(int octaves, glm::vec3 pos)
 }
 
 ChunkController::ChunkController(unsigned int seed, glm::ivec2 pos, World *world)
-	: _world(world), _data(seed, pos)
+	: _world(world), _data(seed, pos + glm::ivec2(32, 32)) // octree expects position at the center of the chunk
 {
 	_position = pos;
 	_verticalOffset = -VERTICAL_OFFSET;
@@ -399,11 +399,11 @@ void ChunkController::buildTopFace(Face const &face, Mesh &mesh, glm::vec3 pos, 
 {
 	std::array<glm::vec3, 4> vertices = {
 		glm::vec3(1, 1, 0) + pos, glm::vec3(0, 1, 0) + pos,
-		glm::vec3(1, 1, -1) + pos, glm::vec3(0, 1, -1) + pos
+		glm::vec3(1, 1, 1) + pos, glm::vec3(0, 1, 1) + pos
 	};
 	std::array<glm::u32vec3, 2> triangles = {
-		glm::u32vec3(1 + indOffset, 0 + indOffset, 2 + indOffset),
-		glm::u32vec3(1 + indOffset, 2 + indOffset, 3 + indOffset)
+		glm::u32vec3(0 + indOffset, 1 + indOffset, 2 + indOffset),
+		glm::u32vec3(1 + indOffset, 3 + indOffset, 2 + indOffset)
 	};
 
 	glm::vec2 tex = getTexturePosition(face.type);
@@ -431,11 +431,11 @@ void ChunkController::buildBotFace(Face const &face, Mesh &mesh, glm::vec3 pos, 
 {
 	std::array<glm::vec3, 4> vertices = {
 		glm::vec3(1, 0, 0) + pos, glm::vec3(0, 0, 0) + pos,
-		glm::vec3(1, 0, -1) + pos, glm::vec3(0, 0, -1) + pos
+		glm::vec3(1, 0, 1) + pos, glm::vec3(0, 0, 1) + pos
 	};
 	std::array<glm::u32vec3, 2> triangles = {
-		glm::u32vec3(1 + indOffset, 2 + indOffset, 0 + indOffset),
-		glm::u32vec3(1 + indOffset, 3 + indOffset, 2 + indOffset)
+		glm::u32vec3(0 + indOffset, 2 + indOffset, 1 + indOffset),
+		glm::u32vec3(1 + indOffset, 2 + indOffset, 3 + indOffset)
 	};
 
 	glm::vec2 tex = getTexturePosition(face.type);
@@ -462,8 +462,8 @@ void ChunkController::buildBotFace(Face const &face, Mesh &mesh, glm::vec3 pos, 
 void ChunkController::buildFrontFace(Face const &face, Mesh &mesh, glm::vec3 pos, std::size_t indOffset)
 {
 	std::array<glm::vec3, 4> vertices = {
-		glm::vec3(0, 0, 0) + pos, glm::vec3(1, 0, 0) + pos,
-		glm::vec3(1, 1, 0) + pos, glm::vec3(0, 1, 0) + pos
+		glm::vec3(0, 0, 1) + pos, glm::vec3(1, 0, 1) + pos,
+		glm::vec3(1, 1, 1) + pos, glm::vec3(0, 1, 1) + pos
 	};
 	std::array<glm::u32vec3, 2> triangles = {
 		glm::u32vec3(0 + indOffset, 1 + indOffset, 2 + indOffset),
@@ -494,8 +494,8 @@ void ChunkController::buildFrontFace(Face const &face, Mesh &mesh, glm::vec3 pos
 void ChunkController::buildBackFace(Face const &face, Mesh &mesh, glm::vec3 pos, std::size_t indOffset)
 {
 	std::array<glm::vec3, 4> vertices = {
-		glm::vec3(0, 0, -1) + pos, glm::vec3(1, 0, -1) + pos,
-		glm::vec3(1, 1, -1) + pos, glm::vec3(0, 1, -1) + pos
+		glm::vec3(0, 0, 0) + pos, glm::vec3(1, 0, 0) + pos,
+		glm::vec3(1, 1, 0) + pos, glm::vec3(0, 1, 0) + pos
 	};
 	std::array<glm::u32vec3, 2> triangles = {
 		glm::u32vec3(0 + indOffset, 2 + indOffset, 1 + indOffset),
@@ -526,8 +526,8 @@ void ChunkController::buildBackFace(Face const &face, Mesh &mesh, glm::vec3 pos,
 void ChunkController::buildRightFace(Face const &face, Mesh &mesh, glm::vec3 pos, std::size_t indOffset)
 {
 	std::array<glm::vec3, 4> vertices = {
-		glm::vec3(1, 0, 0) + pos, glm::vec3(1, 0, -1) + pos,
-		glm::vec3(1, 1, -1) + pos, glm::vec3(1, 1, 0) + pos
+		glm::vec3(1, 0, 1) + pos, glm::vec3(1, 0, 0) + pos,
+		glm::vec3(1, 1, 0) + pos, glm::vec3(1, 1, 1) + pos
 	};
 	std::array<glm::u32vec3, 2> triangles = {
 		glm::u32vec3(0 + indOffset, 1 + indOffset, 2 + indOffset),
@@ -558,8 +558,8 @@ void ChunkController::buildRightFace(Face const &face, Mesh &mesh, glm::vec3 pos
 void ChunkController::buildLeftFace(Face const &face, Mesh &mesh, glm::vec3 pos, std::size_t indOffset)
 {
 	std::array<glm::vec3, 4> vertices = {
-		glm::vec3(0, 0, 0) + pos, glm::vec3(0, 0, -1) + pos,
-		glm::vec3(0, 1, -1) + pos, glm::vec3(0, 1, 0) + pos
+		glm::vec3(0, 0, 1) + pos, glm::vec3(0, 0, 0) + pos,
+		glm::vec3(0, 1, 0) + pos, glm::vec3(0, 1, 1) + pos
 	};
 	std::array<glm::u32vec3, 2> triangles = {
 		glm::u32vec3(0 + indOffset, 2 + indOffset, 1 + indOffset),

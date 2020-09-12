@@ -6,26 +6,10 @@
 #include <optional>
 #include <iostream>
 #include <algorithm>
+#include "AxisAlignedBoundingBox.hpp"
+#include "DebugGrid.hpp"
 
 namespace octree {
-
-	struct AxisAlignedCube
-	{
-		glm::ivec3 Position;
-		float Size;
-
-		bool contains(glm::ivec3 point) const
-		{
-			return (
-				point.x >= Position.x - Size &&
-				point.y >= Position.y - Size &&
-				point.z >= Position.z - Size &&
-				point.x < Position.x + Size &&
-				point.y < Position.y + Size &&
-				point.z < Position.z + Size
-			);
-		}
-	};
 
 	class Octree
 	{
@@ -38,6 +22,17 @@ namespace octree {
 		virtual std::optional<int> at(int x, int y, int z) = 0;
 		virtual std::optional<int> at_local(int x, int y, int z) = 0;
 		virtual void collapse() = 0;
+		virtual int value() const = 0;
+
+		virtual AxisAlignedBoundingBox const &boundary() const = 0;
+		virtual AxisAlignedBoundingBox &boundary() = 0;
+
+		virtual std::array<Octree*, 8> nodes() = 0;
+		virtual std::array<Octree const*, 8> const nodes() const = 0;
+
+		virtual bool is_divided() const = 0;
+
+		virtual void draw() const = 0;
 	};
 
 	class OctreeNode : public Octree
@@ -64,62 +59,63 @@ namespace octree {
 					_Boundary.Position.x - dividedSize,
 					_Boundary.Position.y - dividedSize,
 					_Boundary.Position.z - dividedSize,
-				}, dividedSize);
+				}, dividedSize, _Value);
 			_Nodes[RIGHT_BOTTOM_FRONT] = std::make_unique<OctreeNode>(
 				glm::vec3{
 					_Boundary.Position.x + dividedSize,
 					_Boundary.Position.y - dividedSize,
 					_Boundary.Position.z - dividedSize,
-				}, dividedSize);
+				}, dividedSize, _Value);
 			_Nodes[LEFT_TOP_FRONT] = std::make_unique<OctreeNode>(
 				glm::vec3{
 					_Boundary.Position.x - dividedSize,
 					_Boundary.Position.y + dividedSize,
 					_Boundary.Position.z - dividedSize,
-				}, dividedSize);
+				}, dividedSize, _Value);
 			_Nodes[RIGHT_TOP_FRONT] = std::make_unique<OctreeNode>(
 				glm::vec3{
 					_Boundary.Position.x + dividedSize,
 					_Boundary.Position.y + dividedSize,
 					_Boundary.Position.z - dividedSize,
-				}, dividedSize);
+				}, dividedSize, _Value);
 			_Nodes[LEFT_BOTTOM_BACK] = std::make_unique<OctreeNode>(
 				glm::vec3{
 					_Boundary.Position.x - dividedSize,
 					_Boundary.Position.y - dividedSize,
 					_Boundary.Position.z + dividedSize,
-				}, dividedSize);
+				}, dividedSize, _Value);
 			_Nodes[RIGHT_BOTTOM_BACK] = std::make_unique<OctreeNode>(
 				glm::vec3{
 					_Boundary.Position.x + dividedSize,
 					_Boundary.Position.y - dividedSize,
 					_Boundary.Position.z + dividedSize,
-				}, dividedSize);
+				}, dividedSize, _Value);
 			_Nodes[LEFT_TOP_BACK] = std::make_unique<OctreeNode>(
 				glm::vec3{
 					_Boundary.Position.x - dividedSize,
 					_Boundary.Position.y + dividedSize,
 					_Boundary.Position.z + dividedSize,
-				}, dividedSize);
+				}, dividedSize, _Value);
 			_Nodes[RIGHT_TOP_BACK] = std::make_unique<OctreeNode>(
 				glm::vec3{
 					_Boundary.Position.x + dividedSize,
 					_Boundary.Position.y + dividedSize,
 					_Boundary.Position.z + dividedSize,
-				}, dividedSize);
+				}, dividedSize, _Value);
 		}
 
 		void collapse()
 		{
-			if (_Nodes[0]->_Divided == false && _Nodes[0]->_Value == _Nodes[1]->_Value &&
-				_Nodes[1]->_Divided == false && _Nodes[1]->_Value == _Nodes[2]->_Value &&
-				_Nodes[2]->_Divided == false && _Nodes[2]->_Value == _Nodes[3]->_Value &&
-				_Nodes[3]->_Divided == false && _Nodes[3]->_Value == _Nodes[4]->_Value &&
-				_Nodes[4]->_Divided == false && _Nodes[4]->_Value == _Nodes[5]->_Value &&
-				_Nodes[5]->_Divided == false && _Nodes[5]->_Value == _Nodes[6]->_Value &&
-				_Nodes[6]->_Divided == false && _Nodes[6]->_Value == _Nodes[7]->_Value &&
-				_Nodes[7]->_Divided == false)
-			{
+			if (!_Divided) { return; }
+
+			bool noneDivided = std::none_of(_Nodes.begin(), _Nodes.end(), [](auto &n) -> bool {
+				return n->is_divided();
+			});
+			bool allEqual = std::all_of(_Nodes.begin(), _Nodes.end(), [&](auto &n) -> bool {
+				return _Nodes[0]->_Value == n->_Value;
+			});
+
+			if (noneDivided && allEqual) {
 				_Value = _Nodes[0]->_Value;
 				_Divided = false;
 				for (auto &node : _Nodes) {
@@ -131,7 +127,7 @@ namespace octree {
 	public:
 		OctreeNode() = delete;
 
-		OctreeNode(glm::ivec3 position, float size, int defaultValue = 0)
+		OctreeNode(glm::vec3 position, float size, int defaultValue = 0)
 			: _Boundary{position, size}, _Nodes{}, _Value(defaultValue), _Divided(false)
 		{
 		}
@@ -196,11 +192,49 @@ namespace octree {
 
 		void erase(int x, int y, int z) override {}
 
-		AxisAlignedCube const &boundary() const { return _Boundary; }
-		AxisAlignedCube &boundary() { return _Boundary; }
+		AxisAlignedBoundingBox const &boundary() const override { return _Boundary; }
+		AxisAlignedBoundingBox &boundary() override { return _Boundary; }
+
+		std::array<Octree*, 8> nodes() override
+		{
+			std::array<Octree*, 8> arr{ nullptr };
+
+			std::transform(_Nodes.begin(), _Nodes.end(), arr.begin(), [] (std::unique_ptr<OctreeNode> &u_ptr) {
+				return u_ptr.get();
+			});
+
+			return arr;
+		}
+
+		std::array<Octree const*, 8> const nodes() const override
+		{
+			std::array<Octree const*, 8> arr{ nullptr };
+
+			std::transform(_Nodes.begin(), _Nodes.end(), arr.begin(), [] (std::unique_ptr<OctreeNode> const &u_ptr) {
+				return u_ptr.get();
+			});
+
+			return arr;
+		}
+
+		bool is_divided() const override
+		{
+			return _Divided;
+		}
+
+		int value() const override
+		{
+			return _Value;
+		}
+
+		void draw() const override
+		{
+			if (_Boundary.Size <= 0.5f || _Divided)
+				DebugGrid::get().draw(_Boundary.Position - glm::vec3(_Boundary.Size, _Boundary.Size, _Boundary.Size), _Boundary.Size * 2, 0.1f);
+		}
 
 	private:
-		AxisAlignedCube _Boundary;
+		AxisAlignedBoundingBox _Boundary;
 		std::array<std::unique_ptr<OctreeNode>, 8> _Nodes;
 		int _Value;
 		bool _Divided;

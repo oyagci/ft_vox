@@ -23,6 +23,7 @@ public:
 	std::optional<std::shared_ptr<ChunkController>> getChunk(glm::ivec2 pos);
 
 	glm::vec3 getPlayerPosition() const { return _camera.getPosition(); }
+	auto &getCamera() const { return _camera; }
 
 private:
 	std::vector<glm::vec2> getChunksTooFar(glm::vec3 camPos);
