@@ -8,6 +8,7 @@
 #include <optional>
 #include "Time.hpp"
 #include <atomic>
+#include "threadpool/ThreadPool.hpp"
 
 using namespace lazy::graphics;
 
@@ -61,10 +62,11 @@ public:
 	float getVerticalOffset() const { return _verticalOffset; }
 
 private:
-	void generate();
+	void generate(size_t step);
 	void build();
 
-	void genChunkFaces();
+	void genChunkData();
+	void genChunkFaces(size_t step);
 	int getVisibleFaces(int x, int y, int z);
 	Face genFaceToRender(glm::vec3 pos, FaceDirection f, Chunk::Block const &block);
 
@@ -78,12 +80,16 @@ private:
 
 	glm::vec2 getTexturePosition(Chunk::BlockType type);
 
+	void genTrees(glm::vec3 seedOff);
+	void putTree(glm::ivec3 root);
+
 private:
 	World *_world;
 	Mesh _mesh;
 	glm::vec2 _position;
 	std::vector<Face> _faces;
-	std::atomic_bool _isGenerated;
+	bool _isGenerated;
+	unsigned int _seed;
 
 	std::unique_ptr<ChunkControllerState> _state;
 
@@ -119,6 +125,9 @@ protected:
 
 class ChunkControllerState_NotGenerated : public ChunkControllerState
 {
+private:
+	size_t _Step = 0;
+
 public:
 	ChunkControllerState_NotGenerated(ChunkController *controller)
 		: ChunkControllerState(controller) {}

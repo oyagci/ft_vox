@@ -10,6 +10,7 @@
 #include <queue>
 #include "TextRenderer.hpp"
 #include <future>
+#include "threadpool/ThreadPool.hpp"
 
 class World;
 
@@ -20,7 +21,6 @@ public:
 	~WorldGenerator();
 
 	void update(Camera const &camera);
-	void setCameraPosition(glm::vec3 pos);
 	std::list<std::shared_ptr<ChunkController>> takeChunks();
 	void removeChunksTooFar(std::vector<glm::vec2> chunksTooFar);
 
@@ -56,42 +56,6 @@ private:
 	glm::ivec3 lastGridPos;
 	unsigned int _seed;
 
-	template <typename T>
-	class BlockingQueue {
-		public:
-			void enqueue(T item)
-			{
-				std::unique_lock<std::mutex> l(_qLock);
-				_queue.push(item);
-			}
-
-			T dequeue()
-			{
-				std::unique_lock<std::mutex> l(_qLock);
-				T pos = _queue.front();
-				_queue.pop();
-				return pos;
-			}
-
-			bool empty()
-			{
-				std::unique_lock<std::mutex> l(_qLock);
-				return _queue.size() == 0;
-			}
-
-			size_t size()
-			{
-				std::unique_lock<std::mutex> l(_qLock);
-				return _queue.size();
-			}
-
-		private:
-			std::queue<T> _queue;
-			std::mutex _qLock;
-	};
-
-	std::future<void> _job;
-	BlockingQueue<glm::vec3> _jobs;
-	std::atomic_bool _stopGeneration;
+	ThreadPool _threadpool;
 };
 

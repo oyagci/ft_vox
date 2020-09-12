@@ -2,7 +2,6 @@
 #include "Time.hpp"
 #include "Settings.hpp"
 #include "stb_image.h"
-#include "NoiseCompute.hpp"
 
 Game::Game()
 {
@@ -17,8 +16,6 @@ Game::Game()
 	maths::transform t = { glm::vec3(32, 64, 32), glm::quat(), glm::vec3(1), nullptr };
 	_camera = std::make_unique<Camera>(*_display, t);
 	_camera->setProjection(glm::radians(80.0f), 0.1f, 1000.0f);
-
-	NoiseCompute::Get();
 
 	_world = std::make_unique<World>(*_camera);
 	_fpsCounter = std::make_unique<FPSCounter>();

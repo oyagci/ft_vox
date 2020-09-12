@@ -35,11 +35,6 @@ public:
 	void setBlock(std::size_t x, std::size_t y, std::size_t z, Block val);
 
 private:
-
-	void genTrees(glm::vec3 seedOff);
-	void putTree(glm::ivec3 root);
-
-private:
 	std::unique_ptr<std::array<Block, CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE>> _blocks;
 	Block _void = 0;
 	glm::vec2 _position;

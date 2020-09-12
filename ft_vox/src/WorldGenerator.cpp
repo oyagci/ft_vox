@@ -5,30 +5,14 @@
 #include "World.hpp"
 #include <list>
 
-WorldGenerator::WorldGenerator(World *world)
+WorldGenerator::WorldGenerator(World *world) : _threadpool(4)
 {
 	_seed = std::any_cast<unsigned int>(Settings::instance().get("seed"));
 	_factory = std::make_unique<ChunkFactory>(world, _seed);
 
-	_stopGeneration.store(false);
-	_job = std::async(std::launch::async, [this] {
-		while (_stopGeneration.load() == false) {
-			auto empty = [this]() -> auto { return _jobs.empty(); };
-			if (!empty()) {
-				glm::vec3 pos = _jobs.dequeue();
-				std::shared_ptr<ChunkController> chunk = _factory->getChunk(pos);
-				std::unique_lock<std::mutex> l(_cl);
-				_chunks.push(chunk);
-			}
-		}
-	});
 }
 
-WorldGenerator::~WorldGenerator()
-{
-	_stopGeneration.store(true);
-	_job.wait();
-}
+WorldGenerator::~WorldGenerator() = default;
 
 void WorldGenerator::genChunksAroundPlayer()
 {
@@ -69,24 +53,31 @@ void WorldGenerator::update(Camera const &camera)
 	}
 
 	if (!_chunksToGenerate.empty() && priority.size() > 0) {
-		if (_jobs.size() < 4) {
-			glm::vec3 chunkPos = priority.top().position;
-			priority.pop();
-			_chunksToGenerate.remove(chunkPos);
-			_jobs.enqueue(chunkPos);
-		}
+		glm::vec3 chunkPos = priority.top().position;
+		priority.pop();
+		_chunksToGenerate.remove(chunkPos);
+
+		_threadpool.enqueue([this, chunkPos]() {
+			std::shared_ptr<ChunkController> chunk = _factory->getChunk(chunkPos);
+			{
+				std::unique_lock<std::mutex> l(_cl);
+				_chunks.push(chunk);
+			}
+		});
 	}
 }
 
 std::list<std::shared_ptr<ChunkController>> WorldGenerator::takeChunks()
 {
 	std::list<std::shared_ptr<ChunkController>> tmp;
-	std::unique_lock<std::mutex> l(_cl);
 
-	while (!_chunks.empty()) {
-		std::shared_ptr<ChunkController> c = _chunks.front();
-		tmp.push_front(c);
-		_chunks.pop();
+	{
+		std::unique_lock<std::mutex> l(_cl);
+
+		while (!_chunks.empty()) {
+			tmp.push_front(_chunks.front());
+			_chunks.pop();
+		}
 	}
 
 	return tmp;
@@ -96,7 +87,7 @@ void WorldGenerator::addChunkToGenerate(glm::vec3 pos)
 {
 	// Ignore Y axis because we only need to generate chunks on the X/Z axis.
 	// If we dont do this chunks will be generated at the same X/Z coordinates for each Y unit
-	// resulting in multiple times the same chunk being generated and wasting precious resources
+	// resulting in multiple times the same chunk being generated and that's a no-no
 	pos.y = 0;
 
 	if (std::find(_generatedChunks.begin(), _generatedChunks.end(), pos) == _generatedChunks.end()) {

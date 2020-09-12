@@ -9,18 +9,7 @@
 #include "IRenderer.hpp"
 #include "TextRenderer.hpp"
 #include "Texture.hpp"
-
-namespace std {
-	template <>
-	struct hash<glm::vec2>
-	{
-		std::size_t operator()(const glm::vec2 &v) const
-		{
-			return (hash<float>()(v.x)
-					^ ((hash<float>()(v.y) << 1) >> 1));
-		}
-	};
-}
+#include "Hash.hpp"
 
 class World;
 
