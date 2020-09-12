@@ -2,15 +2,19 @@
 #include "World.hpp"
 #include "Time.hpp"
 #include <unordered_map>
-#include "SimplexNoise.hpp"
+#include "FastNoise.h"
 
 using lazy::utils::Time;
 
-SimplexNoise s = SimplexNoise(0.1f, 1.0f, 2.0f, 0.25f);
+FastNoise fn = FastNoise(1337);
 
 float simplexNoise(int octaves, glm::vec3 pos)
 {
-	return s.fractal(octaves, pos.x, pos.y, pos.z);
+	fn.SetFractalOctaves(octaves);
+	fn.SetFrequency(0.1);
+	fn.SetFractalLacunarity(2.0f);
+
+	return fn.GetSimplex(pos.x, pos.y, pos.z);
 }
 
 ChunkController::ChunkController(unsigned int seed, glm::ivec2 pos, World *world)

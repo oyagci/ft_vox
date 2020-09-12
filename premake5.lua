@@ -21,11 +21,13 @@ IncludeDir["GLFW"]   = "%{wks.location}/ft_vox/vendor/glfw/include"
 IncludeDir["glm"]    = "%{wks.location}/ft_vox/vendor/glm"
 IncludeDir["GLAD"]   = "%{wks.location}/ft_vox/vendor/glad/include"
 IncludeDir["freetype"] = "%{wks.location}/ft_vox/vendor/freetype/include"
+IncludeDir["FastNoise"] = "%{wks.location}/ft_vox/vendor/FastNoise"
 
 include "ft_vox/vendor/glad"
 include "ft_vox/vendor/glfw"
 include "ft_vox/vendor/LazyGL"
 include "ft_vox/vendor/freetype"
+include "ft_vox/vendor/FastNoise"
 
 project "ft_vox"
     location "ft_vox"
@@ -49,6 +51,8 @@ project "ft_vox"
         "%{IncludeDir.GLAD}",
         "%{IncludeDir.GLFW}",
 		"%{IncludeDir.freetype}",
+		"%{IncludeDir.FastNoise}",
+		"%{IncludeDir.tracy}",
     }
 
     links
@@ -57,6 +61,7 @@ project "ft_vox"
 		"freetype",
 		"GLAD",
 		"GLFW",
+		"FastNoise",
     }
 
     filter "system:windows"
