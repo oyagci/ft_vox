@@ -105,12 +105,26 @@ project "ft_vox"
     {
         "LazyGL",
 		"freetype",
+		"GLAD",
+		"GLFW",
     }
 
     filter "system:windows"
         cppdialect "C++17"
         staticruntime "On"
         systemversion "latest"
+
+	filter "system:linux"
+		cppdialect "C++17"
+		staticruntime "On"
+
+	links
+	{
+		"dl",
+		"pthread",
+		"X11",
+		"zlib",
+	}
 
     filter "configurations:Release"
         optimize "On"
