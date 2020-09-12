@@ -4,6 +4,7 @@
 #include <glm/vec3.hpp>
 #include <glm/matrix.hpp>
 #include <memory>
+#include "octree/Octree.hpp"
 
 using namespace lazy::graphics;
 
@@ -32,12 +33,14 @@ public:
 	Chunk(unsigned int seed, glm::ivec2 pos);
 
 	Block getBlock(std::size_t x, std::size_t y, std::size_t z) const;
+	Block at(std::size_t x, std::size_t y, std::size_t z) const;
 	void setBlock(std::size_t x, std::size_t y, std::size_t z, Block val);
 
 private:
-	std::unique_ptr<std::array<Block, CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE>> _blocks;
 	Block _void = 0;
-	glm::vec2 _position;
+
+	std::unique_ptr<octree::Octree> _blocks;
+	std::unique_ptr<std::array<Block, CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE>> _rawBlocks;
 
 	float _verticalOffset;
 	float _offsetTime;
