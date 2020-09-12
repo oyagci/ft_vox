@@ -21,12 +21,12 @@ namespace lazy
 
 		Mesh::~Mesh()
 		{
-			glDeleteBuffers(1, &ibo);
-			glDeleteBuffers(1, &tbo);
-			glDeleteBuffers(1, &ubo);
-			glDeleteBuffers(1, &nbo);
-			glDeleteBuffers(1, &vbo);
-			glDeleteVertexArrays(1, &vao);
+			if (ibo > 0) { glDeleteBuffers(1, &ibo); }
+			if (tbo > 0) { glDeleteBuffers(1, &tbo); }
+			if (ubo > 0) { glDeleteBuffers(1, &ubo); }
+			if (nbo > 0) { glDeleteBuffers(1, &nbo); }
+			if (vbo > 0) { glDeleteBuffers(1, &vbo); }
+			if (vao > 0) { glDeleteVertexArrays(1, &vao); }
 		}
 
 		Mesh::Mesh(Mesh &&m)
@@ -56,12 +56,12 @@ namespace lazy
 		{
 			if (this != &rhs)
 			{
-				glDeleteBuffers(1, &ibo);
-				glDeleteBuffers(1, &tbo);
-				glDeleteBuffers(1, &ubo);
-				glDeleteBuffers(1, &nbo);
-				glDeleteBuffers(1, &vbo);
-				glDeleteVertexArrays(1, &vao);
+				if (ibo > 0) { glDeleteBuffers(1, &ibo); }
+				if (tbo > 0) { glDeleteBuffers(1, &tbo); }
+				if (ubo > 0) { glDeleteBuffers(1, &ubo); }
+				if (nbo > 0) { glDeleteBuffers(1, &nbo); }
+				if (vbo > 0) { glDeleteBuffers(1, &vbo); }
+				if (vao > 0) { glDeleteVertexArrays(1, &vao); }
 
 				vPositions = std::move(rhs.vPositions);
 				vNormals = std::move(rhs.vNormals);
@@ -153,9 +153,11 @@ namespace lazy
 			glEnableVertexAttribArray(2);
 			glEnableVertexAttribArray(3);
 
-			glBindBuffer(GL_ARRAY_BUFFER, vbo);
-			glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * vPositions.size(), (void *)(&vPositions[0]), GL_STATIC_DRAW);
-			glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (GLvoid *) 0);
+			if (vPositions.size()) {
+				glBindBuffer(GL_ARRAY_BUFFER, vbo);
+				glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * vPositions.size(), (void *)(&vPositions[0]), GL_STATIC_DRAW);
+				glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (GLvoid *)0);
+			}
 
 			if (vNormals.size()) {
 				glBindBuffer(GL_ARRAY_BUFFER, nbo);
@@ -163,9 +165,11 @@ namespace lazy
 				glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (GLvoid *)0);
 			}
 
-			glBindBuffer(GL_ARRAY_BUFFER, ubo);
-			glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * vUvs.size(), &vUvs[0], GL_STATIC_DRAW);
-			glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0, (GLvoid *) 0);
+			if (vUvs.size()) {
+				glBindBuffer(GL_ARRAY_BUFFER, ubo);
+				glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * vUvs.size(), &vUvs[0], GL_STATIC_DRAW);
+				glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0, (GLvoid *)0);
+			}
 
 			if (vTangents.size()) {
 				glBindBuffer(GL_ARRAY_BUFFER, tbo);
@@ -173,8 +177,10 @@ namespace lazy
 				glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, 0, (GLvoid *)0);
 			}
 
-			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
-			glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint) * indices.size(), &indices[0], GL_STATIC_DRAW);
+			if (indices.size()) {
+				glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
+				glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint) * indices.size(), &indices[0], GL_STATIC_DRAW);
+			}
 
 			glBindVertexArray(0);
 
