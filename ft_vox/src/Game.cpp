@@ -31,8 +31,6 @@ Game::Game()
 	_ui->registerFunc("playSingleplayer", [this] { onStartPlaying(); });
 	_ui->registerFunc("quitGame", [this] { onExit(); });
 
-	_blockTargeting = std::make_unique<BlockTargeting>();
-
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glDepthFunc(GL_LEQUAL);
@@ -64,8 +62,8 @@ int Game::run()
 			case PLAYING:
 				play();
 				glDisable(GL_CULL_FACE);
-				_blockTargeting->update(_camera->getPosition(), _camera->getTransform().forward());
-				_blockTargeting->draw();
+				BlockTargeting::get().update(_camera->getPosition(), _camera->getTransform().forward());
+				BlockTargeting::get().draw();
 				glEnable(GL_CULL_FACE);
 				break ;
 			case PAUSED:
@@ -122,6 +120,22 @@ void Game::play()
 		GLFW_KEY_LEFT_CONTROL,
 		GLFW_KEY_SPACE
 	});
+
+	if (lazy::inputs::input::getMouse().getButtonDown(GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) {
+		auto block = BlockTargeting::get().getCurrentTarget();
+
+		if (block) {
+			_world->setBlock(block->Position, 0);
+		}
+	}
+
+	if (lazy::inputs::input::getMouse().getButtonDown(GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS) {
+		auto block = BlockTargeting::get().getCurrentTarget();
+
+		if (block) {
+			_world->setBlock(block->Position + glm::ivec3(block->Normal), 2);
+		}
+	}
 
 	glDisable(GL_BLEND);
 	_world->update();

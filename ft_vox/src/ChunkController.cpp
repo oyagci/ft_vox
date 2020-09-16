@@ -724,3 +724,18 @@ std::optional<ChunkControllerState*> ChunkControllerState_Done::OnRegenerate()
 	return std::make_optional(new ChunkControllerState_NotGenerated(_Controller));
 }
 
+std::optional<ChunkControllerState*> ChunkControllerState_Done::OnChangeBlock(glm::ivec3 const &pos, Chunk::Block type)
+{
+	_Controller->setBlock(pos.x, pos.y, pos.z, type);
+	return std::make_optional(new ChunkControllerState_NotGenerated(_Controller));
+}
+
+
+void ChunkController::changeBlock(glm::ivec3 position, Chunk::Block type)
+{
+	auto nextState = _state->OnChangeBlock(position, type);
+
+	if (nextState) {
+		_state.reset(*nextState);
+	}
+}

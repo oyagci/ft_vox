@@ -16,7 +16,6 @@ auto Chunk::at(std::size_t x, std::size_t y, std::size_t z) const -> Block
 		return (_void);
 	}
 
-	return (*_rawBlocks)[x * CHUNK_SIZE * CHUNK_SIZE + y * CHUNK_SIZE + z];
 	return _blocks->at_local(x, y, z).value_or(_void);
 }
 
@@ -35,6 +34,5 @@ void Chunk::setBlock(size_t x, size_t y, size_t z, Block val)
 		return ;
 	}
 	(*_rawBlocks)[x * CHUNK_SIZE * CHUNK_SIZE + y * CHUNK_SIZE + z] = val;
-
 	_blocks->set_local(x, y, z, val);
 }

@@ -8,6 +8,7 @@
 #include "ChunkRenderer.hpp"
 #include "Cubemap.hpp"
 #include <optional>
+#include "Region.hpp"
 
 using lazy::graphics::Camera;
 using lazy::graphics::Shader;
@@ -24,6 +25,9 @@ public:
 
 	glm::vec3 getPlayerPosition() const { return _camera.getPosition(); }
 	auto &getCamera() const { return _camera; }
+	auto &getChunks() const { return _chunksRegion; }
+
+	void setBlock(glm::ivec3 const &position, Chunk::Block value);
 
 private:
 	std::vector<glm::vec2> getChunksTooFar(glm::vec3 camPos);
@@ -37,6 +41,8 @@ private:
 	std::unique_ptr<Shader> _cubemapShader;
 
 	std::list<std::shared_ptr<ChunkController>> _chunks;
+
+	Region<std::shared_ptr<ChunkController>> _chunksRegion;
 
 	Camera &_camera;
 

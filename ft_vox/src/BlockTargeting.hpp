@@ -13,8 +13,10 @@ struct Ray
 
 struct HitResult
 {
-	float Near;
-	float Far;
+	float     Near = std::numeric_limits<float>::infinity();
+	float     Far  = 0.0f;
+	int       Id   = 0;
+	glm::vec3 Normal;
 };
 
 class TargetBlockMesh
@@ -99,17 +101,35 @@ public:
 
 class BlockTargeting
 {
+public:
+	struct TargetBlockInfo
+	{
+		glm::ivec3 Position;
+		glm::vec3 Normal;
+		int Type;
+	};
 private:
 	HitResult raycast(AxisAlignedBoundingBox const &aabb, Ray const &ray);
 	HitResult raycastAgainstOctree(octree::Octree const &octree, Ray const &ray);
 
 	TargetBlockMesh _targetBlockHighlight;
 
-	glm::vec3 _targetBlockPosition;
+	TargetBlockInfo _currentTarget;
 
-public:
 	BlockTargeting();
 
+public:
+
+	BlockTargeting(BlockTargeting const &) = delete;
+	BlockTargeting &operator=(BlockTargeting const &) = delete;
+
+	static auto &get()
+	{
+		static BlockTargeting instance;
+		return instance;
+	}
+
 	void update(glm::vec3 const &position, glm::vec3 const &direction);
-	void draw() { _targetBlockHighlight.draw(_targetBlockPosition); }
+	void draw() { _targetBlockHighlight.draw(_currentTarget.Position); }
+	std::optional<TargetBlockInfo> getCurrentTarget();
 };

@@ -58,6 +58,5 @@ private:
 	std::unique_ptr<World> _world;
 	std::unique_ptr<FPSCounter> _fpsCounter;
 	std::unique_ptr<UI> _ui;
-	std::unique_ptr<BlockTargeting> _blockTargeting;
 	GameState _state;
 };

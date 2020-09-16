@@ -135,7 +135,6 @@ namespace octree {
 		void set(int x, int y, int z, int val) override
 		{
 			if (!_Boundary.contains({ x, y, z })) { return; }
-			if (_Value == val) { return; }
 
 			if (_Boundary.Size >= 1 && !_Divided) {
 				divide();

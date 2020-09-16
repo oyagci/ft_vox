@@ -60,14 +60,18 @@ void World::update()
 	_generator->update(_camera);
 	_chunkRenderer->update();
 
-	auto chunks = _generator->takeChunks();
-	if (!chunks.empty()) {
-		// New chunks have been created
-		// Add them to list of chunks
-		_chunks.insert(_chunks.end(), chunks.begin(), chunks.end());
+	{
+		std::unique_lock l(_chunksLock);
+		auto chunks = _generator->takeChunks();
+		if (!chunks.empty()) {
+			// New chunks have been created
+			// Add them to list of chunks
+			_chunks.insert(_chunks.end(), chunks.begin(), chunks.end());
 
-		for (auto &c : chunks) {
-			_chunkRenderer->addChunk(c);
+			for (auto &c : chunks) {
+				_chunksRegion.set(c->getPosition(), c);
+				_chunkRenderer->addChunk(c);
+			}
 		}
 	}
 }
@@ -78,12 +82,12 @@ std::vector<glm::vec2> World::getChunksTooFar(glm::vec3 camPos)
 	int renderDistance = std::any_cast<int>(Settings::instance().get("renderDistance"));
 	std::vector<glm::vec2> positions;
 
-	for (auto &c : _chunks) {
-		float dist = glm::length(c->getPosition() - camPos2D);
+	auto tooFar = _chunksRegion.queryOutside({ camPos2D, renderDistance * 32.0f });
 
-		if (dist / 64 > renderDistance) {
-			positions.push_back(c->getPosition());
-		}
+	for (auto &tf : tooFar) {
+		auto const &pos = tf->getPosition();
+		positions.push_back(pos);
+		_chunksRegion.erase(pos);
 	}
 
 	return positions;
@@ -114,34 +118,55 @@ std::optional<Chunk::Block> World::getBlock(int x, int y, int z)
 {
 	std::optional<Chunk::Block> b;
 
-	std::unique_lock<std::mutex> l(_chunksLock);
-	for (auto const &c : _chunks) {
-		glm::vec2 const &pos = c->getPosition();
+	{
+		std::unique_lock<std::mutex> l(_chunksLock);
 
-		if (pos.x <= x && x < pos.x + Chunk::CHUNK_SIZE &&
-			pos.y <= z && z < pos.y + Chunk::CHUNK_SIZE) {
+		auto chunkMatches = _chunksRegion.query(glm::vec2(x, z));
+		if (chunkMatches.size() > 0)
+		{
+			auto chunk = chunkMatches[0];
 
-			glm::uvec3 offset(x % Chunk::CHUNK_SIZE, y, z % Chunk::CHUNK_SIZE);
-			Chunk::Block block = c->getBlock(offset.x, offset.y, offset.z);
-			if (block != 0) {
-				b = block;
+			auto &pos = chunk->getPosition();
+
+			if (pos.x <= x && pos.x + Chunk::CHUNK_SIZE > x &&
+				pos.y <= z && pos.y + Chunk::CHUNK_SIZE > z) {
+
+				glm::uvec3 offset(x % Chunk::CHUNK_SIZE, y, z % Chunk::CHUNK_SIZE);
+				auto block = chunk->getBlock(offset.x, offset.y, offset.z);
+				if (block != 0) {
+					return block;
+				}
 			}
-			break ; 
 		}
 	}
-	return b;
+
+	return std::nullopt;
 }
 
 std::optional<std::shared_ptr<ChunkController>> World::getChunk(glm::ivec2 pos)
 {
 	std::optional<std::shared_ptr<ChunkController>> chunk;
-	std::unique_lock<std::mutex> l(_chunksLock);
-	for (auto &c : _chunks) {
-		glm::ivec2 gridPos(c->getPosition() / Chunk::CHUNK_SIZE);
-		if (gridPos == pos) {
-			chunk = c;
+
+	{
+		std::unique_lock<std::mutex> l(_chunksLock);
+		auto chunkMatches = _chunksRegion.query(pos * Chunk::CHUNK_SIZE);
+
+		if (chunkMatches.size() > 0) {
+			return chunkMatches[0];
 		}
 	}
 
-	return chunk;
+	return std::nullopt;
+}
+
+void World::setBlock(glm::ivec3 const &position, Chunk::Block value)
+{
+	glm::ivec2 gridPos(position.x / Chunk::CHUNK_SIZE, position.z / Chunk::CHUNK_SIZE);
+
+	auto chunk = getChunk(gridPos);
+	if (chunk) {
+		chunk.value()->changeBlock({ position.x % Chunk::CHUNK_SIZE,
+									  position.y % Chunk::CHUNK_SIZE,
+									  position.z % Chunk::CHUNK_SIZE }, value);
+	}
 }

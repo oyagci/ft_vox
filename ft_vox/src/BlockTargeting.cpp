@@ -29,16 +29,30 @@ BlockTargeting::BlockTargeting()
 
 void BlockTargeting::update(glm::vec3 const &position, glm::vec3 const &direction)
 {
-	auto chunkOpt = Game::get().getWorld().getChunk({ 0 / Chunk::CHUNK_SIZE, 0 / Chunk::CHUNK_SIZE });
-	if (!chunkOpt) { return; }
-
-	auto &octree = *(**chunkOpt).getOctree();
+	auto chunks = Game::get().getWorld().getChunks().query(AxisAlignedBoundingBox2D{ { position.x, position.z }, 128.0f });
 
 	Ray ray{ position, direction };
-	HitResult hitResult = raycastAgainstOctree(octree, ray);
+	HitResult shortestHit{ std::numeric_limits<float>::infinity(), 0.0f };
 
-	glm::vec3 blockPosition(position + direction * (hitResult.Near + 0.001f));
-	_targetBlockPosition = floor(blockPosition);
+	for (auto chunk : chunks) {
+		auto &octree = chunk->getOctree();
+		HitResult hitResult = raycastAgainstOctree(*octree, ray);
+
+		if (hitResult.Near < shortestHit.Near) {
+			shortestHit = hitResult;
+		}
+	}
+
+	if (shortestHit.Near < 24.0f) {
+		glm::vec3 blockPosition(position + direction * (shortestHit.Near + 0.001f));
+		_currentTarget.Position = floor(blockPosition);
+		_currentTarget.Type = shortestHit.Id;
+		_currentTarget.Normal = shortestHit.Normal;
+	}
+	else {
+		_currentTarget.Position = { 0.0f, -1000.0f, 0.0f };
+		_currentTarget.Type = 0;
+	}
 }
 
 HitResult BlockTargeting::raycastAgainstOctree(octree::Octree const &octree, Ray const &ray)
@@ -49,19 +63,30 @@ HitResult BlockTargeting::raycastAgainstOctree(octree::Octree const &octree, Ray
 	octree::Octree const *last = nullptr;
 #endif
 
-	if (octree.is_divided()) {
+	// Is the ray going through this chunk?
+	hitResult = raycast(octree.boundary(), ray);
 
-		std::vector<octree::Octree const*> hits;
-
-		for (auto const &node : octree.nodes()) {
-
-			AxisAlignedBoundingBox box{ node->boundary().Position, node->boundary().Size };
-			HitResult result = raycast(box, ray);
-
-			hits.push_back(node);
+	if (hitResult.Near == std::numeric_limits<float>::infinity()) { // No hit
+		return hitResult;
+	}
+	else if (!octree.is_divided()) { // Leaf
+		if (octree.value() != 0) { // Hit
+			hitResult.Id = octree.value();
+			return hitResult;
 		}
 
+		// No hit;
+		return { std::numeric_limits<float>::infinity(), 0.0f };
+	}
+	else { // Node
+
+		std::vector<octree::Octree const*> hits;
 		HitResult shortestHit{ std::numeric_limits<float>::infinity(), 0.0f };
+
+		for (auto const &node : octree.nodes()) {
+			HitResult result = raycast(node->boundary(), ray);
+			hits.push_back(node);
+		}
 
 		for (auto const &h : hits) {
 			auto result = raycastAgainstOctree(*h, ray);
@@ -74,22 +99,17 @@ HitResult BlockTargeting::raycastAgainstOctree(octree::Octree const &octree, Ray
 			}
 		}
 
-		hitResult = shortestHit;
 #if defined(DEBUG) && defined(DEBUG_OCTREE)
 		if (last) last->draw();
 #endif
-	}
-	else if (octree.value() != 0) {
 
-		AxisAlignedBoundingBox box{ octree.boundary().Position, octree.boundary().Size };
-		hitResult = raycast(box, ray);
+		return shortestHit;
 	}
 
-	return hitResult;
+	throw std::runtime_error("unreachable");
 }
 
 /// Do a raycast against an AABB
-/// Return value: vec2 where `x' is the near distance and `y' is the far distance (the length of the ray inside the box).
 HitResult BlockTargeting::raycast(AxisAlignedBoundingBox const &aabb, Ray const &ray)
 {
 	glm::vec3 const &min = aabb.min();
@@ -134,7 +154,17 @@ HitResult BlockTargeting::raycast(AxisAlignedBoundingBox const &aabb, Ray const 
 	else {
 		hitResult.Near = tmin;
 		hitResult.Far = tmax - tmin;
+		hitResult.Normal = aabb.normalFromPoint(ray.Origin + ray.Direction * tmin);
 	}
 
 	return hitResult;
+}
+
+auto BlockTargeting::getCurrentTarget() -> std::optional<TargetBlockInfo>
+{
+	// Return a value without conditional branching
+
+	std::optional<TargetBlockInfo> results[2] = { std::nullopt, std::make_optional(_currentTarget) };
+
+	return results[static_cast<size_t>(_currentTarget.Position.y >= 0.0f)];
 }

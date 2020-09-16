@@ -62,6 +62,8 @@ public:
 	unsigned int getUnavailableSides();
 	float getVerticalOffset() const { return _verticalOffset; }
 
+	void changeBlock(glm::ivec3 position, Chunk::Block type);
+
 private:
 	void generate(size_t step);
 	void build();
@@ -104,6 +106,7 @@ private:
 	friend class ChunkControllerState_IsGenerating;
 	friend class ChunkControllerState_NotBuilt;
 	friend class ChunkControllerState_Built;
+	friend class ChunkControllerState_Done;
 };
 
 class ChunkControllerState
@@ -116,6 +119,7 @@ public:
 	virtual std::optional<ChunkControllerState*> OnRegenerate() { return std::nullopt; }
 	virtual std::optional<ChunkControllerState*> OnDraw()       { return std::nullopt; }
 	virtual std::optional<ChunkControllerState*> OnUpdate()     { return std::nullopt; }
+	virtual std::optional<ChunkControllerState*> OnChangeBlock(glm::ivec3 const &, Chunk::Block type) { return std::nullopt;  }
 
 protected:
 	ChunkController *_Controller = nullptr;
@@ -175,4 +179,5 @@ public:
 
 	std::optional<ChunkControllerState*> OnRegenerate() override;
 	std::optional<ChunkControllerState*> OnDraw() override;
+	std::optional<ChunkControllerState*> OnChangeBlock(glm::ivec3 const &, Chunk::Block) override;
 };
