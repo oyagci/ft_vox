@@ -45,10 +45,10 @@ void WorldGenerator::update(Camera const &camera)
 		glm::vec3 chunkCenter(Chunk::CHUNK_SIZE / 2.0f, Chunk::CHUNK_SIZE / 2.0f, Chunk::CHUNK_SIZE / 2.0f);
 		float chunkRadius = glm::length(chunkCenter);
 		if (camera.sphereInFrustum(glm::vec3(c.x, 0.0f, c.z) + chunkCenter, chunkRadius)) {
-			priority.push(ChunkPriority(glm::length(camera.getPosition() - c), c));
+			priority.push(ChunkPriority((Priority)glm::length(camera.getPosition() - c), c));
 		}
 		else {
-			priority.push(ChunkPriority(glm::length(camera.getPosition() - c) + 128, c));
+			priority.push(ChunkPriority((Priority)glm::length(camera.getPosition() - c) + 128, c));
 		}
 	}
 

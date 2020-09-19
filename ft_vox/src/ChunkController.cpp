@@ -11,7 +11,7 @@ FastNoise fn = FastNoise(1337);
 float simplexNoise(int octaves, glm::vec3 pos)
 {
 	fn.SetFractalOctaves(octaves);
-	fn.SetFrequency(0.1);
+	fn.SetFrequency(0.1f);
 	fn.SetFractalLacunarity(2.0f);
 
 	return fn.GetSimplex(pos.x, pos.y, pos.z);
@@ -481,7 +481,7 @@ void ChunkController::buildFrontFace(Face const &face, Mesh &mesh, glm::vec3 pos
 
 	for (auto &v : vertices) {
 		mesh.addPosition(v);
-		mesh.addNormal(glm::vec3(0.0f, 0.0f, -1.0f));
+		mesh.addNormal(glm::vec3(0.0f, 0.0f, 1.0f));
 	}
 	for (auto &t : triangles) {
 		mesh.addTriangle(t);
@@ -513,7 +513,7 @@ void ChunkController::buildBackFace(Face const &face, Mesh &mesh, glm::vec3 pos,
 
 	for (auto &v : vertices) {
 		mesh.addPosition(v);
-		mesh.addNormal(glm::vec3(0.0f, 0.0f, 1.0f));
+		mesh.addNormal(glm::vec3(0.0f, 0.0f, -1.0f));
 	}
 	for (auto &t : triangles) {
 		mesh.addTriangle(t);

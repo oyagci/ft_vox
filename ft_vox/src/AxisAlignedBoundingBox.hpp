@@ -48,7 +48,7 @@ struct AxisAlignedBoundingBox
 	}
 
 	template <typename T> inline T sgn(T const val) const {
-		return (T(0) < val) - (val < T(0));
+		return (T)(T(0) < (T)val) - ((T)val < T(0));
 	}
 
 	glm::vec3 normalFromPoint(glm::vec3 point) const

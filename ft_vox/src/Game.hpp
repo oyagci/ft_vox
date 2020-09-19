@@ -8,6 +8,9 @@
 #include "World.hpp"
 #include "ui/UI.hpp"
 #include "BlockTargeting.hpp"
+#include "GBuffer.hpp"
+#include "Quad.hpp"
+#include "AmbientOcclusion.hpp"
 
 using namespace lazy;
 using namespace graphics;
@@ -58,5 +61,15 @@ private:
 	std::unique_ptr<World> _world;
 	std::unique_ptr<FPSCounter> _fpsCounter;
 	std::unique_ptr<UI> _ui;
+
+	std::unique_ptr<GBuffer> _gBuffer;
+
+	std::unique_ptr<lazy::graphics::Shader> _finalDrawShader;
+
+	std::unique_ptr<Quad> _renderQuad;
+
 	GameState _state;
+
+	std::unique_ptr<AmbientOcclusion> _ssao;
 };
+

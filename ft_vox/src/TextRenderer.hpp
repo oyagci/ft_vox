@@ -10,7 +10,7 @@ class TextRenderer
 {
 public:
 //	TextRenderer() = delete;
-	TextRenderer(float width = 1280.0f, float height = 720.0f);
+	TextRenderer(int width = 1280, int height = 720);
 	TextRenderer(const TextRenderer &) = delete;
 
 	void operator=(TextRenderer const &) = delete;

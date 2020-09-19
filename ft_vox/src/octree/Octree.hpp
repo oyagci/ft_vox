@@ -154,9 +154,9 @@ namespace octree {
 		void set_local(int x, int y, int z, int val) override
 		{
 			// Convert local coordinates to world coordinates
-			x += _Boundary.Position.x - _Boundary.Size;
-			y += _Boundary.Position.y - _Boundary.Size;
-			z += _Boundary.Position.z - _Boundary.Size;
+			x += (int)(_Boundary.Position.x - _Boundary.Size);
+			y += (int)(_Boundary.Position.y - _Boundary.Size);
+			z += (int)(_Boundary.Position.z - _Boundary.Size);
 
 			set(x, y, z, val);
 		}
@@ -182,9 +182,9 @@ namespace octree {
 		std::optional<int> at_local(int x, int y, int z) override
 		{
 			// Convert local coordinates to world coordinates
-			x += _Boundary.Position.x - _Boundary.Size;
-			y += _Boundary.Position.y - _Boundary.Size;
-			z += _Boundary.Position.z - _Boundary.Size;
+			x += (int)(_Boundary.Position.x - _Boundary.Size);
+			y += (int)(_Boundary.Position.y - _Boundary.Size);
+			z += (int)(_Boundary.Position.z - _Boundary.Size);
 
 			return at(x, y, z);
 		}

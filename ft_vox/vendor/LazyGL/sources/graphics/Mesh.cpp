@@ -190,7 +190,7 @@ namespace lazy
 		void Mesh::draw()
 		{
 			glBindVertexArray(vao);
-			glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, nullptr);
+			glDrawElements(GL_TRIANGLES, (GLsizei)(indices.size()), GL_UNSIGNED_INT, nullptr);
 			glBindVertexArray(0);
 		}
 	}

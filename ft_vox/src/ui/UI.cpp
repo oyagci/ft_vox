@@ -3,14 +3,14 @@
 #include "MainMenuScene.hpp"
 #include "PlayerHUDScene.hpp"
 
-UI::UI(float width, float height)
+UI::UI(int width, int height)
 {
 	_shader.addVertexShader("shaders/ui.vs.glsl")
 		.addFragmentShader("shaders/ui.fs.glsl")
 		.link();
 
 	_shader.bind();
-	_shader.setUniform4x4f("projectionMatrix", glm::ortho(0.0f, width, 0.0f, height));
+	_shader.setUniform4x4f("projectionMatrix", glm::ortho(0.0f, (float)width, 0.0f, (float)height));
 	_shader.setUniform4x4f("modelMatrix", glm::mat4(1.0f));
 	_shader.unbind();
 
@@ -67,16 +67,6 @@ auto UI::getScene(std::string const &name) -> std::optional<std::shared_ptr<IUIS
 		scene = sceneIter->second;
 	}
 	return scene;
-}
-
-template<class T,
-typename = std::enable_if_t<std::is_base_of<IUIScene, T>::value>>
-bool UI::loadScene(std::string const &name)
-{
-	std::shared_ptr<T> scene = std::make_shared<T>(this, _size);
-	_scenes[name] = scene;
-
-	return true;
 }
 
 void UI::renderScene(IUIScene &scene)

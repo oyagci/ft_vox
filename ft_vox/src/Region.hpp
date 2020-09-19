@@ -84,7 +84,7 @@ public:
 		}
 
 		if (fixedBase != 0 && number != 0) {
-			float sign = number > 0 ? 1 : -1;
+			float sign = number > 0.0f ? 1.0f : -1.0f;
 			number *= sign;
 			number /= fixedBase;
 			int fixedPoint = (int)ceil(number);
@@ -106,8 +106,8 @@ public:
 
 		// Align the position on RegionSideSize
 		glm::ivec2 regionChunk{
-			roundUp(static_cast<int>(position.x), RegionSideSize),
-			roundUp(static_cast<int>(position.y), RegionSideSize),
+			(int)roundUp(floor(position.x), (float)RegionSideSize),
+			(int)roundUp(floor(position.y), (float)RegionSideSize),
 		};
 
 		glm::ivec2 regionCenter{ regionChunk.x + RegionSize, regionChunk.y + RegionSize };

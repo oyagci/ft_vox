@@ -1,7 +1,6 @@
 #pragma once
 #include <memory>
 #include "WorldGenerator.hpp"
-#include "IRenderer.hpp"
 #include <list>
 #include <vector>
 #include <lazy.hpp>
@@ -13,12 +12,12 @@
 using lazy::graphics::Camera;
 using lazy::graphics::Shader;
 
-class World : public IRenderer
+class World
 {
 public:
 	World(Camera &cam);
 
-	void render() override;
+	void render(Shader &shader);
 	void update();
 	std::optional<Chunk::Block> getBlock(int x, int y, int z);
 	std::optional<std::shared_ptr<ChunkController>> getChunk(glm::ivec2 pos);
@@ -35,7 +34,6 @@ private:
 
 private:
 	std::unique_ptr<ChunkRenderer> _chunkRenderer;
-	std::unique_ptr<Shader> _shader;
 	std::unique_ptr<WorldGenerator> _generator;
 	std::unique_ptr<Cubemap> _cubemap;
 	std::unique_ptr<Shader> _cubemapShader;

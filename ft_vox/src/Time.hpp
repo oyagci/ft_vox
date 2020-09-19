@@ -21,7 +21,7 @@ namespace lazy {
 		public:
 			void update()
 			{
-				float currentFrame = glfwGetTime();
+				float currentFrame = (float)glfwGetTime();
 
 				_deltaTime = currentFrame - _lastFrame;
 				_lastFrame = currentFrame;

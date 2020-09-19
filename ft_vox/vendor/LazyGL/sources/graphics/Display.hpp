@@ -17,7 +17,7 @@ namespace lazy
 			int 		width;
 			int 		height;
 			bool		resized;
-			glm::vec2	screenSize;
+			glm::ivec2	screenSize;
 			int			refreshRate;
 			bool		isFullscreen;
 

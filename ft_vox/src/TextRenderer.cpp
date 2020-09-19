@@ -4,7 +4,7 @@
 
 using namespace anchor;
 
-TextRenderer::TextRenderer(float width, float height)
+TextRenderer::TextRenderer(int width, int height)
 {
 	_width = width;
 	_height = height;

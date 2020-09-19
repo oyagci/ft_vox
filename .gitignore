@@ -89,3 +89,12 @@ tags
 
 build/
 compile_commands.json
+
+bin
+bin-int
+obj
+*.vcxproj.*
+*.sln
+Makefile
+.vs
+*.vcxproj

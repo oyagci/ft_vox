@@ -22,7 +22,7 @@ private:
 		CHANGE_SCENE,
 	};
 public:
-	UI(float width, float height);
+	UI(int width, int height);
 
 	void update();
 	void render();
@@ -46,7 +46,13 @@ private:
 
 	template<class T,
 	typename = std::enable_if_t<std::is_base_of<IUIScene, T>::value>>
-	bool loadScene(std::string const &name);
+	bool loadScene(std::string const &name)
+	{
+		std::shared_ptr<T> scene = std::make_shared<T>(this, _size);
+		_scenes[name] = scene;
+
+		return true;
+	}
 
 	void renderScene(IUIScene &scene);
 

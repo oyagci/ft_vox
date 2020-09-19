@@ -6,7 +6,7 @@
 class Label : public ASceneComponent
 {
 public:
-	Label(IUIScene *scene) : ASceneComponent(scene), _tr(2560.0f, 1440.0f), _scale(0.6f)
+	Label(IUIScene *scene) : ASceneComponent(scene), _tr(2560, 1440), _scale(0.6f)
 	{}
 
 	void draw(Shader &shader) override

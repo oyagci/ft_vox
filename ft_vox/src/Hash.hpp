@@ -16,8 +16,8 @@ namespace std {
 	{
 		std::size_t operator()(const glm::ivec2 &v) const
 		{
-			return (hash<float>()(v.x)
-					^ ((hash<float>()(v.y) << 1) >> 1));
+			return (hash<int>()(v.x)
+					^ ((hash<int>()(v.y) << 1) >> 1));
 		}
 	};
 
@@ -26,9 +26,9 @@ namespace std {
 	{
 		std::size_t operator()(const glm::ivec3 &v) const
 		{
-			return (hash<float>()(v.x)
-					^ ((hash<float>()(v.y) << 1) >> 1)
-					^ ((hash<float>()(v.z) << 2) >> 2));
+			return (hash<int>()(v.x)
+					^ ((hash<int>()(v.y) << 1) >> 1)
+					^ ((hash<int>()(v.z) << 2) >> 2));
 		}
 	};
 }

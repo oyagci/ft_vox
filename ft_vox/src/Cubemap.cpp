@@ -30,7 +30,7 @@ void Cubemap::setupTexture()
 		if (!data) {
 			std::cerr << "WARNING::CUBEMAP::INIT::IMAGE_NOT_FOUND " << paths[i] << std::endl;
 		}
-		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB,
+		glTexImage2D((GLenum)(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i), 0, GL_RGB,
 			w, h, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
 		stbi_image_free(data);
 	}

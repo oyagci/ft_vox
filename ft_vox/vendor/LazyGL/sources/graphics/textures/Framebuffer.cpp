@@ -65,7 +65,7 @@ void Framebuffer::genColorTexture(GLuint internalFormat, GLint format, GLuint ty
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrapMode);
     }
     glBindTexture(GL_TEXTURE_2D, 0);
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + _cbos.size(), GL_TEXTURE_2D, cbo, 0);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, (GLenum)(GL_COLOR_ATTACHMENT0 + _cbos.size()), GL_TEXTURE_2D, cbo, 0);
     this->unbind();
 
     _cbos.emplace_back(cbo);
@@ -92,7 +92,7 @@ void Framebuffer::genDepthTexture(GLuint filterMode, GLuint wrapMode)
 void Framebuffer::drawBuffers(std::vector<GLenum> attachments)
 {
     this->bind();
-    glDrawBuffers(attachments.size(), attachments.data());
+    glDrawBuffers((GLsizei)(attachments.size()), attachments.data());
     this->unbind();
 }
 

@@ -51,10 +51,10 @@ void ChunkRenderer::render(Camera &camera, Shader &shader)
 		}
 	}
 //	glEnable(GL_BLEND);
-	tr.drawText(std::to_string(n) +
-		" Visible Chunks (" +
-		std::to_string(_chunkMap.size()) + " total)",
-		.3f, glm::vec3(1.0f, 1.0f, 1.0f));
+//	tr.drawText(std::to_string(n) +
+//		" Visible Chunks (" +
+//		std::to_string(_chunkMap.size()) + " total)",
+//		.3f, glm::vec3(1.0f, 1.0f, 1.0f));
 //	glDisable(GL_BLEND);
 }
 

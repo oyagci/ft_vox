@@ -9,12 +9,14 @@ namespace lazy
 {
 	namespace graphics
 	{
-		Shader::Shader()
+		Shader::Shader() : program(0)
 		{}
 
 		Shader::~Shader()
 		{
-			glDeleteProgram(program);
+			if (program > 0) {
+				glDeleteProgram(program);
+			}
 		}
 
 		GLuint Shader::createShader(const char *sources, GLenum type)

@@ -38,6 +38,9 @@ namespace lazy
 			Shader();
 			~Shader();
 
+			Shader &operator=(Shader const &) = delete;
+			Shader(Shader const &) = delete;
+
 			Shader &addVertexShader(const std::string &path);
 			Shader &addGeometryShader(const std::string &path);
 			Shader &addTesselationShader(const std::string &path);

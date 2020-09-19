@@ -15,14 +15,6 @@ World::World(Camera &camera) : _camera(camera)
 
 	_chunkRenderer = std::make_unique<ChunkRenderer>(this);
 
-	_shader = std::make_unique<Shader>();
-	_shader->addVertexShader("shaders/basic.vs.glsl")
-		.addFragmentShader("shaders/basic.fs.glsl");
-	_shader->link();
-	_shader->bind();
-	_shader->setUniform1f("fogStart", 128.0f);
-	_shader->unbind();
-
 	_cubemap = std::make_unique<Cubemap>();
 	_cubemapShader = std::make_unique<Shader>();
 	_cubemapShader->addVertexShader("shaders/cubemap.vs.glsl")
@@ -30,15 +22,15 @@ World::World(Camera &camera) : _camera(camera)
 		.link();
 }
 
-void World::render()
+void World::render(Shader &shader)
 {
-	_shader->bind();
-	_shader->setUniform4x4f("projectionMatrix", _camera.getProjectionMatrix());
-	_shader->setUniform4x4f("viewMatrix", _camera.getViewMatrix());
-	_shader->setUniform4x4f("viewProjectionMatrix", _camera.getViewProjectionMatrix());
-	_shader->setUniform4x4f("modelMatrix", glm::mat4(1.0f));
-	_chunkRenderer->render(_camera, *_shader);
-	_shader->unbind();
+	shader.bind();
+	shader.setUniform4x4f("projectionMatrix", _camera.getProjectionMatrix());
+	shader.setUniform4x4f("viewMatrix", _camera.getViewMatrix());
+	shader.setUniform4x4f("viewProjectionMatrix", _camera.getViewProjectionMatrix());
+	shader.setUniform4x4f("modelMatrix", glm::mat4(1.0f));
+	_chunkRenderer->render(_camera, shader);
+	shader.unbind();
 
 	glm::mat4 cubemapView = glm::mat4(glm::mat3(_camera.getViewMatrix()));
 	_cubemapShader->bind();

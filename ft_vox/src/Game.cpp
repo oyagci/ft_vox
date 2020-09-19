@@ -31,6 +31,27 @@ Game::Game()
 	_ui->registerFunc("playSingleplayer", [this] { onStartPlaying(); });
 	_ui->registerFunc("quitGame", [this] { onExit(); });
 
+	_gBuffer = std::make_unique<GBuffer>();
+	_gBuffer->shader().bind();
+	_gBuffer->shader().setUniform1f("fogStart", 128.0f);
+	_gBuffer->shader().unbind();
+
+	_finalDrawShader = std::make_unique<lazy::graphics::Shader>();
+	_finalDrawShader->addVertexShader("shaders/final.vs.glsl")
+		.addFragmentShader("shaders/final.fs.glsl")
+		.link();
+	_finalDrawShader->bind();
+		_finalDrawShader->setUniform1i("colorTexture", 0);
+		_finalDrawShader->setUniform1i("positionTexture", 1);
+		_finalDrawShader->setUniform1i("normalTexture", 2);
+		_finalDrawShader->setUniform1i("depthTexture", 3);
+		_finalDrawShader->setUniform1i("ssaoTexture", 4);
+	_finalDrawShader->unbind();
+
+	_renderQuad = std::make_unique<Quad>();
+
+	_ssao = std::make_unique<AmbientOcclusion>();
+
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glDepthFunc(GL_LEQUAL);
@@ -61,10 +82,6 @@ int Game::run()
 				break ;
 			case PLAYING:
 				play();
-				glDisable(GL_CULL_FACE);
-				BlockTargeting::get().update(_camera->getPosition(), _camera->getTransform().forward());
-				BlockTargeting::get().draw();
-				glEnable(GL_CULL_FACE);
 				break ;
 			case PAUSED:
 				break ;
@@ -74,7 +91,6 @@ int Game::run()
 
 		_ui->update();
 		_ui->render();
-
 	}
 
 	return EXIT_SUCCESS;
@@ -137,12 +153,68 @@ void Game::play()
 		}
 	}
 
-	glDisable(GL_BLEND);
-	_world->update();
-	_world->render();
-	glEnable(GL_BLEND);
+	glClearColor(1.0f, 0.0f, 1.0f, 1.0f);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-//	_textRenderer->drawText(std::to_string(_fpsCounter->getFPS()) + " FPS", 0.5f, glm::vec3(1.0f));
+	// G-buffer pass
+	{
+		_gBuffer->shader().bind();
+		_gBuffer->shader().setUniform4x4f("projectionMatrix", _camera->getProjectionMatrix());
+		_gBuffer->shader().setUniform4x4f("viewMatrix", _camera->getViewMatrix());
+		_gBuffer->shader().setUniform4x4f("viewProjectionMatrix", _camera->getViewProjectionMatrix());
+		_gBuffer->shader().setUniform4x4f("modelMatrix", glm::mat4(1.0f));
+
+		glEnable(GL_DEPTH_TEST);
+		glBindFramebuffer(GL_FRAMEBUFFER, _gBuffer->framebuffer());
+
+		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+		{
+			glDisable(GL_BLEND);
+			_world->update();
+			_world->render(_gBuffer->shader());
+			glEnable(GL_BLEND);
+		}
+
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		_gBuffer->shader().unbind();
+	}
+
+	_ssao->render(_camera->getProjectionMatrix(), _gBuffer->positionTex(), _gBuffer->normalTex());
+
+	// Post-Process and final draw
+	{
+		glDisable(GL_DEPTH_TEST);
+
+		_finalDrawShader->bind();
+		_finalDrawShader->setUniform4x4f("projectionMatrix", _camera->getProjectionMatrix());
+
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, _gBuffer->colorTex());
+
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, _gBuffer->positionTex());
+
+		glActiveTexture(GL_TEXTURE2);
+		glBindTexture(GL_TEXTURE_2D, _gBuffer->normalTex());
+
+		glActiveTexture(GL_TEXTURE3);
+		glBindTexture(GL_TEXTURE_2D, _gBuffer->depthTex());
+
+		glActiveTexture(GL_TEXTURE4);
+		glBindTexture(GL_TEXTURE_2D, _ssao->ssaoTexture());
+
+		glClearColor(1.0f, 0.0f, 0.0f, 1.0f);
+		glClear(GL_COLOR_BUFFER_BIT);
+
+		_renderQuad->draw();
+	}
+
+	glDisable(GL_CULL_FACE);
+	BlockTargeting::get().update(_camera->getPosition(), _camera->getTransform().forward());
+	BlockTargeting::get().draw();
+	glEnable(GL_CULL_FACE);
 }
 
 void Game::mainMenu()
