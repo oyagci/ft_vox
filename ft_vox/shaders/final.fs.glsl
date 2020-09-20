@@ -34,5 +34,28 @@ void main()
 	float fogAmount = calc_fog(fogStart, fogStart + 128.0);
 	color = (1.0 - fogAmount) * fogColor + fogAmount * color;
 
+	const vec2 size = textureSize(colorTexture, 0);
+	const float crosshairLength = 8.0;
+	const float crosshairWidth = 1.0;
+
+	// This will be either 0 or 1
+	int crosshair = int(
+	   (TexCoords.x * size.x >= (size.x / 2.0) - crosshairLength &&
+		TexCoords.x * size.x <= (size.x / 2.0) + crosshairLength &&
+		TexCoords.y * size.y >= (size.y / 2.0) - crosshairWidth &&
+		TexCoords.y * size.y <= (size.y / 2.0) + crosshairWidth)
+			||
+	   (TexCoords.x * size.x >= (size.x / 2.0) - crosshairWidth &&
+		TexCoords.x * size.x <= (size.x / 2.0) + crosshairWidth &&
+		TexCoords.y * size.y >= (size.y / 2.0) - crosshairLength &&
+		TexCoords.y * size.y <= (size.y / 2.0) + crosshairLength)
+	);
+
+	// Branchless condition:
+	// If crosshair == 1 then set crosshair color
+	// Else keep original color
+	color = (crosshair * (1.0 - color + 0.1)) +
+			(1.0 - crosshair) * color;
+
 	frag_color = vec4(color, 1.0f);
 }
