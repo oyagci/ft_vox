@@ -5,6 +5,8 @@
 #include <glm/vec2.hpp>
 #include <optional>
 #include <ostream>
+#include <vector>
+#include <algorithm>
 
 template <typename ElemType>
 class RegionNode
@@ -122,7 +124,7 @@ public:
 
 	std::vector<ElemType> query(glm::vec2 const &position) const
 	{
-		std::vector<RegionNodeType::Elem> elements;
+		std::vector<typename RegionNodeType::Elem> elements;
 
 		for (auto const &r : _RegionNodes) {
 			if (r.boundary().contains(position)) {
@@ -146,7 +148,7 @@ public:
 
 	std::vector<ElemType> query(AxisAlignedBoundingBox2D const &boundary) const
 	{
-		std::vector<RegionNodeType::Elem> elements;
+		std::vector<typename RegionNodeType::Elem> elements;
 
 		for (auto const &r : _RegionNodes) {
 			if (boundary.contains(r.boundary())) {
@@ -162,7 +164,7 @@ public:
 
 	std::vector<ElemType> queryOutside(AxisAlignedBoundingBox2D const &boundary) const
 	{
-		std::vector<RegionNodeType::Elem> elements;
+		std::vector<typename RegionNodeType::Elem> elements;
 
 		for (auto const &r : _RegionNodes) {
 			if (!r.boundary().contains(boundary)) {

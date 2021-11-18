@@ -1,5 +1,3 @@
-#pragma once
-
 #include "ThreadPool.hpp"
 
 ThreadPool::ThreadPool(size_t nThreads) : _Stop(false)
